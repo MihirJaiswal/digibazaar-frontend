@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String     @id @default(uuid())
+  username    String     @unique
+  email       String     @unique
+  password    String
+  img         String?
+  country     String
+  phone       String?
+  desc        String?
+  isSeller    Boolean    @default(false)
+  badges      Json?      // List of badges ["Top Rated", "Fast Responder"]
+  socialLinks Json?      // Social media links
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  products    Product[]
+  gigs        Gig[]
+  orders      Order[]    @relation("BuyerOrders")
+  soldOrders  Order[]    @relation("SellerOrders")
+  messages    Message[]
+  reviews     Review[]
+  likes       Like[]
+  comments    Comment[]
+  bookmarks   Bookmark[]
+  conversationsAsSeller Conversation[] @relation("SellerConversations")
+  conversationsAsBuyer  Conversation[] @relation("BuyerConversations")
+}
+
+model Gig {
+  id             String   @id @default(uuid())
+  userId         String
+  title          String
+  desc           String
+  totalStars     Int      @default(0)
+  starNumber     Int      @default(0)
+  categoryId     String
+  price          Int
+  cover          String
+  images         Json
+  shortTitle     String
+  shortDesc      String
+  deliveryTime   Int
+  revisionNumber Int
+  features       Json
+  sales          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  user      User      @relation(fields: [userId], references: [id])
+  category  Category  @relation(fields: [categoryId], references: [id])
+  orders    Order[]
+  reviews   Review[]
+  likes     Like[]
+  comments  Comment[]
+}
+
+model Order {
+  id            String   @id @default(uuid())
+  gigId         String
+  sellerId      String
+  buyerId       String
+  price         Int
+  img           String?
+  title         String
+  isCompleted   Boolean  @default(false)
+  paymentIntent String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  gig    Gig   @relation(fields: [gigId], references: [id])
+  seller User  @relation(fields: [sellerId], references: [id], name: "SellerOrders")
+  buyer  User  @relation(fields: [buyerId], references: [id], name: "BuyerOrders")
+}
+
+model Conversation {
+  id           String   @id @default(uuid())
+  sellerId     String
+  buyerId      String
+  readBySeller Boolean  @default(false)
+  readByBuyer  Boolean  @default(false)
+  lastMessage  String?  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  seller User @relation(fields: [sellerId], references: [id], name: "SellerConversations")
+  buyer  User @relation(fields: [buyerId], references: [id], name: "BuyerConversations")
+  messages Message[]
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String
+  userId         String
+  desc           String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  gigId     String
+  userId    String
+  star      Int      
+  desc      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  gig  Gig  @relation(fields: [gigId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String
+  gigId     String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+  gig  Gig  @relation(fields: [gigId], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  gigId     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+  gig  Gig  @relation(fields: [gigId], references: [id])
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  gigId     String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  // Relations
+  gigs        Gig[]
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id          String   @id @default(uuid())
+  name        String
+  categoryId  String
+  createdAt   DateTime @default(now())
+
+  // Relations
+  category Category @relation(fields: [categoryId], references: [id])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  title       String
+  price       Int
+  description String
+  summary     Json
+  images      Json
+  tags        Json
+  licenseType String
+  formats     Json
+  productFile String
+  userId      String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id])
+}
