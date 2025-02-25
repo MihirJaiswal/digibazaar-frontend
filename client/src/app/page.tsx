@@ -35,7 +35,7 @@ const featuredProjects = [
 export default function Home() {
   return (
     <>
-    {/* <Header/> */}
+    <Header/>
     <div className="py-6 px-3 lg:px-16 dark:bg-gray-950 dark:text-gray-100">
       {/* Hero Section */}
       <section className="py-16 px-4 text-center">
