@@ -5,16 +5,19 @@ import { useState } from "react"
 import { useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { useRouter } from "next/navigation";
 
 interface CommentReplyFormProps {
   onSubmit: (content: string) => void
   onCancel: () => void
   initialContent?: string
+  user: any
 }
 
-export function CommentReplyForm({ onSubmit, onCancel, initialContent = "" }: CommentReplyFormProps) {
+export function CommentReplyForm({ onSubmit, onCancel, initialContent = "", user }: CommentReplyFormProps) {
   const [content, setContent] = useState(initialContent)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const router = useRouter();
 
   useEffect(() => {
     // Focus the textarea when the component mounts
@@ -26,6 +29,10 @@ export function CommentReplyForm({ onSubmit, onCancel, initialContent = "" }: Co
       onSubmit(content)
       setContent("")
     }
+  }
+
+  const takeToLogin = () => {
+    router.push("/auth/login");
   }
 
   return (
@@ -41,7 +48,7 @@ export function CommentReplyForm({ onSubmit, onCancel, initialContent = "" }: Co
         <Button variant="outline" size="sm" onClick={onCancel}>
           Cancel
         </Button>
-        <Button size="sm" onClick={handleSubmit}>
+        <Button size="sm" onClick={user ? handleSubmit : takeToLogin}>
           Reply
         </Button>
       </div>

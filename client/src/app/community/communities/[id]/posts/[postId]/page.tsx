@@ -65,6 +65,7 @@ export default function PostPage() {
       fetchData();
     }
   }, [postId, token, user]);
+  
 
   async function handleLike() {
     try {
@@ -96,6 +97,10 @@ export default function PostPage() {
       toast.error("Failed to unlike post");
       console.error("Error unliking post:", error);
     }
+  }
+
+  const takeToLogin = () => {
+    router.push("/auth/login");
   }
 
   if (loading) {
@@ -134,7 +139,7 @@ export default function PostPage() {
               variant="ghost"
               size="icon"
               className={`rounded-full h-8 w-8 ${likedByUser ? "bg-blue-500" : ""}`}
-              onClick={handleLike}
+              onClick={user ? handleLike : takeToLogin}
               disabled={likedByUser}
             >
               <ArrowUpIcon className="h-4 w-4" />
@@ -145,7 +150,7 @@ export default function PostPage() {
               variant="ghost"
               size="icon"
               className="rounded-full h-8 w-8"
-              onClick={handleUnlike}
+              onClick={user ? handleUnlike : takeToLogin}
               disabled={!likedByUser}
             >
               <ArrowDownIcon className="h-4 w-4" />

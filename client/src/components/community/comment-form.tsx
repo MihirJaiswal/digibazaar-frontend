@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
 
 interface CommentFormProps {
   postId: string;
@@ -18,6 +19,7 @@ export function CommentForm({ postId, onCommentAdded }: CommentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const token = useAuthStore((state) => state.token);
   const user = useAuthStore((state) => state.user);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,12 +49,15 @@ export function CommentForm({ postId, onCommentAdded }: CommentFormProps) {
         onCommentAdded(comment);
       }
     } catch (error) {
-      toast.error("Failed to add comment");
-      console.error("Error adding comment:", error);
+      toast.error( !user ? "Failed to add comment" : "Please login to add a comment");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const takeToLogin = () => {
+    router.push("/auth/login");
+  }
 
   return (
     <Card>
@@ -66,7 +71,7 @@ export function CommentForm({ postId, onCommentAdded }: CommentFormProps) {
           />
         </CardContent>
         <CardFooter className="flex justify-end px-4 py-3 border-t">
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} onClick={user ? handleSubmit : takeToLogin}>
             {isSubmitting ? "Submitting..." : "Comment"}
           </Button>
         </CardFooter>

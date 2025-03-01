@@ -11,6 +11,7 @@ import { formatDistanceToNow } from "date-fns"
 import axios from "axios"
 import { useAuthStore } from "@/store/authStore"
 import { CommentReplyForm } from "@/components/community/comment-reply-form"
+import { useRouter } from "next/navigation";
 
 interface Comment {
   id: string
@@ -22,7 +23,7 @@ interface Comment {
   parentId: string | null
   upvotes?: number
   liked?: boolean
-  author?: {
+  user?: {
     username: string
   }
   replies?: Comment[]
@@ -39,27 +40,22 @@ export function CommentList({ postId }: CommentListProps) {
   const [comments, setComments] = useState<Comment[]>([])
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [commentTree, setCommentTree] = useState<Comment[]>([])
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchComments() {
-      if (!token) {
-        console.error("No authentication token found.")
-        return
-      }
-
       try {
         console.log("Fetching comments:", `http://localhost:8800/api/community-comments/${postId}/comments`)
         const response = await axios.get(`http://localhost:8800/api/community-comments/${postId}/comments`, {
           withCredentials: true,
-          headers: { Authorization: `Bearer ${token}` },
         })
+
 
         // Fetch likes for each comment
         const commentsWithLikes = await Promise.all(
           response.data.map(async (comment: Comment) => {
             const likesResponse = await axios.get(`http://localhost:8800/api/community-comments/${comment.id}/likes`, {
               withCredentials: true,
-              headers: { Authorization: `Bearer ${token}` },
             })
             return {
               ...comment,
@@ -153,6 +149,11 @@ export function CommentList({ postId }: CommentListProps) {
     }
   }
 
+
+  const takeToLogin = () => {
+    router.push("/auth/login");
+  }
+
   const handleLike = async (commentId: string) => {
     if (!token) {
       console.error("No authentication token found.")
@@ -217,12 +218,12 @@ export function CommentList({ postId }: CommentListProps) {
           <CardContent className="p-4">
             <div className="flex gap-4">
               <Avatar className="h-10 w-10">
-                <AvatarImage src="/placeholder-user.jpg" alt={comment.author?.username} />
-                <AvatarFallback>{comment.author?.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+                <AvatarImage src="/placeholder-user.jpg" alt={comment.user?.username} />
+                <AvatarFallback>{comment.user?.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium">{comment.author?.username || "Anonymous"}</span>
+                  <span className="font-medium">{comment.user?.username || "Anonymos"}</span>
                   <span className="text-xs text-muted-foreground">
                     {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                   </span>
@@ -235,6 +236,7 @@ export function CommentList({ postId }: CommentListProps) {
               <CommentReplyForm
                 onSubmit={(content) => handleSubmitReply(comment.id, content)}
                 onCancel={() => setReplyingTo(null)}
+                user={user}
               />
             )}
           </CardContent>
@@ -243,7 +245,7 @@ export function CommentList({ postId }: CommentListProps) {
               variant="ghost"
               size="icon"
               className="h-8 w-8 rounded-full"
-              onClick={() => handleLike(comment.id)}
+              onClick={user ? () => handleLike(comment.id) : takeToLogin}
               disabled={comment.liked}
             >
               <ArrowUpIcon className="h-4 w-4" />
@@ -253,7 +255,7 @@ export function CommentList({ postId }: CommentListProps) {
               variant="ghost"
               size="icon"
               className="h-8 w-8 rounded-full"
-              onClick={() => handleUnlike(comment.id)}
+              onClick={user ? () => handleUnlike(comment.id) : takeToLogin}
               disabled={!comment.liked}
             >
               <ArrowDownIcon className="h-4 w-4" />

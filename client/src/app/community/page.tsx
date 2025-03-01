@@ -1,5 +1,4 @@
 import { CommunityList } from "@/components/community/community-list"
-import { FeaturedPosts } from "@/components/community/featured-posts"
 import Header from "@/components/global/Header"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
