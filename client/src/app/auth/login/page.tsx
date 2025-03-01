@@ -1,8 +1,9 @@
-import LoginForm from '@/components/LoginForm';
-
+import LoginForm from '@/components/global/LoginForm';
+import Header from '@/components/global/Header';
 export default function LoginPage() {
   return (
-    <div className="container mx-auto max-w-md mt-10">
+    <div>
+      <Header/>
       <LoginForm/>
     </div>
   );

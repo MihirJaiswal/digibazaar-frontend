@@ -1,9 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import ProjectGrid from "@/components/Project";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import ProjectGrid from "@/components/home/Project";
+import Header from "@/components/global/Header";
+import Footer from "@/components/global/Footer";
   
 const featuredProjects = [
   {

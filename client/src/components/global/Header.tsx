@@ -6,10 +6,13 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const { user, logout } = useAuthStore(); // ✅ Using Zustand store
+  console.log("Auth store in Header:", useAuthStore.getState());
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     try {
@@ -27,7 +30,7 @@ export default function Header() {
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white">
-          FiverrClone
+          DigiBazar
         </Link>
 
         {/* Desktop Navigation */}
@@ -61,10 +64,10 @@ export default function Header() {
           ) : (
             <>
               <Link href="/auth/login">
-                <Button variant="outline">Login</Button>
+                <Button variant="outline" disabled={pathname === "/auth/login"}>Login</Button>
               </Link>
               <Link href="/auth/signup">
-                <Button>Sign Up</Button>
+                <Button disabled={pathname === "/auth/signup"}>Sign Up</Button>
               </Link>
             </>
           )}
@@ -128,12 +131,14 @@ export default function Header() {
                 ) : (
                   <>
                     <Link href="/auth/login">
-                      <Button variant="outline" className="w-full">
+                      <Button variant="outline" className="w-full" disabled={pathname === "/auth/login"}>
                         Login
                       </Button>
                     </Link>
                     <Link href="/auth/signup">
-                      <Button className="w-full">Sign Up</Button>
+                      <Button className="w-full" disabled={pathname === "/auth/signup"}>
+                        Sign Up
+                      </Button>
                     </Link>
                   </>
                 )}

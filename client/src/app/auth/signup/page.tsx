@@ -1,8 +1,10 @@
-import SignupForm from '@/components/SignupForm';
+import SignupForm from '@/components/global/SignupForm';
+import Header from '@/components/global/Header';
 
 export default function SignupPage() {
   return (
-    <div className="container mx-auto max-w-md mt-10">
+    <div>
+      <Header/>
       <SignupForm/>
     </div>
   );
