@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/store/authStore";
 import { CommentList } from "@/components/community/comment-list";
 import { CommentForm } from "@/components/community/comment-form";
+import Header from "@/components/global/Header";
+import Sidebar from "@/components/community/Sidebar";
 export default function PostPage() {
   const { id: communityId, postId } = useParams();
   const router = useRouter();
@@ -105,26 +107,43 @@ export default function PostPage() {
 
   if (loading) {
     return (
-      <div className="container py-6 space-y-6">
+      <>
+      <Header/>
+      <div className="flex">
+        <Sidebar/>
+        <div className="container py-6 space-y-6 flex-1">
         <Skeleton className="h-8 w-40" />
         <Skeleton className="h-60 w-full" />
         <Skeleton className="h-40 w-full" />
       </div>
+      </div>
+      </>
     );
   }
 
   if (!post) {
     return (
-      <div className="container py-10 text-center">
+      <>
+      <Header/>
+      <div className="flex">
+        <Sidebar/>
+        <div className="container py-10 text-center">
         <h1 className="text-2xl font-bold mb-4">Post not found</h1>
         <p className="mb-6">The post you're looking for doesn't exist or has been removed.</p>
         <Button onClick={() => router.push(`/communities/${communityId}`)}>Back to Community</Button>
       </div>
+      </div>
+      </>
     );
   }
 
   return (
-    <div className="container py-6 space-y-6 max-w-4xl">
+    <>
+    <Header/>
+    <div className="flex">
+      <Sidebar/>
+      <div className="flex-1 p-6">
+      <div className="container py-6 space-y-6 max-w-4xl">
       <Button variant="ghost" asChild className="mb-4">
         <Link href={`/community/communities/${communityId}`}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to r/{post.community?.name}
@@ -132,7 +151,7 @@ export default function PostPage() {
       </Button>
 
       <Card>
-        <div className="flex">
+        <div className="flex w-full mx-auto">
           <div className="flex flex-col items-center p-4 bg-muted/30 rounded-l-lg">
             {/* Upvote button: Blue and disabled if liked */}
             <Button
@@ -188,5 +207,8 @@ export default function PostPage() {
       <CommentForm postId={postId as string} />
       <CommentList postId={postId as string} />
     </div>
+    </div>
+    </div>
+    </>
   );
 }

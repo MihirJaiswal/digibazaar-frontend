@@ -1,42 +1,35 @@
-import { CommunityList } from "@/components/community/community-list"
-import Header from "@/components/global/Header"
-import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
-import Link from "next/link"
+"use client";
 
-export default function Home() {
+import { usePathname } from "next/navigation";
+import Sidebar from "@/components/community/Sidebar";
+import { CommunityList } from "@/components/community/community-list";
+import Posts from "@/components/community/AllPost";
+import UserPosts from "@/components/community/UserPost";
+import UserCommunities from "@/components/community/UserCommunities";
+import { useAuthStore } from "@/store/authStore";
+import Header from "@/components/global/Header";
+
+const MainPage = () => {
+  const { user } = useAuthStore();
+  const pathname = usePathname(); // ✅ Detect current route
+
   return (
-    <div className="max-w-7xl mx-auto">
-      <section className="space-y-4">
-        <div className="text-center space-y-2 py-10">
-          <h1 className="text-4xl font-bold tracking-tight">Welcome to Redditly</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Join our communities, share your thoughts, and discover interesting content from people around the world.
-          </p>
-          <div className="flex justify-center gap-4 mt-6">
-            <Button asChild>
-              <Link href="/communities">
-                Browse Communities <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/auth/register">Create Account</Link>
-            </Button>
-          </div>
+    <>
+      <Header />
+      <div className="flex">
+        {/* ✅ Sidebar with Navigation */}
+        <Sidebar />
+
+        {/* ✅ Dynamic Content Based on Route */}
+        <div className="flex-1 p-6">
+          {pathname === "/community" && <CommunityList />}
+          {pathname === "/community/posts" && <Posts />}
+          {user && pathname === "/community/user/posts" && <UserPosts />}
+          {user && pathname === "/community/user/communities" && <UserCommunities />}
         </div>
-      </section>
+      </div>
+    </>
+  );
+};
 
-
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold tracking-tight">Popular Communities</h2>
-          <Button variant="link" asChild>
-            <Link href="/communities">View All</Link>
-          </Button>
-        </div>
-        <CommunityList />
-      </section>
-    </div>
-  )
-}
-
+export default MainPage;
