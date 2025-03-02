@@ -101,6 +101,7 @@ export function CommentList({ postId }: CommentListProps) {
             parentComment.replies = []
           }
           parentComment.replies.push(commentWithReplies)
+          parentComment.replies.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         } else {
           // If parent doesn't exist (shouldn't happen), add as root
           rootComments.push(commentWithReplies)
