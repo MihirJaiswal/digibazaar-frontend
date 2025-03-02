@@ -170,6 +170,15 @@ export default function Posts() {
                   <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
                 </CardDescription>
               </CardHeader>
+              {post.image && (
+                <CardContent>
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="max-h-80 w-full object-cover rounded-md"
+                  />
+                </CardContent>
+              )}
               <CardContent>
                 <p className="line-clamp-3 text-sm text-muted-foreground">{post.content}</p>
               </CardContent>

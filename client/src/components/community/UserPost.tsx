@@ -180,6 +180,15 @@ export default function UserPosts() {
                   </Link>
                 </CardTitle>
               </CardHeader>
+              {post.image && (
+                <CardContent>
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="max-h-80 w-full object-cover rounded-md"
+                  />
+                </CardContent>
+              )}
               <CardContent>
                 <p className="line-clamp-3 text-sm text-muted-foreground">{post.content}</p>
               </CardContent>

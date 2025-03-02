@@ -188,6 +188,16 @@ export default function PostPage() {
               </CardDescription>
               <CardTitle className="text-lg">{post.title}</CardTitle>
             </CardHeader>
+            {post.image && (
+              <CardContent>
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="max-h-80 w-full object-cover rounded-md"
+                />
+              </CardContent>
+            )}
+            
             <CardContent>
               <p className="prose dark:prose-invert max-w-none">{post.content}</p>
             </CardContent>

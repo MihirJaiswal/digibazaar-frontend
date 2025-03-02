@@ -189,29 +189,35 @@ export function PostList({ posts }: PostListProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {post.type === "image" && post.url && (
-                  <div className="mb-4">
-                    <img
-                      src={post.url || "/placeholder.svg"}
-                      alt={post.title}
-                      className="max-h-60 object-contain rounded-md"
-                    />
-                  </div>
-                )}
-                {post.type === "link" && post.url && (
-                  <div className="mb-4">
-                    <a
-                      href={post.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline break-all"
-                    >
-                      {post.url}
-                    </a>
-                  </div>
-                )}
-                <p className="line-clamp-3 text-sm text-muted-foreground">{post.content}</p>
-              </CardContent>
+              {/* 🖼️ Show Image if Available */}
+              {post.image && post.image.trim() !== "" && (
+                <div className="mb-4">
+                  <img
+                    src={post.image}  // ✅ Correctly uses `post.image`
+                    alt={post.title}
+                    className="max-h-80 w-full object-cover rounded-md"
+                  />
+                </div>
+              )}
+
+              {/* 🌐 Show Link Preview if it's a Link Post */}
+              {post.link && post.link.trim() !== "" && (
+                <div className="mb-4">
+                  <a
+                    href={post.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline break-all"
+                  >
+                    {post.link}
+                  </a>
+                </div>
+              )}
+
+              {/* 📝 Show Post Content */}
+              <p className="line-clamp-3 text-sm text-muted-foreground">{post.content}</p>
+            </CardContent>
+
               <CardFooter className="flex gap-4">
               <Button variant="ghost" size="sm" asChild className="gap-2">
                   <Link href={`/community/communities/${post.communityId}/posts/${post.id}`}>

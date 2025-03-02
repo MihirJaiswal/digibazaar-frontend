@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthStore } from "@/store/authStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
-import Sidebar from "@/components/community/Sidebar"; // ✅ Import Sidebar
+import Sidebar from "@/components/community/Sidebar";
 import Header from "@/components/global/Header";
 
 export default function CommunityPage() {
@@ -56,10 +56,6 @@ export default function CommunityPage() {
           <Sidebar />
           <div className="flex-1 max-w-5xl mx-auto py-6 space-y-6 px-6">
             <Skeleton className="h-40 w-full" />
-            <div className="flex gap-4">
-              <Skeleton className="h-10 w-20" />
-              <Skeleton className="h-10 w-20" />
-            </div>
             <div className="grid grid-cols-3 gap-6">
               <div className="col-span-2 space-y-4">
                 <Skeleton className="h-40 w-full" />
@@ -121,45 +117,46 @@ export default function CommunityPage() {
           {/* Community Info */}
           <CommunityInfo community={community} />
 
-          {/* Tabs & Create Post */}
-          <div className="flex justify-between items-center border-b pb-2">
-            <Tabs defaultValue="posts" className="w-full">
-              <TabsList className="flex justify-start">
-                <TabsTrigger value="posts">Posts</TabsTrigger>
-                <TabsTrigger value="about">About</TabsTrigger>
-                <TabsTrigger value="members">Members</TabsTrigger>
-              </TabsList>
-            </Tabs>
-            {user && (
-              <Button asChild className="ml-4">
-                <Link href={`/community/communities/${id}/submit`}>
-                  <Plus className="mr-2 h-4 w-4" /> Create Post
-                </Link>
-              </Button>
-            )}
-          </div>
-
-          {/* Content Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Section (Posts) */}
+          {/* ✅ Fixed Tabs - `TabsContent` is inside the same `Tabs` component */}
+          <Tabs defaultValue="posts" className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* ✅ Left Section (Posts, About, Members) */}
             <div className="lg:col-span-2">
-              <PostList posts={posts} />
-              <Tabs>
-                <TabsContent value="members" className="pt-4">
-                  <CommunityMembers communityId={id as string} />
-                </TabsContent>
-              </Tabs>
+              <div className="flex justify-between items-center border-b pb-2">
+                <TabsList className="flex justify-start">
+                  <TabsTrigger value="posts">Posts</TabsTrigger>
+                  <TabsTrigger value="about">About</TabsTrigger>
+                  <TabsTrigger value="members">Members</TabsTrigger>
+                </TabsList>
+                {user && (
+                  <Button asChild>
+                    <Link href={`/community/communities/${id}/submit`}>
+                      <Plus className="mr-2 h-4 w-4" /> Create Post
+                    </Link>
+                  </Button>
+                )}
+              </div>
+
+              <TabsContent value="posts">
+                <PostList posts={posts} />
+              </TabsContent>
+              <TabsContent value="about">
+                <Card className="border border-gray-300 rounded-lg shadow-md">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">About</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700">{community.description}</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value="members">
+                <CommunityMembers communityId={id as string} />
+              </TabsContent>
             </div>
 
-            {/* Right Section (Rules & Info) */}
+            {/* ✅ Right Section (Rules - Always Visible) */}
             <div className="lg:col-span-1 w-96">
               <Card className="border border-gray-300 rounded-lg shadow-md">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Description</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700">{community.description}</p>
-                </CardContent>
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">Community Rules</CardTitle>
                 </CardHeader>
@@ -174,7 +171,7 @@ export default function CommunityPage() {
                 </CardContent>
               </Card>
             </div>
-          </div>
+          </Tabs>
         </div>
       </div>
     </>
