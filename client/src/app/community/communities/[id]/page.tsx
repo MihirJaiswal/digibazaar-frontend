@@ -50,7 +50,7 @@ export default function CommunityPage() {
 
   if (loading) {
     return (
-      <div className="container py-6 space-y-6">
+      <div className="max-w-7xl mx-auto py-6 space-y-6">
         <Skeleton className="h-40 w-full" />
         <div className="flex gap-4">
           <Skeleton className="h-10 w-20" />
@@ -69,7 +69,7 @@ export default function CommunityPage() {
 
   if (!community) {
     return (
-      <div className="container py-10 text-center">
+      <div className="max-w-7xl mx-auto py-10 text-center">
         <h1 className="text-2xl font-bold mb-4">Community not found</h1>
         <p className="mb-6">
           The community you're looking for doesn't exist or has been removed.
@@ -82,7 +82,7 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="container py-6 space-y-6">
+    <div className="max-w-7xl mx-auto py-6 space-y-6">
       <CommunityInfo community={community} />
 
       <div className="flex justify-between items-center">

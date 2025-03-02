@@ -6,8 +6,7 @@ import Link from "next/link"
 
 export default function Home() {
   return (
-    <div>
-      <Header/>
+    <div className="max-w-7xl mx-auto">
       <section className="space-y-4">
         <div className="text-center space-y-2 py-10">
           <h1 className="text-4xl font-bold tracking-tight">Welcome to Redditly</h1>
