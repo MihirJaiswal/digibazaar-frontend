@@ -3,10 +3,10 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Clock, RefreshCw, CheckCircle, MessageSquare, Edit, Trash2, X } from "lucide-react"
+import { Clock, RefreshCw, CheckCircle, MessageSquare, Edit, Trash2, X, Package } from "lucide-react"
 import type { Gig } from "@/app/gigs/types/gig"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuthStore } from "@/store/authStore"
 import { 
   Dialog, 
@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import Link from "next/link"
 
 interface GigSidebarProps {
   gig: Gig
@@ -29,8 +30,11 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const baseApiUrl = "http://localhost:8800/api/gigs"
-  const { token } = useAuthStore()
+  const [hasOrdered, setHasOrdered] = useState(false)
+  const [orderData, setOrderData] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const baseApiUrl = "http://localhost:8800/api"
+  const { token, user } = useAuthStore()
 
   // State for form fields
   const [formData, setFormData] = useState({
@@ -47,6 +51,46 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
     year: "numeric",
     month: "long",
   })
+
+  // Check if user has already ordered this gig
+  useEffect(() => {
+    const checkOrderStatus = async () => {
+      if (!token || !user?.id) {
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        // Get all orders for the current user
+        const response = await fetch(`${baseApiUrl}/gig-orders/user/${user.id}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+          credentials: "include",
+        })
+
+        if (response.ok) {
+          const orders = await response.json()
+          // Check if any order contains this gig
+          const existingOrder = orders.find((order: any) => order.gigId === gig.id)
+          
+          if (existingOrder) {
+            setHasOrdered(true)
+            setOrderData(existingOrder)
+          }
+        } else {
+          console.error("Failed to fetch orders:", response.status)
+        }
+      } catch (error) {
+        console.error("Error checking order status:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    checkOrderStatus()
+  }, [token, user, gig.id, baseApiUrl])
 
   const handleEditGig = () => {
     setFormData({
@@ -83,7 +127,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
     setIsUpdating(true)
 
     try {
-      const response = await fetch(`${baseApiUrl}/${gig.id}`, {
+      const response = await fetch(`${baseApiUrl}/gigs/${gig.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -133,7 +177,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
     setIsDeleting(true)
 
     try {
-      const response = await fetch(`${baseApiUrl}/${gig.id}`, {
+      const response = await fetch(`${baseApiUrl}/gigs/${gig.id}`, {
         method: "DELETE",
         credentials: "include",
         headers: {
@@ -153,6 +197,20 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
       alert("Failed to delete gig. Please try again.")
     } finally {
       setIsDeleting(false)
+    }
+  }
+
+  const handleProceedToOrder = () => {
+    if (!token) {
+      router.push("/login") // Redirect to login if user is not authenticated
+    } else {
+      router.push(`/gigs/gig/${gig.id}/confirm-order`) // Redirect to order confirmation page
+    }
+  }
+
+  const handleTrackOrder = () => {
+    if (orderData) {
+      router.push(`/orders/${orderData.id}`) // Redirect to order details page
     }
   }
 
@@ -234,9 +292,37 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                 )}
               </div>
 
-              <Button className="w-full bg-primary hover:bg-primary/90 text-white mb-3">Continue (${gig.price})</Button>
+              {isLoading ? (
+                <Button disabled className="w-full bg-primary hover:bg-primary/90 text-white mb-3">
+                  Loading...
+                </Button>
+              ) : hasOrdered ? (
+                <div className="space-y-3">
+                  <Button 
+                    disabled 
+                    className="w-full bg-green-600 hover:bg-green-600 text-white mb-3"
+                  >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Ordered
+                  </Button>
+                  <Button 
+                    className="w-full" 
+                    onClick={handleTrackOrder}
+                  >
+                    <Package className="mr-2 h-4 w-4" />
+                    Track Order
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  className="w-full bg-primary hover:bg-primary/90 text-white mb-3" 
+                  onClick={handleProceedToOrder}
+                >
+                  Continue (${gig.price})
+                </Button>
+              )}
 
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full mt-3">
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Contact Seller
               </Button>
