@@ -9,19 +9,24 @@ import Link from "next/link"
 import { useAuthStore } from "@/store/authStore"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { AlertCircle, User, Mail, Lock, Image, Globe, Phone, FileText } from "lucide-react"
+import { AlertCircle, User, Mail, Lock, Image, Globe, Phone, FileText, Loader2, ArrowRight } from 'lucide-react'
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { motion, AnimatePresence } from "framer-motion"
 import axios from "axios"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
-
 export default function SignUp() {
-  const { register: registerField, handleSubmit, reset } = useForm()
+  const { register: registerField, handleSubmit, watch, reset } = useForm()
   const { user, setUser, token } = useAuthStore()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [step, setStep] = useState(1)
   const router = useRouter()
+
+  const watchedFields = watch()
 
   const onSubmit = async (data: any) => {
     setLoading(true)
@@ -31,34 +36,24 @@ export default function SignUp() {
         username: data.username,
         email: data.email,
         password: data.password,
-        profilePic: data.profilePic, // ✅ Fixed field name
+        profilePic: data.profilePic,
         country: data.country,
         phone: data.phone,
-        bio: data.desc, // ✅ Fixed field name
-        isSeller: data.isSeller === "on", // ✅ Convert string "on" to boolean
+        bio: data.desc,
+        isSeller: data.isSeller === "on",
       })
-      console.log("Registration successful", response.data)
-      console.log("Full API response:", response);
-  console.log("API response.data:", response.data);
-  // Check if user data exists and has the right structure
-  console.log("User data structure:", response.data.user);
-      setUser(response.data.user) // ✅ Update global user state
-      console.log("Auth store after update:", useAuthStore.getState());
+      
       if (response.data && !response.data.user) {
-        console.log("Setting user with direct response data");
-        setUser(response.data); // Use the data directly if there's no user property
+        setUser(response.data)
       } else {
-        console.log("Setting user with response.data.user");
-        setUser(response.data.user, response.data.token); 
+        setUser(response.data.user, response.data.token)
       }
       
-      // Check the store state again after setting
-      console.log("Auth store after proper update:", useAuthStore.getState());
-      toast.success("Account created successfully!") // ✅ Show success toas
+      toast.success("Account created successfully!")
       reset()
       setTimeout(() => {
-        router.push("/"); // ✅ Wait a bit before redirecting
-      }, 500);
+        router.push("/")
+      }, 500)
     } catch (err: any) {
       console.error("Error:", err)
       setError(err.response?.data?.message || "Something went wrong")
@@ -67,104 +62,271 @@ export default function SignUp() {
     }
   }
 
-  return (
-    <div className="flex justify-center items-center max-w-7xl mx-auto md:mt-4 md:p-6 p-2">
-      <Card className="flex flex-row w-full bg-white rounded-none overflow-hidden">
-        {/* Left Side - Image */}
-        <div className="hidden md:flex w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/signup-bg.jpg')" }}>
-          <div className="w-full h-full bg-black/40 flex items-center justify-center text-white p-6">
-            <h2 className="text-3xl font-bold text-center">Join Us Today</h2>
-          </div>
-        </div>
+  const nextStep = () => setStep(2)
+  const prevStep = () => setStep(1)
 
-        {/* Right Side - Form */}
-        <div className="w-full md:w-1/2 md:p-8 md:border border-gray-400 ">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold text-center">Create an Account</CardTitle>
-            <CardDescription className="text-center">Fill in the details below to sign up</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="username">Username</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input id="username" placeholder="johndoe" {...registerField("username", { required: true })} className="pl-10" />
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-background relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl transform rotate-12 animate-pulse" />
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-primary/10 to-transparent rounded-full blur-3xl transform -rotate-12 animate-pulse" />
+      </div>
+
+      <div className="container relative flex items-center justify-center min-h-screen py-20 px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-4xl"
+        >
+          <Card className="border-0 shadow-2xl bg-background/80 backdrop-blur-xl">
+            <div className="md:grid md:grid-cols-5 divide-x divide-border">
+              {/* Left side - Progress */}
+              <div className="col-span-2 p-6 bg-muted/30">
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-2xl font-bold">Create Account</h2>
+                    <p className="text-muted-foreground mt-1">Join our community today</p>
                   </div>
-                </div>
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input id="email" type="email" placeholder="john@example.com" {...registerField("email", { required: true })} className="pl-10" />
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Progress</span>
+                        <span className="text-primary">{step}/2</span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full bg-primary"
+                          initial={{ width: "0%" }}
+                          animate={{ width: `${(step / 2) * 100}%` }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <button
+                        onClick={() => setStep(1)}
+                        className={`w-full p-4 rounded-lg text-left transition-all ${
+                          step === 1 ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
+                            step === 1 ? 'border-primary-foreground' : 'border-muted-foreground'
+                          }`}>
+                            1
+                          </div>
+                          <div>
+                            <p className="font-medium">Account Details</p>
+                            <p className="text-sm opacity-80">Basic information</p>
+                          </div>
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => watchedFields.username && watchedFields.email && watchedFields.password && setStep(2)}
+                        className={`w-full p-4 rounded-lg text-left transition-all ${
+                          step === 2 ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
+                            step === 2 ? 'border-primary-foreground' : 'border-muted-foreground'
+                          }`}>
+                            2
+                          </div>
+                          <div>
+                            <p className="font-medium">Profile Setup</p>
+                            <p className="text-sm opacity-80">Personalize your profile</p>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <p className="text-sm">Already have an account?</p>
+                    <Link 
+                      href="/auth/login" 
+                      className="inline-flex items-center text-sm text-primary hover:text-primary/80 font-medium mt-1"
+                    >
+                      Login to your account
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
                   </div>
                 </div>
               </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input id="password" type="password" placeholder="••••••••" {...registerField("password", { required: true })} className="pl-10" />
-                </div>
+
+              {/* Right side - Form */}
+              <div className="col-span-3 p-6">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                  <AnimatePresence mode="wait">
+                    {step === 1 && (
+                      <motion.div
+                        key="step1"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-4"
+                      >
+                        <div className="space-y-2">
+                          <Label htmlFor="username">Username</Label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="username"
+                              placeholder="johndoe"
+                              {...registerField("username", { required: true })}
+                              className="pl-10"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="email"
+                              type="email"
+                              placeholder="john@example.com"
+                              {...registerField("email", { required: true })}
+                              className="pl-10"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="password">Password</Label>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="password"
+                              type="password"
+                              placeholder="••••••••"
+                              {...registerField("password", { required: true })}
+                              className="pl-10"
+                            />
+                          </div>
+                        </div>
+
+                        <Button
+                          type="button"
+                          onClick={nextStep}
+                          disabled={!watchedFields.username || !watchedFields.email || !watchedFields.password}
+                          className="w-full"
+                        >
+                          Continue
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </motion.div>
+                    )}
+
+                    {step === 2 && (
+                      <motion.div
+                        key="step2"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-4"
+                      >
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="profilePic">Profile Image URL</Label>
+                            <div className="relative">
+                              <Image className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                id="profilePic"
+                                placeholder="https://example.com/image.jpg"
+                                {...registerField("profilePic")}
+                                className="pl-10"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="country">Country</Label>
+                            <div className="relative">
+                              <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                id="country"
+                                placeholder="India"
+                                {...registerField("country", { required: true })}
+                                className="pl-10"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="phone">Phone</Label>
+                            <div className="relative">
+                              <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                id="phone"
+                                placeholder="+91 123-4567"
+                                {...registerField("phone", { required: true })}
+                                className="pl-10"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="desc">Description</Label>
+                            <div className="relative">
+                              <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                id="desc"
+                                placeholder="Tell us about yourself"
+                                {...registerField("desc")}
+                                className="pl-10"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-2 bg-muted/50 p-4 rounded-lg">
+                          <Checkbox id="isSeller" {...registerField("isSeller")} />
+                          <Label htmlFor="isSeller" className="text-sm">Register as a Seller</Label>
+                        </div>
+
+                        {error && (
+                          <Alert variant="destructive">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription>{error}</AlertDescription>
+                          </Alert>
+                        )}
+
+                        <div className="flex gap-3">
+                          <Button type="button" variant="outline" onClick={prevStep} className="flex-1">
+                            Back
+                          </Button>
+                          <Button type="submit" disabled={loading} className="flex-1">
+                            {loading ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Creating...
+                              </>
+                            ) : (
+                              "Create Account"
+                            )}
+                          </Button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </form>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="profilePic">Profile Image URL</Label>
-                  <div className="relative">
-                    <Image className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input id="profilePic" placeholder="https://example.com/image.jpg" {...registerField("profilePic")} className="pl-10" />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="country">Country</Label>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input id="country" placeholder="India" {...registerField("country", { required: true })} className="pl-10" />
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="phone">Phone</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input id="phone" placeholder="+91 123-4567" {...registerField("phone", { required: true })} className="pl-10" />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="desc">Description</Label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input id="desc" placeholder="Tell us about yourself" {...registerField("desc")} className="pl-10" />
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="isSeller" {...registerField("isSeller")} />
-                <Label htmlFor="isSeller">Register as Seller</Label>
-              </div>
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Creating Account..." : "Sign Up"}
-              </Button>
-            </form>
-          </CardContent>
-          <CardFooter className="flex justify-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="text-blue-600 hover:underline">
-                Login
-              </Link>
-            </p>
-          </CardFooter>
-        </div>
-      </Card>
+            </div>
+          </Card>
+        </motion.div>
+      </div>
     </div>
   )
 }

@@ -1,95 +1,138 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { usePathname } from "next/navigation"; // ✅ Detect active route
-import { useAuthStore } from "@/store/authStore";
-import { Home, FileText, PlusCircle, User, Settings } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { useAuthStore } from "@/store/authStore"
+import { Home, FileText, PlusCircle, Settings, Info, ShoppingBag, Heart, ChevronRight } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 const GigsSidebar = () => {
-  const { user } = useAuthStore();
-  const pathname = usePathname(); // ✅ Get current route
+  const { user } = useAuthStore()
+  const pathname = usePathname()
+
+  const navItems = [
+    { href: "/gigs", label: "Dashboard", icon: Home },
+    { href: "/gigs/gig", label: "All Gigs", icon: FileText },
+    ...(user
+      ? [
+          { href: "/gigs/orders", label: "Your Orders", icon: ShoppingBag },
+          { href: "/gigs/favorites", label: "Saved Gigs", icon: Heart },
+          { href: "/gigs/create-gig", label: "Create Gig", icon: PlusCircle, highlight: true },
+        ]
+      : []),
+  ]
+
+  const secondaryNavItems = [
+    { href: "/settings", label: "Settings", icon: Settings },
+    { href: "/about", label: "About", icon: Info },
+  ]
 
   return (
-    <aside className="w-72 bg-white border-r border-gray-300 p-4 h-screen shadow-md border-t shadow-gray-300 sticky top-0">
-      {/* Navigation Section */}
-      <Card className="shadow-none border-none">
-        <CardHeader className="bg-white border-b border-gray-300">
-          <CardTitle className="text-lg font-bold">Gigs Menu</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <nav className="space-y-2">
-            <Link
-              href="/gigs"
-              className={`flex items-center p-3 w-full rounded-md transition ${
-                pathname === "/gigs" ? "bg-gray-300 text-gray-900 font-semibold" : "hover:bg-gray-200"
-              }`}
+    <aside className="w-64 bg-white border-r border-neutral-200 h-screen sticky top-0 flex flex-col overflow-y-auto">
+      {/* User Profile Section */}
+      {user && (
+        <div className="p-4 border-b border-neutral-100">
+          <div className="flex items-center gap-3 mb-3">
+            <Avatar className="h-10 w-10 border border-neutral-200">
+              <AvatarImage src={user.profilePic || "/placeholder-user.svg"} alt={user.username} />
+              <AvatarFallback>{user.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+            </Avatar>
+            <div className="overflow-hidden">
+              <p className="font-medium text-neutral-900 truncate">{user.username}</p>
+              <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+            </div>
+          </div>
+          <Link href="/profile">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full text-xs justify-between border-neutral-200 text-neutral-700 font-normal"
             >
-              <Home className="w-5 h-5 mr-3" />
-              Home
-            </Link>
-            <Link
-              href="/gigs/gig"
-              className={`flex items-center p-3 w-full rounded-md transition ${
-                pathname === "/gigs/gig" ? "bg-gray-300 text-gray-900 font-semibold" : "hover:bg-gray-200"
-              }`}
-            >
-              <FileText className="w-5 h-5 mr-3" />
-              All Gigs
-            </Link>
-            {user && (
-              <>
-                <Link
-                  href="/gigs/your-gigs"
-                  className={`flex items-center p-3 w-full rounded-md transition ${
-                    pathname === "/gigs/your-gigs" ? "bg-gray-300 text-gray-900 font-semibold" : "hover:bg-gray-200"
-                  }`}
-                >
-                  <User className="w-5 h-5 mr-3" />
-                  Your Gigs
-                </Link>
-                <Link
-                  href="/gigs/create-gig"
-                  className={`flex items-center p-3 w-full rounded-md transition ${
-                    pathname === "/gigs/create-gig" ? "bg-gray-300 text-gray-900 font-semibold" : "hover:bg-gray-200"
-                  }`}
-                >
-                  <PlusCircle className="w-5 h-5 mr-3" />
-                  Create Gig
-                </Link>
-              </>
-            )}
-          </nav>
-        </CardContent>
-      </Card>
-
-      <Separator className="my-4" />
-
-      {/* Settings and About */}
-      <Card className="shadow-none border-none">
-        <CardContent>
-          <Link
-            href="/settings"
-            className={`flex items-center p-3 rounded-md transition ${
-              pathname === "/settings" ? "bg-gray-300 text-gray-900 font-semibold" : "hover:bg-gray-200"
-            }`}
-          >
-            <Settings className="w-5 h-5 mr-3" />
-            Settings
+              View Profile
+              <ChevronRight className="h-3 w-3 opacity-70" />
+            </Button>
           </Link>
-          <Link
-            href="/about"
-            className={`flex items-center p-3 rounded-md transition ${
-              pathname === "/about" ? "bg-gray-300 text-gray-900 font-semibold" : "hover:bg-gray-200"
-            }`}
-          >
-            ℹ️ About
-          </Link>
-        </CardContent>
-      </Card>
+        </div>
+      )}
+
+      {/* Main Navigation */}
+      <div className="flex-1 py-4 px-3">
+        <div className="mb-1 px-3">
+          <p className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Menu</p>
+        </div>
+        <nav className="space-y-1">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`
+                  flex items-center px-3 py-2 rounded-md text-sm group transition-colors
+                  ${isActive ? "bg-primary/10 text-primary font-medium" : "text-neutral-700 hover:bg-neutral-100"}
+                  ${item.highlight && !isActive ? "text-primary hover:bg-primary/5" : ""}
+                `}
+              >
+                <item.icon
+                  className={`w-4 h-4 mr-3 ${isActive ? "text-primary" : "text-neutral-500 group-hover:text-neutral-700"}`}
+                />
+                <span>{item.label}</span>
+                {item.highlight && !isActive && (
+                  <Badge className="ml-auto bg-primary/10 text-primary text-xs font-normal py-0.5">New</Badge>
+                )}
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* Secondary Navigation */}
+        <div className="mt-8 mb-1 px-3">
+          <p className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Support</p>
+        </div>
+        <nav className="space-y-1">
+          {secondaryNavItems.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`
+                  flex items-center px-3 py-2 rounded-md text-sm group transition-colors
+                  ${
+                    isActive
+                      ? "bg-neutral-100 text-neutral-900 font-medium"
+                      : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                  }
+                `}
+              >
+                <item.icon
+                  className={`w-4 h-4 mr-3 ${isActive ? "text-neutral-900" : "text-neutral-400 group-hover:text-neutral-700"}`}
+                />
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
+
+      {/* Footer */}
+      {!user && (
+        <div className="p-4 border-t border-neutral-200 bg-neutral-50">
+          <div className="text-center space-y-3">
+            <p className="text-sm text-neutral-600">Sign in to access all features</p>
+            <Link href="/login">
+              <Button className="w-full" size="sm">
+                Sign In
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
     </aside>
-  );
-};
+  )
+}
 
-export default GigsSidebar;
+export default GigsSidebar
+

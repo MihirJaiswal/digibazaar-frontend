@@ -7,10 +7,16 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { GigCard } from "@/components/gigs/gig-card";
-import { Pagination } from "@/components/ui/pagination";
-import { Search } from "lucide-react";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Search, Filter, X, Plus, Briefcase, ChevronDown } from 'lucide-react';
 import Header from "@/components/global/Header";
 import GigsSidebar from "@/components/gigs/GigsSidebar";
+import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
+import { DialogTitle } from "@/components/ui/dialog";
 
 interface Category {
   value: string;
@@ -67,8 +73,9 @@ export default function GigsPage() {
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [filteredGigs, setFilteredGigs] = useState<Gig[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [activeFilters, setActiveFilters] = useState<number>(0);
 
-  const itemsPerPage = 6;
+  const itemsPerPage = 9;
 
   // Fetch categories dynamically and merge with defaultCategories
   useEffect(() => {
@@ -154,126 +161,324 @@ export default function GigsPage() {
     setIsLoading(false);
   }, [searchTerm, selectedCategory, priceRange, deliveryTime, sortBy, gigs]);
 
+  // Calculate active filters
+  useEffect(() => {
+    let count = 0;
+    if (selectedCategory !== "All") count++;
+    if (priceRange[0] > 0 || priceRange[1] < 300) count++;
+    if (deliveryTime[0] !== 7) count++;
+    setActiveFilters(count);
+  }, [selectedCategory, priceRange, deliveryTime]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredGigs.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentGigs = filteredGigs.slice(startIndex, endIndex);
+
+  // Reset filters function
+  const resetFilters = () => {
+    setSelectedCategory("All");
+    setPriceRange([0, 300]);
+    setDeliveryTime([7]);
+  };
+
   return (
-    <>
+    <div className="min-h-screen bg-neutral-50">
       <Header />
-      <div className="flex min-h-screen">
+      <div className="flex">
         <GigsSidebar />
-        <main className="flex-1 container py-8 px-6 md:px-12">
+        <main className="flex-1 max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           {/* Page Title & Create Gig Button */}
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-800">Explore Gigs</h1>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">
-              <a href="/create-gig">+ Create a Gig</a>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Explore Gigs</h1>
+              <p className="text-neutral-500 mt-1">Find the perfect services for your project</p>
+            </div>
+            <Button className="bg-primary hover:bg-primary/90 text-white shadow-sm flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              <a href="/create-gig">Create a Gig</a>
             </Button>
           </div>
 
           {/* Search and Sorting */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6 bg-white p-4 rounded-md shadow-sm">
-            <div className="relative flex-grow">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                type="search"
-                placeholder="Search gigs..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 transition-all"
-              />
-            </div>
+          <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                <Input
+                  type="search"
+                  placeholder="Search for services..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 border-neutral-300 focus-visible:ring-primary"
+                />
+              </div>
 
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px] border border-gray-300 shadow-sm">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="recommended">Recommended</SelectItem>
-                <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="rating">Best Rating</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-              </SelectContent>
-            </Select>
+              <div className="flex gap-3">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="flex items-center gap-2 border-neutral-300 text-neutral-700">
+                      <Filter className="h-4 w-4" />
+                      Filters
+                      {activeFilters > 0 && (
+                        <Badge variant="secondary" className="ml-1 bg-primary/10 text-primary text-xs">
+                          {activeFilters}
+                        </Badge>
+                      )}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent className="w-full sm:max-w-md">
+                    <div className="flex items-center justify-between mb-6">
+                    <DialogTitle className="text-lg font-semibold">Filters</DialogTitle>
+                      {activeFilters > 0 && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={resetFilters}
+                          className="text-neutral-500 hover:text-neutral-900 text-xs"
+                        >
+                          Clear all
+                        </Button>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-6">
+                      {/* Category Filter */}
+                      <div>
+                        <h4 className="text-sm font-medium text-neutral-900 mb-2">Category</h4>
+                        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                          <SelectTrigger className="w-full border-neutral-300">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category.value} value={category.value}>
+                                {category.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <Separator />
+
+                      {/* Price Slider */}
+                      <div>
+                        <h4 className="text-sm font-medium text-neutral-900 mb-2">Price Range</h4>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-neutral-500">${priceRange[0]}</span>
+                          <span className="text-sm text-neutral-500">${priceRange[1]}</span>
+                        </div>
+                        <Slider 
+                          value={priceRange} 
+                          min={0} 
+                          max={300} 
+                          step={5} 
+                          className="py-4"
+                          onValueChange={(value) => setPriceRange(value as [number, number])} 
+                        />
+                      </div>
+
+                      <Separator />
+
+                      {/* Delivery Time Slider */}
+                      <div>
+                        <h4 className="text-sm font-medium text-neutral-900 mb-2">Delivery Time</h4>
+                        <p className="text-sm text-neutral-500 mb-2">Up to {deliveryTime[0]} days</p>
+                        <Slider 
+                          value={deliveryTime} 
+                          min={1} 
+                          max={30} 
+                          step={1}
+                          className="py-4"
+                          onValueChange={setDeliveryTime} 
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <Button 
+                        onClick={resetFilters}
+                        className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-900"
+                      >
+                        Reset Filters
+                      </Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-[180px] border-neutral-300">
+                    <div className="flex items-center gap-2">
+                      <span>Sort by</span>
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recommended">Recommended</SelectItem>
+                    <SelectItem value="newest">Newest</SelectItem>
+                    <SelectItem value="rating">Best Rating</SelectItem>
+                    <SelectItem value="price-low">Price: Low to High</SelectItem>
+                    <SelectItem value="price-high">Price: High to Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            {/* Active filters */}
+            {activeFilters > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-neutral-100">
+                {selectedCategory !== "All" && (
+                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full bg-neutral-50">
+                    Category: {categories.find(c => c.value === selectedCategory)?.label}
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-4 w-4 ml-1 hover:bg-neutral-200" 
+                      onClick={() => setSelectedCategory("All")}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                )}
+                
+                {(priceRange[0] > 0 || priceRange[1] < 300) && (
+                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full bg-neutral-50">
+                    Price: ${priceRange[0]} - ${priceRange[1]}
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-4 w-4 ml-1 hover:bg-neutral-200" 
+                      onClick={() => setPriceRange([0, 300])}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                )}
+                
+                {deliveryTime[0] !== 7 && (
+                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full bg-neutral-50">
+                    Delivery: Up to {deliveryTime[0]} days
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-4 w-4 ml-1 hover:bg-neutral-200" 
+                      onClick={() => setDeliveryTime([7])}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Gigs Grid */}
-            <div className="md:col-span-3">
-              {isLoading ? (
-                <p className="text-center text-gray-600">Loading gigs...</p>
-              ) : filteredGigs.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredGigs.slice(0, itemsPerPage).map((gig) => (
-                    <GigCard key={gig.id} gig={gig} />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-gray-500">No gigs found.</p>
+          {/* Results count */}
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-neutral-600">
+              {filteredGigs.length} {filteredGigs.length === 1 ? 'service' : 'services'} available
+            </p>
+          </div>
+
+          {/* Gigs Grid */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i} className="overflow-hidden h-full flex flex-col">
+                  <Skeleton className="aspect-[4/3] w-full" />
+                  <CardContent className="p-5 flex-grow flex flex-col">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Skeleton className="w-8 h-8 rounded-full" />
+                      <div className="space-y-1">
+                        <Skeleton className="h-3 w-24" />
+                        <Skeleton className="h-2 w-16" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-4 w-full mb-1" />
+                    <Skeleton className="h-4 w-3/4 mb-3" />
+                    <div className="mt-auto">
+                      <Skeleton className="h-3 w-24 mb-2" />
+                      <Skeleton className="h-6 w-16" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : filteredGigs.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {currentGigs.map((gig) => (
+                  <GigCard key={gig.id} gig={gig} showDescription={true} />
+                ))}
+              </div>
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <>
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                  />
+                  <PaginationContent className="mt-10 flex justify-center gap-2">
+                    {/* Previous Button */}
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (currentPage > 1) setCurrentPage(currentPage - 1);
+                        }}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                
+                    {/* Page Numbers */}
+                    {Array.from({ length: totalPages }).map((_, i) => (
+                      <PaginationItem key={i}>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(i + 1);
+                          }}
+                          isActive={currentPage === i + 1}
+                        >
+                          {i + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                
+                    {/* Next Button */}
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                        }}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </>
               )}
+            </>
+          ) : (
+            <div className="text-center py-16 bg-white rounded-xl border border-neutral-200">
+              <Briefcase className="h-12 w-12 mx-auto text-neutral-300 mb-4" />
+              <h3 className="text-lg font-medium text-neutral-900 mb-2">No gigs found</h3>
+              <p className="text-neutral-500 max-w-md mx-auto mb-6">
+                We couldn't find any gigs matching your current filters. Try adjusting your search criteria.
+              </p>
+              <Button onClick={resetFilters} variant="outline" className="border-neutral-300">
+                Reset Filters
+              </Button>
             </div>
-            {/* Filters Sidebar */}
-            <div className="md:col-span-1 bg-white p-6 rounded-lg shadow-lg min-h-[600px]">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Filters</h2>
-              <div className="space-y-8">
-                {/* Category Filter */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Category</h3>
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-full border border-gray-300 rounded-md px-3 py-2">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.value} value={category.value}>
-                          {category.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Price Slider */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Price Range</h3>
-                  <p className="text-sm text-gray-600 mb-2">${priceRange[0]} - ${priceRange[1]}</p>
-                  <Slider 
-                    value={priceRange} 
-                    min={0} 
-                    max={300} 
-                    step={5} 
-                    onValueChange={(value) => setPriceRange(value as [number, number])} 
-                  />
-                </div>
-
-                {/* Delivery Time Slider */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Delivery Time</h3>
-                  <p className="text-sm text-gray-600 mb-2">{deliveryTime[0]} days</p>
-                  <Slider 
-                    value={deliveryTime} 
-                    min={1} 
-                    max={30} 
-                    step={1} 
-                    onValueChange={setDeliveryTime} 
-                  />
-                </div>
-              </div>
-              {/* Reset Filters Button */}
-              <div className="mt-8">
-                <Button 
-                  onClick={() => {
-                    setSelectedCategory("All");
-                    setPriceRange([0, 300]);
-                    setDeliveryTime([7]);
-                  }}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-md shadow-md"
-                >
-                  Reset Filters
-                </Button>
-              </div>
-            </div>
-          </div>
+          )}
         </main>
       </div>
-    </>
+    </div>
   );
 }
