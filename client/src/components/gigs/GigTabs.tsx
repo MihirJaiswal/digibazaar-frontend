@@ -217,61 +217,7 @@ export default function GigTabs({ gig, isOwner }: GigTabsProps) {
       <TabsContent value="reviews">
         <Card>
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">Reviews</h2>
-              <div className="flex items-center">
-                <Star className="h-5 w-5 text-yellow-400 fill-yellow-400 mr-2" />
-                <span className="text-lg font-semibold">{rating}</span>
-                <span className="text-muted-foreground ml-1">({gig.starNumber} reviews)</span>
-              </div>
-            </div>
-
-            {canReview && !showReviewForm && (
-              <Button onClick={() => setShowReviewForm(true)} className="mb-6">
-                Write a Review
-              </Button>
-            )}
-
-            {showReviewForm && (
               <GigReviewForm gigId={gig.id} onSubmit={handleReviewSubmit} onCancel={() => setShowReviewForm(false)} />
-            )}
-
-            {reviews.length > 0 ? (
-              <div className="space-y-6">
-                {reviews.map((review) => (
-                  <div key={review.id} className="border-b pb-6 last:border-b-0">
-                    <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg mb-3">
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage src={review.user.profilePic || "/placeholder.svg"} />
-                          <AvatarFallback>{review.user.username.charAt(0).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h4 className="font-medium">{review.user.username}</h4>
-                          <div className="flex items-center">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`h-4 w-4 ${i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        {new Date(review.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <p>{review.comment}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-10 text-muted-foreground">
-                <Award className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                <p>No reviews yet. Be the first to leave a review!</p>
-              </div>
-            )}
           </CardContent>
         </Card>
       </TabsContent>

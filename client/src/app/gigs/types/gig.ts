@@ -50,6 +50,7 @@ export interface User {
     updatedAt: string
     user: User
     reviews?: Review[]
+    isLiked?: boolean
   }
   
   

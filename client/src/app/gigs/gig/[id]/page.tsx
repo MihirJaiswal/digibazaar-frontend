@@ -172,7 +172,7 @@ export default function GigDetailsPage() {
 
               <GigTabs gig={gig} isOwner={isOwner || false} />
 
-              {!isOwner && <GigRelated gig={gig} />}
+            
             </div>
 
             {/* Right Sidebar - Pricing & Order */}
