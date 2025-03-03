@@ -8,7 +8,6 @@ import GigsSidebar from "@/components/gigs/GigsSidebar"
 import GigHeader from "@/components/gigs/GigHeader"
 import GigImageGallery from "@/components/gigs/GigImageGallery"
 import GigTabs from "@/components/gigs/GigTabs"
-import GigRelated from "@/components/gigs/GigRelated"
 import GigSidebar from "@/components/gigs/GigSidebar"
 import { useAuthStore } from "@/store/authStore"
 import type { Gig } from "@/app/gigs/types/gig"
@@ -162,7 +161,7 @@ export default function GigDetailsPage() {
               <GigHeader gig={gig} />
 
               <GigImageGallery
-                gig={gig}
+                gig={gig}  
                 isLiked={isLiked}
                 isBookmarked={isBookmarked}
                 onLike={handleLike}
