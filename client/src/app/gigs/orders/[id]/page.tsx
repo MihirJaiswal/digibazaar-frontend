@@ -11,6 +11,7 @@ import GigsSidebar from "@/components/gigs/GigsSidebar";
 import { Loader2, AlertCircle, CheckCircle2, Clock, DollarSign, User, FileText } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import OrderUpdateForm from "@/components/gigs/OrderUpdateForm";
 
 type Order = {
   id: string;
@@ -224,6 +225,9 @@ export default function OrderDetailsPage() {
                   )}
                 </CardContent>
               </Card>
+            )}
+             {order && order.sellerId === user?.id && (
+              <OrderUpdateForm orderId={order.id} />
             )}
           </div>
         </main>

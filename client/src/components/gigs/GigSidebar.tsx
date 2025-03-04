@@ -246,9 +246,9 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
 
   const handleTrackOrder = () => {
     if (orderData) {
-      router.push(`/orders/${orderData.id}`) // Redirect to order details page
+      router.push(`/gigs/orders/track/${orderData.id}`); // Redirects to the dynamic order tracking page
     }
-  }
+  };
 
   return (
     <>
@@ -350,7 +350,25 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                     Track Order
                   </Button>
                 </div>
-              ) :  (
+              ) : 
+                hasOrdered && orderData?.status != "PENDING" ?(
+                  <div>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <p className="text-blue-800 font-medium ">
+                        You cannot cancel this order. Please contact the seller to request cancellation.
+                      </p>
+                    </div>
+
+                   <Button 
+                   className="w-full mt-3" 
+                   onClick={handleTrackOrder}
+                 >
+                   <Package className="mr-2 h-4 w-4" />
+                   Track Order
+                 </Button>
+                  </div>
+                )
+              : (
                 <Button 
                   className="w-full bg-primary hover:bg-primary/90 text-white mb-3" 
                   onClick={handleProceedToOrder}
