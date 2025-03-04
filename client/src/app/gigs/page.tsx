@@ -125,47 +125,6 @@ export default function Home() {
               </div>
             </div>
           </section>
-
-          {/* Top Gigs */}
-          <section className="py-16 bg-muted/50">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold mb-12 text-center">Top Gigs</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {topGigs.map((gig) => (
-                  <Card key={gig.id} className="overflow-hidden transition-all duration-300 hover:shadow-md">
-                    <div className="aspect-video relative overflow-hidden">
-                      <img
-                        src={gig.image}
-                        alt={gig.title}
-                        className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-                      />
-                    </div>
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-2 mb-3">
-                        <img src={gig.seller.avatar} alt={gig.seller.name} className="w-8 h-8 rounded-full" />
-                        <div>
-                          <p className="text-sm font-medium">{gig.seller.name}</p>
-                          <p className="text-xs text-muted-foreground">{gig.seller.level}</p>
-                        </div>
-                      </div>
-                      <h3 className="font-medium mb-3 hover:text-primary">
-                        <Link href={`/gigs/${gig.id}`}>{gig.title}</Link>
-                      </h3>
-                      <div className="flex items-center gap-1 mb-3">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-medium">{gig.rating}</span>
-                        <span className="text-sm text-muted-foreground">({gig.reviews})</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <p className="text-sm">Starting at</p>
-                        <p className="font-bold text-lg">${gig.price}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </section>
         </main>
       </div>
     </div>
