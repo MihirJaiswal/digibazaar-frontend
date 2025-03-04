@@ -169,8 +169,8 @@ export default function OrderDetailsPage() {
                 <CardContent className="p-6 space-y-6">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Gig Details</h3>
-                    <p className="text-gray-700 font-medium">{order.gig.title}</p>
-                    <p className="text-gray-600 mt-1">{order.gig.desc}</p>
+                    <p className="text-gray-700 font-medium">{order.gig?.title}</p>
+                    <p className="text-gray-600 mt-1">{order.gig?.desc}</p>
                   </div>
                   
                   <Separator />

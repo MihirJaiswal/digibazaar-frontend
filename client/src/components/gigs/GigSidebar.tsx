@@ -33,6 +33,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
   const [hasOrdered, setHasOrdered] = useState(false)
   const [orderData, setOrderData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isCancelling, setIsCancelling] = useState(false);
   const baseApiUrl = "http://localhost:8800/api"
   const { token, user } = useAuthStore()
 
@@ -73,6 +74,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
         if (response.ok) {
           const orders = await response.json()
           // Check if any order contains this gig
+          console.log(orders)
           const existingOrder = orders.find((order: any) => order.gigId === gig.id)
           
           if (existingOrder) {
@@ -168,6 +170,40 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
       setIsEditDialogOpen(false)
     }
   }
+
+  const handleCancelOrder = async () => {
+    if (!orderData) return;
+  
+    if (!confirm("Are you sure you want to cancel this order? This action cannot be undone.")) {
+      return;
+    }
+  
+    setIsCancelling(true);
+  
+    try {
+      const response = await fetch(`${baseApiUrl}/gig-orders/${orderData.id}/cancel`, {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to cancel order");
+      }
+  
+      alert("Order canceled successfully!");
+      setHasOrdered(false); // Update UI to remove order actions
+      setOrderData(null); // Reset order data
+    } catch (error: any) {
+      console.error("Error canceling order:", error);
+      alert(error.message || "Failed to cancel order. Please try again.");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   const handleDeleteGig = async () => {
     if (!confirm("Are you sure you want to delete this gig? This action cannot be undone.")) {
@@ -296,14 +332,15 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                 <Button disabled className="w-full bg-primary hover:bg-primary/90 text-white mb-3">
                   Loading...
                 </Button>
-              ) : hasOrdered ? (
+              ) : hasOrdered && orderData?.status === "PENDING" ? (
                 <div className="space-y-3">
-                  <Button 
-                    disabled 
-                    className="w-full bg-green-600 hover:bg-green-600 text-white mb-3"
+                  <Button  
+                    className="w-full bg-red-600 hover:bg-red-700 text-white mb-3"
+                    onClick={handleCancelOrder}
+                    disabled={isCancelling}
                   >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Ordered
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel Order
                   </Button>
                   <Button 
                     className="w-full" 
@@ -313,7 +350,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                     Track Order
                   </Button>
                 </div>
-              ) : (
+              ) :  (
                 <Button 
                   className="w-full bg-primary hover:bg-primary/90 text-white mb-3" 
                   onClick={handleProceedToOrder}
