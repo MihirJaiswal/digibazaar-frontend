@@ -227,19 +227,21 @@ export default function OrderDetailsPage() {
                     <p className="text-gray-700">{order.requirement}</p>
                   </div>
 
-                  {order.status === "IN_PROGRESS" && (
+                  
                     <div className="flex justify-end mt-6">
                       {order.sellerId === user?.id ? (
                         <Button variant="destructive" onClick={handleRejectOrder}>
                           Reject Order
                         </Button>
-                      ) : order.buyer?.id === user?.id ? (
+                      ) : 
+                      
+                      order.buyer?.id === user?.id ? (
                         <Button variant="outline" onClick={handleTrackOrder}>
                           Track Order
                         </Button>
                       ) : null}
                     </div>
-                  )}
+                 
 
                 </CardContent>
               </Card>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
 
 type OrderUpdateFormProps = {
   orderId: string;
@@ -10,6 +11,7 @@ type OrderUpdateFormProps = {
 
 export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
   const { token } = useAuthStore();
+  const router = useRouter();
   // Initialize selectedStatus from localStorage or default to "PENDING"
   const [selectedStatus, setSelectedStatus] = useState<string>(() => {
     if (typeof window !== "undefined") {
@@ -79,6 +81,10 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
     }
   };
 
+  const handleDeliverProduct = async () => {
+    router.push(`/gigs/orders/${orderId}/create`);
+  }
+
   // Handler to create a new order update (title, content, gigOrderId, and optionally expectedDeliveryDate)
   const handleCreateUpdate = async () => {
     if (!updateTitle || !updateContent) return;
@@ -130,7 +136,6 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
             <option value="PENDING">PENDING</option>
             <option value="IN_PROGRESS">IN_PROGRESS</option>
             <option value="COMPLETED">COMPLETED</option>
-            <option value="DELIVERED">DELIVERED</option>
           </select>
           <Button onClick={handleStatusUpdate}>Update Status</Button>
         </div>
@@ -162,6 +167,11 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
           />
         </div>
         <Button onClick={handleCreateUpdate}>Submit Update</Button>
+      </div>
+      <div>
+        <button className="bg-blue-500 text-white px-4 py-2 rounded-md" onClick={handleDeliverProduct} >
+          Deliver Product ?
+        </button>
       </div>
       <div>
         <h4 className="text-xl font-semibold mb-2">Existing Updates</h4>

@@ -138,32 +138,47 @@ export default function OrderTrackingPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="mb-4">
-            <h3 className="text-xl font-semibold">Order Status</h3>
-            <p className="text-lg">{order.status.replace("_", " ")}</p>
-          </div>
-          <Separator />
-          <div className="mt-4">
-            <h3 className="text-xl font-semibold mb-2">Order Updates</h3>
-            {loadingUpdates ? (
-              <p>Loading updates...</p>
-            ) : updates.length > 0 ? (
-              <ul className="space-y-2">
-                {updates.map((upd) => (
-                  <li key={upd.id} className="border p-2 rounded">
-                    <p className="font-bold">{upd.title}</p>
-                    <p>{upd.content}</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(upd.createdAt).toLocaleString()}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No updates available.</p>
-            )}
-          </div>
-        </CardContent>
+  <div className="mb-4">
+    <h3 className="text-xl font-semibold">Order Status</h3>
+    <p className="text-lg">{order.status.replace("_", " ")}</p>
+  </div>
+
+  {/* Show Review Button if Order is Delivered */}
+  {order.status === "DELIVERED" && (
+    <div className="mt-4">
+      <Button
+        variant="default"
+        onClick={() => router.push(`/gigs/orders/review/${order.id}`)}
+      >
+        Review Product
+      </Button>
+    </div>
+  )}
+
+  <Separator />
+
+  <div className="mt-4">
+    <h3 className="text-xl font-semibold mb-2">Order Updates</h3>
+    {loadingUpdates ? (
+      <p>Loading updates...</p>
+    ) : updates.length > 0 ? (
+      <ul className="space-y-2">
+        {updates.map((upd) => (
+          <li key={upd.id} className="border p-2 rounded">
+            <p className="font-bold">{upd.title}</p>
+            <p>{upd.content}</p>
+            <p className="text-sm text-gray-500">
+              {new Date(upd.createdAt).toLocaleString()}
+            </p>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No updates available.</p>
+    )}
+  </div>
+</CardContent>
+
       </Card>
     </div>
   );
