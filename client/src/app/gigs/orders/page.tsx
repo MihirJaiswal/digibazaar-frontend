@@ -7,12 +7,11 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import Header from "@/components/global/Header";
 import GigsSidebar from "@/components/gigs/GigsSidebar";
-import { Loader2, AlertCircle, CheckCircle2, Clock, DollarSign, User } from 'lucide-react';
+import { Loader2, AlertCircle, DollarSign, User } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
 
-// Define your Order type. Adjust properties if necessary.
+// Define your Order type
 type Order = {
   id: string;
   buyer?: {
@@ -33,9 +32,6 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // Order type: "seller" for orders you received, "buyer" for orders you placed
-  const [orderType, setOrderType] = useState<"seller" | "buyer">("seller");
 
   useEffect(() => {
     if (!token || !user?.id) return;
@@ -43,11 +39,7 @@ export default function OrdersPage() {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        // Choose endpoint based on orderType state
-        const endpoint =
-          orderType === "seller"
-            ? `http://localhost:8800/api/gig-orders/seller/${user.id}`
-            : `http://localhost:8800/api/gig-orders/buyer/${user.id}`;
+        const endpoint = `http://localhost:8800/api/gig-orders/buyer/${user.id}`;
 
         const res = await fetch(endpoint, {
           headers: {
@@ -55,9 +47,11 @@ export default function OrdersPage() {
             Authorization: `Bearer ${token}`,
           },
         });
+
         if (!res.ok) {
           throw new Error("Failed to fetch orders");
         }
+
         const data = await res.json();
         setOrders(data);
       } catch (error) {
@@ -69,10 +63,14 @@ export default function OrdersPage() {
     };
 
     fetchOrders();
-  }, [token, user?.id, orderType]);
+  }, [token, user?.id]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case "REJECTED":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "DELIVERED":
+        return "bg-cyan-100 text-cyan-800 border-cyan-200";
       case "IN_PROGRESS":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "COMPLETED":
@@ -103,21 +101,7 @@ export default function OrdersPage() {
         <GigsSidebar />
         <main className="flex-1 p-6 lg:p-8">
           <div className="max-w-4xl mx-auto">
-            {/* Toggle Buttons */}
-            <div className="flex space-x-4 mb-6">
-              <Button
-                variant={orderType === "buyer" ? "default" : "outline"}
-                onClick={() => setOrderType("buyer")}
-              >
-                My Orders
-              </Button>
-              <Button
-                variant={orderType === "seller" ? "default" : "outline"}
-                onClick={() => setOrderType("seller")}
-              >
-                Orders Received
-              </Button>
-            </div>
+            <h2 className="text-xl font-semibold mb-6">My Orders</h2>
 
             {loading ? (
               <div className="flex items-center justify-center h-64">
@@ -133,11 +117,7 @@ export default function OrdersPage() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>No Orders Found</AlertTitle>
-                <AlertDescription>
-                  {orderType === "buyer"
-                    ? "You haven't placed any orders yet."
-                    : "You haven't received any orders yet."}
-                </AlertDescription>
+                <AlertDescription>You haven't placed any orders yet.</AlertDescription>
               </Alert>
             ) : (
               <div className="space-y-6">

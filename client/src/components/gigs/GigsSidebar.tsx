@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useAuthStore } from "@/store/authStore"
-import { Home, FileText, PlusCircle, Settings, Info, ShoppingBag, Heart, ChevronRight } from "lucide-react"
+import { Home, FileText, PlusCircle, Settings, Info, ShoppingBag, Heart, ChevronRight, PieChart } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -13,12 +13,12 @@ const GigsSidebar = () => {
   const pathname = usePathname()
 
   const navItems = [
-    { href: "/gigs", label: "Dashboard", icon: Home },
+    { href: "/gigs", label: "Home", icon: Home },
+    { href: "/gigs/dashboard", label: "Dashboard", icon: PieChart },
     { href: "/gigs/gig", label: "All Gigs", icon: FileText },
     ...(user
       ? [
           { href: "/gigs/orders", label: "Your Orders", icon: ShoppingBag },
-          { href: "/gigs/favorites", label: "Saved Gigs", icon: Heart },
           { href: "/gigs/create-gig", label: "Create Gig", icon: PlusCircle, highlight: true },
         ]
       : []),
