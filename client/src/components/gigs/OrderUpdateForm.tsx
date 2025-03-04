@@ -19,6 +19,8 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
   });
   const [updateTitle, setUpdateTitle] = useState("");
   const [updateContent, setUpdateContent] = useState("");
+  // New state for expected delivery date (optional)
+  const [expectedDeliveryDate, setExpectedDeliveryDate] = useState("");
   const [existingUpdates, setExistingUpdates] = useState<any[]>([]);
   const [loadingUpdates, setLoadingUpdates] = useState(true);
   const [updateError, setUpdateError] = useState("");
@@ -36,7 +38,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
       try {
         const res = await fetch(`http://localhost:8800/api/gig-order-updates/${orderId}`, {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
           credentials: "include",
         });
@@ -62,7 +64,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status: selectedStatus }),
         credentials: "include",
@@ -77,18 +79,26 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
     }
   };
 
-  // Handler to create a new order update (title, content, and gigOrderId)
+  // Handler to create a new order update (title, content, gigOrderId, and optionally expectedDeliveryDate)
   const handleCreateUpdate = async () => {
     if (!updateTitle || !updateContent) return;
     try {
+      const requestBody: any = {
+        gigOrderId: orderId,
+        title: updateTitle,
+        content: updateContent,
+      };
+      if (expectedDeliveryDate) {
+        // Optionally, send the date as an ISO string
+        requestBody.expectedDeliveryDate = expectedDeliveryDate;
+      }
       const res = await fetch(`http://localhost:8800/api/gig-order-updates/${orderId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-        // Include gigOrderId in the request body along with title and content
-        body: JSON.stringify({ gigOrderId: orderId, title: updateTitle, content: updateContent }),
+        body: JSON.stringify(requestBody),
         credentials: "include",
       });
       if (!res.ok) {
@@ -98,6 +108,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
       setExistingUpdates((prev) => [...prev, newUpdate]);
       setUpdateTitle("");
       setUpdateContent("");
+      setExpectedDeliveryDate("");
     } catch (err: any) {
       console.error("Error creating order update", err);
       setUpdateError(err.message || "Failed to create order update");
@@ -105,11 +116,9 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
   };
 
   return (
-    <div className="mt-8 border p-4 rounded-lg bg-white shadow">
-      <h3 className="text-xl font-bold mb-4">Order Updates</h3>
-      {updateError && (
-        <p className="text-red-500 mb-2">{updateError}</p>
-      )}
+    <div className="mt-8 border p-6 rounded-lg bg-white shadow">
+      <h3 className="text-2xl font-bold mb-4">Order Updates</h3>
+      {updateError && <p className="text-red-500 mb-2">{updateError}</p>}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Update Order Status</label>
         <div className="flex items-center space-x-4 mt-2">
@@ -127,7 +136,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
         </div>
       </div>
       <div className="mb-4">
-        <h4 className="text-lg font-semibold mb-2">Add Order Update</h4>
+        <h4 className="text-xl font-semibold mb-2">Add Order Update</h4>
         <input
           type="text"
           placeholder="Title"
@@ -142,18 +151,34 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
           className="border rounded p-2 w-full mb-2"
           rows={3}
         />
+        {/* Expected Delivery Date (optional) */}
+        <div className="mb-2">
+          <label className="block text-sm font-medium text-gray-700">Expected Delivery Date (optional)</label>
+          <input
+            type="date"
+            value={expectedDeliveryDate}
+            onChange={(e) => setExpectedDeliveryDate(e.target.value)}
+            className="border rounded p-2 w-full"
+          />
+        </div>
         <Button onClick={handleCreateUpdate}>Submit Update</Button>
       </div>
       <div>
-        <h4 className="text-lg font-semibold mb-2">Existing Updates</h4>
+        <h4 className="text-xl font-semibold mb-2">Existing Updates</h4>
         {loadingUpdates ? (
           <p>Loading updates...</p>
         ) : existingUpdates.length > 0 ? (
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {existingUpdates.map((upd: any) => (
-              <li key={upd.id} className="border p-2 rounded">
-                <p className="font-bold">{upd.title}</p>
+              <li key={upd.id} className="border p-3 rounded bg-gray-50">
+                <p className="font-bold text-lg">{upd.title}</p>
                 <p>{upd.content}</p>
+                {upd.expectedDeliveryDate && (
+                  <p className="text-sm text-blue-700">
+                    Expected Delivery:{" "}
+                    {new Date(upd.expectedDeliveryDate).toLocaleDateString()}
+                  </p>
+                )}
                 <p className="text-sm text-gray-500">
                   {new Date(upd.createdAt).toLocaleString()}
                 </p>

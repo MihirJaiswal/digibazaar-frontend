@@ -40,6 +40,7 @@ interface Gig {
   category: string;
   tags: string[];
   deliveryTime: number;
+  cover: string;
 }
 
 // Default categories (static list)
@@ -125,11 +126,14 @@ export default function GigsPage() {
     let results = [...gigs];
 
     if (searchTerm) {
-      results = results.filter(
-        (gig) =>
-          gig.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          gig.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      results = results.filter((gig) => {
+        const title = gig.title || "";
+        const description = gig.description || "";
+        return (
+          title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          description.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
     }
 
     if (selectedCategory !== "All") {

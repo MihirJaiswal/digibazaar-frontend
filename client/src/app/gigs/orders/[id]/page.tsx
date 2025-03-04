@@ -113,6 +113,17 @@ export default function OrderDetailsPage() {
     }
   };
 
+  const handleTrackOrder = async () => {
+    if (!order) return;
+
+    try {
+      router.push(`/gigs/orders/track/${order.id}`);
+    } catch (error) {
+      console.error("Error tracking order:", error);
+      setError("Failed to track order. Please try again.");
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "IN_PROGRESS":
@@ -216,13 +227,20 @@ export default function OrderDetailsPage() {
                     <p className="text-gray-700">{order.requirement}</p>
                   </div>
 
-                  {order.status === "IN_PROGRESS" && order.sellerId === user?.id && (
+                  {order.status === "IN_PROGRESS" && (
                     <div className="flex justify-end mt-6">
-                      <Button variant="destructive" onClick={handleRejectOrder}>
-                        Reject Order
-                      </Button>
+                      {order.sellerId === user?.id ? (
+                        <Button variant="destructive" onClick={handleRejectOrder}>
+                          Reject Order
+                        </Button>
+                      ) : order.buyer?.id === user?.id ? (
+                        <Button variant="outline" onClick={handleTrackOrder}>
+                          Track Order
+                        </Button>
+                      ) : null}
                     </div>
                   )}
+
                 </CardContent>
               </Card>
             )}

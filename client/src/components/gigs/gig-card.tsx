@@ -26,7 +26,7 @@ interface Gig {
   rating: number
   reviews: number
   seller: Seller
-  images: string[]
+  cover: string
   category: string
   tags: string[]
   deliveryTime: number
@@ -108,7 +108,7 @@ export function GigCard({ gig, showDescription = false }: GigCardProps) {
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
           {!imageLoaded && <Skeleton className="absolute inset-0 w-full h-full" />}
           <img
-            src={gig.images[0] || "/placeholder.svg"}
+            src={gig.cover || "/placeholder.svg"}
             alt={gig.title}
             className={`object-cover w-full h-full transition-transform duration-500 group-hover:scale-105 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
             onLoad={() => setImageLoaded(true)}

@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 
+// Define your Order type. Adjust properties if necessary.
 type Order = {
   id: string;
   buyer?: {
@@ -32,13 +33,23 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Order type: "seller" for orders you received, "buyer" for orders you placed
+  const [orderType, setOrderType] = useState<"seller" | "buyer">("seller");
 
   useEffect(() => {
     if (!token || !user?.id) return;
 
     const fetchOrders = async () => {
       try {
-        const res = await fetch(`http://localhost:8800/api/gig-orders/seller/${user.id}`, {
+        setLoading(true);
+        // Choose endpoint based on orderType state
+        const endpoint =
+          orderType === "seller"
+            ? `http://localhost:8800/api/gig-orders/seller/${user.id}`
+            : `http://localhost:8800/api/gig-orders/buyer/${user.id}`;
+
+        const res = await fetch(endpoint, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -58,7 +69,7 @@ export default function OrdersPage() {
     };
 
     fetchOrders();
-  }, [token, user?.id]);
+  }, [token, user?.id, orderType]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -92,6 +103,21 @@ export default function OrdersPage() {
         <GigsSidebar />
         <main className="flex-1 p-6 lg:p-8">
           <div className="max-w-4xl mx-auto">
+            {/* Toggle Buttons */}
+            <div className="flex space-x-4 mb-6">
+              <Button
+                variant={orderType === "buyer" ? "default" : "outline"}
+                onClick={() => setOrderType("buyer")}
+              >
+                My Orders
+              </Button>
+              <Button
+                variant={orderType === "seller" ? "default" : "outline"}
+                onClick={() => setOrderType("seller")}
+              >
+                Orders Received
+              </Button>
+            </div>
 
             {loading ? (
               <div className="flex items-center justify-center h-64">
@@ -107,7 +133,11 @@ export default function OrdersPage() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>No Orders Found</AlertTitle>
-                <AlertDescription>You don't have any orders yet.</AlertDescription>
+                <AlertDescription>
+                  {orderType === "buyer"
+                    ? "You haven't placed any orders yet."
+                    : "You haven't received any orders yet."}
+                </AlertDescription>
               </Alert>
             ) : (
               <div className="space-y-6">
