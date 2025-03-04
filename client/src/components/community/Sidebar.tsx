@@ -20,8 +20,6 @@ const Sidebar = () => {
       ? [
           { href: "/community/communities/user/posts", label: "Your Posts", icon: User },
           { href: "/community/communities/user/communities", label: "Your Communities", icon: Users },
-          { href: "/community/communities/bookmarks", label: "Bookmarks", icon: Bookmark },
-          { href: "/community/communities/notifications", label: "Notifications", icon: Bell, badge: 3 },
         ]
       : []),
   ]
@@ -80,7 +78,6 @@ const Sidebar = () => {
                   className={`w-4 h-4 mr-3 ${isActive ? "text-primary" : "text-neutral-500 group-hover:text-neutral-700"}`}
                 />
                 <span>{item.label}</span>
-                {item.badge && <Badge className="ml-auto bg-primary text-white text-xs">{item.badge}</Badge>}
               </Link>
             )
           })}
@@ -89,10 +86,10 @@ const Sidebar = () => {
         {/* Create Post Button */}
         {user && (
           <div className="mt-6 px-3">
-            <Link href="/community/communities/create-post">
+            <Link href="/community/communities/create">
               <Button className="w-full flex items-center gap-2 bg-primary hover:bg-primary/90">
                 <PlusCircle className="h-4 w-4" />
-                Create Post
+                Create Community
               </Button>
             </Link>
           </div>

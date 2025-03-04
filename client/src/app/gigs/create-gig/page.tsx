@@ -31,6 +31,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
+import Header from "@/components/global/Header"
+import GigsSidebar from "@/components/gigs/GigsSidebar"
 
 const categories = [
   { value: "WEB_DEVELOPMENT", label: "Web Development", icon: "💻" },
@@ -324,7 +326,11 @@ export default function CreateGigPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <>
+    <Header />
+    <div className="flex">
+      <GigsSidebar />
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 mx-auto">
       <div className="container py-12 px-4 sm:px-6" ref={formRef}>
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
@@ -608,6 +614,8 @@ export default function CreateGigPage() {
         </div>
       </div>
     </div>
+    </div>
+    </>
   )
 }
 

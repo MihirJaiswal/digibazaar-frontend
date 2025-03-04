@@ -1,58 +1,70 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/authStore";
-import Header from "@/components/global/Header";
-import GigsSidebar from "@/components/gigs/GigsSidebar";
-import { Loader2, AlertCircle, CheckCircle2, Clock, DollarSign, User, FileText } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import OrderUpdateForm from "@/components/gigs/OrderUpdateForm";
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
+import { useAuthStore } from "@/store/authStore"
+import Header from "@/components/global/Header"
+import GigsSidebar from "@/components/gigs/GigsSidebar"
+import OrderUpdateForm from "@/components/gigs/OrderUpdateForm"
+
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import {
+  Loader2,
+  AlertCircle,
+  Clock,
+  DollarSign,
+  User,
+  FileText,
+  Calendar,
+  ShieldAlert,
+  Package,
+  ExternalLink,
+} from "lucide-react"
 
 type Order = {
-  id: string;
-  gigId: string;
-  buyerId: string;
-  sellerId: string;
-  price: number;
-  status: string;
-  requirement: string;
-  paymentIntent: string;
-  createdAt: string;
-  updatedAt: string;
+  id: string
+  gigId: string
+  buyerId: string
+  sellerId: string
+  price: number
+  status: string
+  requirement: string
+  paymentIntent: string
+  createdAt: string
+  updatedAt: string
   gig: {
-    id: string;
-    title: string;
-    desc: string;
-    cover: string;
-  };
+    id: string
+    title: string
+    desc: string
+    cover: string
+  }
   buyer?: {
-    id: string;
-    username: string;
-  };
+    id: string
+    username: string
+  }
   seller?: {
-    id: string;
-    username: string;
-  };
-};
+    id: string
+    username: string
+  }
+}
 
 export default function OrderDetailsPage() {
-  const { token, user } = useAuthStore();
-  const params = useParams();
-  const orderId = params?.id;
-  const router = useRouter();
-  const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { token, user } = useAuthStore()
+  const params = useParams()
+  const orderId = params?.id
+  const router = useRouter()
+  const [order, setOrder] = useState<Order | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
     if (!token || !user?.id || !orderId) {
-      console.warn("Missing dependencies: token, user, or orderId");
-      return;
+      console.warn("Missing dependencies: token, user, or orderId")
+      return
     }
 
     const fetchOrderDetails = async () => {
@@ -62,31 +74,31 @@ export default function OrderDetailsPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        });
+        })
 
         if (!res.ok) {
-          throw new Error(`Failed to fetch order details: ${res.statusText}`);
+          throw new Error(`Failed to fetch order details: ${res.statusText}`)
         }
 
-        const data = await res.json();
-        setOrder(data);
+        const data = await res.json()
+        setOrder(data)
       } catch (error) {
-        console.error("Error fetching order:", error);
-        setError("Failed to load order details. Please try again.");
+        console.error("Error fetching order:", error)
+        setError("Failed to load order details. Please try again.")
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchOrderDetails();
-  }, [token, user?.id, orderId]);
+    fetchOrderDetails()
+  }, [token, user?.id, orderId])
 
   const handleRejectOrder = async () => {
-    if (!order) return;
-  
+    if (!order) return
+
     try {
-      setLoading(true); // Show loading state
-  
+      setActionLoading(true)
+
       const res = await fetch(`http://localhost:8800/api/gig-orders/${order.id}`, {
         method: "PATCH",
         headers: {
@@ -94,164 +106,214 @@ export default function OrderDetailsPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status: "REJECTED" }),
-      });
-  
-      // Handle non-successful responses
+      })
+
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to update order status: ${res.status}`);
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData.error || `Failed to update order status: ${res.status}`)
       }
-  
-      const updatedOrder = await res.json();
-      setOrder(updatedOrder);
-      // Optional: Show success message
+
+      const updatedOrder = await res.json()
+      setOrder(updatedOrder)
     } catch (error: any) {
-      console.error("Error rejecting order:", error);
-      setError(error.message || "Failed to reject order. Please try again.");
+      console.error("Error rejecting order:", error)
+      setError(error.message || "Failed to reject order. Please try again.")
     } finally {
-      setLoading(false);
+      setActionLoading(false)
     }
-  };
+  }
 
   const handleTrackOrder = async () => {
-    if (!order) return;
+    if (!order) return
+    router.push(`/gigs/orders/track/${order.id}`)
+  }
 
-    try {
-      router.push(`/gigs/orders/track/${order.id}`);
-    } catch (error) {
-      console.error("Error tracking order:", error);
-      setError("Failed to track order. Please try again.");
-    }
-  };
-
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
+      case "PENDING":
+        return (
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1">
+            <Clock className="h-3 w-3" />
+            Pending
+          </Badge>
+        )
       case "IN_PROGRESS":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return (
+          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 gap-1">
+            <Package className="h-3 w-3" />
+            In Progress
+          </Badge>
+        )
       case "COMPLETED":
-        return "bg-green-100 text-green-800 border-green-200";
+        return (
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1">
+            <Package className="h-3 w-3" />
+            Completed
+          </Badge>
+        )
       case "REJECTED":
-        return "bg-red-100 text-red-800 border-red-200";
+        return (
+          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1">
+            <ShieldAlert className="h-3 w-3" />
+            Rejected
+          </Badge>
+        )
       default:
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return (
+          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+            {status.replace("_", " ")}
+          </Badge>
+        )
     }
-  };
+  }
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="flex">
         <GigsSidebar />
-        <main className="flex-1 p-6 lg:p-8">
-          <div className="max-w-4xl mx-auto">
+        <main className="flex-1 p-4 md:p-6 lg:p-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
+              <p className="text-gray-500">View and manage your order information</p>
+            </div>
 
             {loading ? (
-              <div className="flex items-center justify-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow-sm border">
+                <div className="flex flex-col items-center gap-2">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-sm text-muted-foreground">Loading order details...</p>
+                </div>
               </div>
             ) : error ? (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="mb-6">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             ) : !order ? (
-              <Alert>
+              <Alert className="mb-6">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Not Found</AlertTitle>
                 <AlertDescription>Order not found.</AlertDescription>
               </Alert>
             ) : (
-              <Card className="overflow-hidden bg-white shadow-lg rounded-lg border-gray-200">
-                <CardHeader className="bg-gray-50 border-b border-gray-200 p-6">
-                  <div className="flex justify-between items-center">
+              <Card className="overflow-hidden bg-white shadow-md rounded-lg border-gray-200 mb-8">
+                <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 p-6">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                     <div>
-                      <CardTitle className="text-2xl font-bold text-gray-900">
-                        Order #{order.id.slice(0, 8)}
-                      </CardTitle>
-                      <CardDescription className="text-sm text-gray-500 mt-1">
-                        Placed on {new Date(order.createdAt).toLocaleString()}
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-2xl font-bold text-gray-900">
+                          Order #{order.id.slice(0, 8)}
+                        </CardTitle>
+                        {getStatusBadge(order.status)}
+                      </div>
+                      <CardDescription className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5" />
+                        {formatDate(order.createdAt)}
                       </CardDescription>
                     </div>
-                    <Badge className={`px-3 py-1 text-sm font-medium capitalize ${getStatusColor(order.status)}`}>
-                      {order.status.replace("_", " ")}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6 space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Gig Details</h3>
-                    <p className="text-gray-700 font-medium">{order.gig?.title}</p>
-                    <p className="text-gray-600 mt-1">{order.gig?.desc}</p>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 uppercase mb-2">Order Information</h3>
-                      <div className="space-y-2">
-                        <p className="flex items-center text-gray-700">
-                          <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                          Status: <span className="font-medium ml-1">{order.status.replace("_", " ")}</span>
-                        </p>
-                        <p className="flex items-center text-gray-700">
-                          <DollarSign className="h-4 w-4 mr-2 text-gray-400" />
-                          Price: <span className="font-medium ml-1">₹{order.price}</span>
-                        </p>
-                        <p className="flex items-center text-gray-700">
-                          <FileText className="h-4 w-4 mr-2 text-gray-400" />
-                          Payment ID: <span className="font-medium ml-1">{order.paymentIntent}</span>
-                        </p>
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 uppercase mb-2">Buyer & Seller</h3>
-                      <div className="space-y-2">
-                        <p className="flex items-center text-gray-700">
-                          <User className="h-4 w-4 mr-2 text-gray-400" />
-                          Buyer: <span className="font-medium ml-1">{order.buyer?.username || "Unknown"}</span>
-                        </p>
-                        <p className="flex items-center text-gray-700">
-                          <User className="h-4 w-4 mr-2 text-gray-400" />
-                          Seller: <span className="font-medium ml-1">{order.seller?.username || "Unknown"}</span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Requirements</h3>
-                    <p className="text-gray-700">{order.requirement}</p>
-                  </div>
-
-                  
-                    <div className="flex justify-end mt-6">
+                    <div className="flex gap-3">
                       {order.sellerId === user?.id ? (
-                        <Button variant="destructive" onClick={handleRejectOrder}>
-                          Reject Order
+                        <Button
+                          variant="destructive"
+                          onClick={handleRejectOrder}
+                          disabled={actionLoading || order.status === "REJECTED"}
+                          className="h-9"
+                        >
+                          {actionLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <>
+                              <ShieldAlert className="h-4 w-4 mr-1.5" />
+                              Reject Order
+                            </>
+                          )}
                         </Button>
-                      ) : 
-                      
-                      order.buyer?.id === user?.id ? (
-                        <Button variant="outline" onClick={handleTrackOrder}>
+                      ) : order.buyerId === user?.id ? (
+                        <Button variant="outline" onClick={handleTrackOrder} className="h-9">
+                          <ExternalLink className="h-4 w-4 mr-1.5" />
                           Track Order
                         </Button>
                       ) : null}
                     </div>
-                 
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-8">
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-primary" />
+                      Gig Details
+                    </h3>
+                    <p className="text-gray-800 font-medium text-lg">{order.gig?.title}</p>
+                    <p className="text-gray-600 mt-2">{order.gig?.desc}</p>
+                  </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white p-4 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-medium text-gray-500 uppercase mb-3">Order Information</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center text-gray-700">
+                          <Clock className="h-4 w-4 mr-3 text-gray-400" />
+                          <span className="text-gray-500 w-24">Status:</span>
+                          <span className="font-medium">{order.status.replace("_", " ")}</span>
+                        </div>
+                        <div className="flex items-center text-gray-700">
+                          <DollarSign className="h-4 w-4 mr-3 text-gray-400" />
+                          <span className="text-gray-500 w-24">Price:</span>
+                          <span className="font-medium">₹{order.price.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-start text-gray-700">
+                          <FileText className="h-4 w-4 mr-3 text-gray-400 mt-0.5" />
+                          <span className="text-gray-500 w-24">Payment ID:</span>
+                          <span className="font-medium break-all">{order.paymentIntent}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-medium text-gray-500 uppercase mb-3">Buyer & Seller</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center text-gray-700">
+                          <User className="h-4 w-4 mr-3 text-gray-400" />
+                          <span className="text-gray-500 w-24">Buyer:</span>
+                          <span className="font-medium">{order.buyer?.username || "Unknown"}</span>
+                        </div>
+                        <div className="flex items-center text-gray-700">
+                          <User className="h-4 w-4 mr-3 text-gray-400" />
+                          <span className="text-gray-500 w-24">Seller:</span>
+                          <span className="font-medium">{order.seller?.username || "Unknown"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-5 rounded-lg border border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h3>
+                    <div className="bg-gray-50 p-4 rounded border border-gray-100">
+                      <p className="text-gray-700 whitespace-pre-line">{order.requirement}</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}
-             {order && order.sellerId === user?.id && (
-              <OrderUpdateForm orderId={order.id} />
-            )}
+
+            {order && order.sellerId === user?.id && <OrderUpdateForm orderId={order.id} />}
           </div>
         </main>
       </div>
     </div>
-  );
+  )
 }
+

@@ -70,7 +70,6 @@ export default function HeroSection() {
           </Link>
         </div>
       </div>
-      <CommunityList/>
     </section>
   );
 }

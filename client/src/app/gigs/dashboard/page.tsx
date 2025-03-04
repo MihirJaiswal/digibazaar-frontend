@@ -1,67 +1,55 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuthStore } from "@/store/authStore"
+import Header from "@/components/global/Header"
+import GigsSidebar from "@/components/gigs/GigsSidebar"
+
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, AlertCircle, DollarSign, User } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import Header from "@/components/global/Header";
-import GigsSidebar from "@/components/gigs/GigsSidebar";
-import { useAuthStore } from "@/store/authStore";
+  Loader2,
+  AlertCircle,
+  DollarSign,
+  User,
+  Search,
+  Calendar,
+  BarChart3,
+  TrendingUp,
+  Clock,
+  Package,
+  CheckCircle2,
+  XCircle,
+  ArrowRight,
+  Filter,
+  RefreshCw,
+} from "lucide-react"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 // -----------------------------------------------------------------------------
-// Define Order type (adjust properties as needed)
+// Define Order type
 type Order = {
-  id: string;
+  id: string
   buyer?: {
-    id: string;
-    username: string;
-  };
-  status: string;
-  createdAt: string;
-  price: number;
+    id: string
+    username: string
+  }
+  status: string
+  createdAt: string
+  price: number
   gig: {
-    title: string;
-  };
-};
+    title: string
+  }
+}
 
 // -----------------------------------------------------------------------------
 // Define order statuses to use in the tabs
-const ORDER_STATUSES = [
-  "PENDING",
-  "IN_PROGRESS",
-  "DELIVERED",
-  "REJECTED",
-  "COMPLETED",
-];
-
-// -----------------------------------------------------------------------------
-// Utility: Get color for order status badge
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "PENDING":
-      return "bg-blue-100 text-blue-800 border-blue-200";
-    case "IN_PROGRESS":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "DELIVERED":
-      return "bg-purple-100 text-purple-800 border-purple-200";
-    case "REJECTED":
-      return "bg-red-100 text-red-800 border-red-200";
-    case "COMPLETED":
-      return "bg-green-100 text-green-800 border-green-200";
-    default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
-  }
-};
+const ORDER_STATUSES = ["PENDING", "IN_PROGRESS", "DELIVERED", "REJECTED", "COMPLETED"]
 
 // -----------------------------------------------------------------------------
 // OrdersDashboard Component
@@ -76,6 +64,7 @@ export default function OrdersDashboard() {
 
   // State for filtering orders
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
 
   // ---------------------------------------------------------------------------
   // Fetch orders from the seller endpoint
@@ -132,12 +121,85 @@ export default function OrdersDashboard() {
     );
   };
 
+  // Sort orders based on selected sort option
+  const sortOrders = (a: Order, b: Order) => {
+    switch (sortBy) {
+      case "newest":
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      case "oldest":
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      case "highest":
+        return b.price - a.price;
+      case "lowest":
+        return a.price - b.price;
+      default:
+        return 0;
+    }
+  };
+
+  // Get status badge with appropriate styling
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return (
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1">
+            <Clock className="h-3 w-3" />
+            Pending
+          </Badge>
+        );
+      case "IN_PROGRESS":
+        return (
+          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 gap-1">
+            <RefreshCw className="h-3 w-3" />
+            In Progress
+          </Badge>
+        );
+      case "DELIVERED":
+        return (
+          <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 gap-1">
+            <Package className="h-3 w-3" />
+            Delivered
+          </Badge>
+        );
+      case "COMPLETED":
+        return (
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1">
+            <CheckCircle2 className="h-3 w-3" />
+            Completed
+          </Badge>
+        );
+      case "REJECTED":
+        return (
+          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1">
+            <XCircle className="h-3 w-3" />
+            Rejected
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+            {status.replace("_", " ")}
+          </Badge>
+        );
+    }
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   // ---------------------------------------------------------------------------
   // Main render
   if (!user) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="max-w-md">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Authentication Required</AlertTitle>
           <AlertDescription>Please login to view your dashboard.</AlertDescription>
@@ -156,65 +218,91 @@ export default function OrdersDashboard() {
         <GigsSidebar />
 
         {/* Main Content */}
-        <main className="flex-1 p-6 lg:p-8">
+        <main className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             {/* Dashboard Title */}
-            <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">Seller Dashboard</h1>
+              <p className="text-gray-500 mt-1">Manage your orders and track your earnings</p>
+            </div>
 
             {/* Summary Section */}
-            <section className="mb-8">
+            <section className="mb-10">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Total Earnings Card */}
-                <Card className="p-4 shadow-md">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold">
+                <Card className="overflow-hidden shadow-md border-gray-200 hover:shadow-lg transition-shadow duration-200">
+                  <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 border-b pb-3">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <DollarSign className="h-5 w-5 text-green-600" />
                       Total Earnings
                     </CardTitle>
-                    <CardDescription className="text-gray-500">
-                      Earnings from Completed Orders
+                    <CardDescription className="text-gray-600">
+                      From completed orders
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold">
-                      ₹{totalEarnings}
-                    </p>
+                  <CardContent className="pt-4">
+                    <div className="flex items-baseline">
+                      <p className="text-3xl font-bold text-gray-900">
+                        ₹{totalEarnings.toLocaleString()}
+                      </p>
+                      <span className="ml-2 text-sm text-gray-500">INR</span>
+                    </div>
                   </CardContent>
+                  <CardFooter className="bg-gray-50 border-t py-2 px-4">
+                    <p className="text-xs text-gray-500 flex items-center">
+                      <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
+                      From {countByStatus["COMPLETED"] || 0} completed orders
+                    </p>
+                  </CardFooter>
                 </Card>
 
                 {/* Total Orders Card */}
-                <Card className="p-4 shadow-md">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold">
+                <Card className="overflow-hidden shadow-md border-gray-200 hover:shadow-lg transition-shadow duration-200">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b pb-3">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <Package className="h-5 w-5 text-blue-600" />
                       Total Orders
                     </CardTitle>
-                    <CardDescription className="text-gray-500">
+                    <CardDescription className="text-gray-600">
                       All orders received
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold">{orders.length}</p>
+                  <CardContent className="pt-4">
+                    <div className="flex items-baseline">
+                      <p className="text-3xl font-bold text-gray-900">{orders.length}</p>
+                      <span className="ml-2 text-sm text-gray-500">orders</span>
+                    </div>
                   </CardContent>
+                  <CardFooter className="bg-gray-50 border-t py-2 px-4">
+                    <p className="text-xs text-gray-500 flex items-center">
+                      <Clock className="h-3 w-3 mr-1 text-blue-500" />
+                      {countByStatus["PENDING"] || 0} pending orders
+                    </p>
+                  </CardFooter>
                 </Card>
 
                 {/* Order Breakdown Card */}
-                <Card className="p-4 shadow-md">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold">
+                <Card className="overflow-hidden shadow-md border-gray-200 hover:shadow-lg transition-shadow duration-200">
+                  <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 border-b pb-3">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5 text-purple-600" />
                       Order Breakdown
                     </CardTitle>
-                    <CardDescription className="text-gray-500">
-                      Orders by Status
+                    <CardDescription className="text-gray-600">
+                      By status
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-4 pb-2">
                     <ul className="space-y-2">
                       {ORDER_STATUSES.map((status) => (
                         <li
                           key={status}
-                          className="flex justify-between border-b pb-1"
+                          className="flex justify-between items-center text-sm"
                         >
-                          <span>{status.replace("_", " ")}</span>
-                          <span>{countByStatus[status] || 0}</span>
+                          <div className="flex items-center">
+                            {getStatusBadge(status)}
+                          </div>
+                          <span className="font-medium">{countByStatus[status] || 0}</span>
                         </li>
                       ))}
                     </ul>
@@ -225,20 +313,48 @@ export default function OrdersDashboard() {
 
             {/* Search / Filter Section */}
             <section className="mb-8">
-              <input
-                type="text"
-                placeholder="Search orders by ID or gig title..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="border p-2 rounded w-full md:w-1/2"
-              />
+              <Card className="border-gray-200 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="relative flex-1">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <Search className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <Input
+                        type="text"
+                        placeholder="Search orders by ID or gig title..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 min-w-[200px]">
+                      <Filter className="h-4 w-4 text-gray-500" />
+                      <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Sort by" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="newest">Newest First</SelectItem>
+                          <SelectItem value="oldest">Oldest First</SelectItem>
+                          <SelectItem value="highest">Highest Price</SelectItem>
+                          <SelectItem value="lowest">Lowest Price</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </section>
 
             {/* Orders Tabs Section */}
             <section className="mb-10">
               {loading ? (
-                <div className="flex items-center justify-center h-64">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow-sm border">
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">Loading your orders...</p>
+                  </div>
                 </div>
               ) : error ? (
                 <Alert variant="destructive">
@@ -247,146 +363,183 @@ export default function OrdersDashboard() {
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               ) : (
-                <Tabs defaultValue="PENDING">
-                  <TabsList className="mb-4 border-b pb-2">
-                    {ORDER_STATUSES.map((status) => (
-                      <TabsTrigger key={status} value={status}>
-                        {status.replace("_", " ")}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-
-                  {ORDER_STATUSES.map((status) => (
-                    <TabsContent key={status} value={status}>
-                      {orders.filter(
-                        (order) =>
-                          order.status === status && filterOrders(order)
-                      ).length === 0 ? (
-                        <p className="text-gray-600">
-                          No orders found for {status.replace("_", " ")}.
-                        </p>
-                      ) : (
-                        <div className="space-y-4">
-                          {orders
-                            .filter(
-                              (order) =>
-                                order.status === status && filterOrders(order)
-                            )
-                            .map((order) => (
-                              <Card
-                                key={order.id}
-                                className="shadow-sm hover:shadow-lg transition-shadow duration-200"
-                              >
-                                <CardHeader className="bg-gray-50 px-4 py-2 border-b">
-                                  <div className="flex justify-between items-center">
-                                    <div>
-                                      <CardTitle className="text-lg font-semibold">
-                                        Order #{order.id.slice(0, 8)}
-                                      </CardTitle>
-                                      <CardDescription className="text-sm text-gray-500">
-                                        {new Date(order.createdAt).toLocaleDateString()}
-                                      </CardDescription>
+                <Card className="border-gray-200 shadow-sm overflow-hidden">
+                  <Tabs defaultValue="PENDING" className="w-full">
+                    <CardHeader className="pb-0 pt-4 px-4">
+                      <TabsList className="w-full justify-start overflow-x-auto">
+                        {ORDER_STATUSES.map((status) => (
+                          <TabsTrigger 
+                            key={status} 
+                            value={status}
+                            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                          >
+                            {status.replace("_", " ")}
+                            <span className="ml-1.5 bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded-full text-xs">
+                              {countByStatus[status] || 0}
+                            </span>
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      {ORDER_STATUSES.map((status) => {
+                        const filteredOrders = orders
+                          .filter((order) => order.status === status && filterOrders(order))
+                          .sort(sortOrders);
+                          
+                        return (
+                          <TabsContent key={status} value={status} className="mt-0 pt-4">
+                            {filteredOrders.length === 0 ? (
+                              <div className="bg-gray-50 p-8 rounded-lg text-center">
+                                <p className="text-gray-600">
+                                  No {status.toLowerCase().replace("_", " ")} orders found.
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="space-y-4">
+                                {filteredOrders.map((order) => (
+                                  <Card
+                                    key={order.id}
+                                    className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 border-gray-200"
+                                  >
+                                    
+                                    <div className="flex flex-col sm:flex-row sm:items-center p-4 gap-4">
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-1">
+                                          <h4 className="font-medium text-gray-900">
+                                            Order #{order.id.slice(0, 8)}
+                                          </h4>
+                                          {getStatusBadge(order.status)}
+                                        </div>
+                                        <p className="text-sm text-gray-700 line-clamp-1 mb-1">
+                                          {order.gig.title}
+                                        </p>
+                                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                                          <span className="flex items-center">
+                                            <Calendar className="h-3 w-3 mr-1" />
+                                            {formatDate(order.createdAt)}
+                                          </span>
+                                          <span className="flex items-center">
+                                            <User className="h-3 w-3 mr-1" />
+                                            {order.buyer?.username || "Unknown"}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-4 self-end sm:self-center">
+                                        <p className="text-lg font-medium flex items-center">
+                                          <DollarSign className="h-4 w-4 text-gray-400" />
+                                          ₹{order.price.toLocaleString()}
+                                        </p>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => router.push(`/gigs/orders/${order.id}`)}
+                                          className="whitespace-nowrap"
+                                        >
+                                          View Details
+                                          <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                                        </Button>
+                                      </div>
                                     </div>
-                                    <div>
-                                      <span
-                                        className={`px-2 py-1 text-xs font-medium rounded ${getStatusColor(
-                                          order.status
-                                        )}`}
-                                      >
-                                        {order.status.replace("_", " ")}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </CardHeader>
-                                <CardContent className="p-4 flex justify-between items-center">
-                                  <div>
-                                    <p className="text-sm font-medium">
-                                      {order.gig.title}
-                                    </p>
-                                    <p className="text-sm text-gray-600 flex items-center">
-                                      <User className="h-4 w-4 mr-1" /> Buyer:{" "}
-                                      {order.buyer?.username || "Unknown"}
-                                    </p>
-                                  </div>
-                                  <div className="flex items-center gap-4">
-                                    <p className="text-sm font-medium flex items-center">
-                                      <DollarSign className="h-4 w-4 mr-1 text-gray-400" />₹
-                                      {order.price}
-                                    </p>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => router.push(`/gigs/orders/${order.id}`)}
-                                    >
-                                      View Details
-                                    </Button>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
-                        </div>
-                      )}
-                    </TabsContent>
-                  ))}
-                </Tabs>
+                                  </Card>
+                                ))}
+                              </div>
+                            )}
+                          </TabsContent>
+                        );
+                      })}
+                    </CardContent>
+                  </Tabs>
+                </Card>
               )}
             </section>
 
             {/* Additional Dashboard Widgets Section */}
-            <section className="mt-10">
-              <h2 className="text-2xl font-bold mb-4">Additional Insights</h2>
+            <section className="mt-10 mb-8">
+              <h2 className="text-2xl font-bold mb-6 text-gray-900">Additional Insights</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Recent Orders Widget */}
-                <Card className="p-4 shadow-md">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold">
+                <Card className="shadow-md border-gray-200 overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b pb-3">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-primary" />
                       Recent Orders
                     </CardTitle>
-                    <CardDescription className="text-gray-500">
+                    <CardDescription className="text-gray-600">
                       Latest orders received
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 max-h-64 overflow-y-auto">
-                      {orders.slice(0, 5).map((order) => (
-                        <li
-                          key={order.id}
-                          className="flex justify-between border-b pb-1"
-                        >
-                          <span>#{order.id.slice(0, 6)}</span>
-                          <span>{order.gig.title}</span>
-                          <span className="text-sm text-gray-600">
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                {/* Order Statistics Chart Widget (Placeholder) */}
-                <Card className="p-4 shadow-md">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold">
-                      Order Statistics
-                    </CardTitle>
-                    <CardDescription className="text-gray-500">
-                      Graphical overview (Coming Soon)
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-48 bg-gray-100 flex items-center justify-center text-gray-500">
-                      Chart Placeholder
+                  <CardContent className="p-0">
+                    <div className="max-h-64 overflow-y-auto">
+                      {orders.length > 0 ? (
+                        <ul className="divide-y">
+                          {orders
+                            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                            .slice(0, 5)
+                            .map((order) => (
+                              <li
+                                key={order.id}
+                                className="p-3 hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div>
+                                    <p className="font-medium text-gray-800">#{order.id.slice(0, 6)}</p>
+                                    <p className="text-sm text-gray-600 line-clamp-1">{order.gig.title}</p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-sm font-medium">₹{order.price.toLocaleString()}</p>
+                                    <p className="text-xs text-gray-500">{formatDate(order.createdAt)}</p>
+                                  </div>
+                                </div>
+                              </li>
+                            ))}
+                        </ul>
+                      ) : (
+                        <div className="p-6 text-center text-gray-500">No orders yet</div>
+                      )}
                     </div>
                   </CardContent>
+                  <CardFooter className="bg-gray-50 border-t p-3 flex justify-center">
+                    <Button variant="ghost" size="sm" className="text-xs" onClick={() => router.push('/seller/orders')}>
+                      View All Orders
+                      <ArrowRight className="ml-1 h-3 w-3" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+
+                {/* Order Statistics Chart Widget */}
+                <Card className="shadow-md border-gray-200 overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b pb-3">
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5 text-primary" />
+                      Order Statistics
+                    </CardTitle>
+                    <CardDescription className="text-gray-600">
+                      Monthly performance
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <div className="h-48 bg-gray-50 rounded-lg flex items-center justify-center text-gray-500 border border-dashed border-gray-300">
+                      <div className="text-center">
+                        <BarChart3 className="h-10 w-10 mx-auto text-gray-300 mb-2" />
+                        <p>Chart Visualization Coming Soon</p>
+                        <p className="text-xs text-gray-400 mt-1">Track your monthly performance</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="bg-gray-50 border-t p-3 flex justify-center">
+                    <Button variant="ghost" size="sm" className="text-xs" disabled>
+                      View Detailed Analytics
+                      <ArrowRight className="ml-1 h-3 w-3" />
+                    </Button>
+                  </CardFooter>
                 </Card>
               </div>
             </section>
-
-            {/* End of Dashboard Content */}
           </div>
         </main>
       </div>
     </div>
   );
 }
+
