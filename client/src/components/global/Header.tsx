@@ -56,8 +56,8 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 transition-all duration-300",
-        isScrolled ? "bg-background/80 backdrop-blur-lg border-b shadow-sm" : "bg-background",
+        "sticky top-0 z-50 transition-all border-b duration-300",
+        isScrolled ? "bg-background/80 backdrop-blur-lg  shadow-sm" : "bg-background",
       )}
     >
       <div className="container mx-auto">
