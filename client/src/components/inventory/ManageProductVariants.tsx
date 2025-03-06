@@ -26,16 +26,23 @@ export default function ManageProductVariants({ productId }: { productId: string
   const [loading, setLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingVariant, setEditingVariant] = useState<Variant | null>(null)
+  const [authChecked, setAuthChecked] = useState(false);
   const [newVariant, setNewVariant] = useState({
     name: "",
     value: "",
     price: 0,
     stock: 0,
-  })
+    })
 
   useEffect(() => {
+    // Set a flag to indicate we've checked auth status
+    // This prevents premature fetch attempts
+    const checkAuth = () => {
+      setAuthChecked(true);
+    };
+    
     fetchVariants()
-  }, [])
+  }, [authChecked])
 
   const fetchVariants = async () => {
     setLoading(true)

@@ -11,10 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Warehouse, BarChart3, Package, DollarSign, Plus, MapPin, Phone, ArrowUpDown, Filter, RefreshCw, Building2, LayoutGrid, ListFilter } from 'lucide-react';
-import { formatCurrency, formatNumber } from "@/app/inventory/lib/utils";
+import { formatCurrency, formatNumber } from "@/app/inventory/your-inventory/lib/utils";
 import Header from "@/components/global/Header";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import dynamic from "next/dynamic";
+import { useAuthStore } from "@/store/authStore";
 
 // Dynamically import chart component to avoid SSR issues
 const WarehouseCapacityChart = dynamic(() => import("@/components/inventory/warehouse-capacity-chart"), { ssr: false });
@@ -44,21 +45,61 @@ const WarehousesPage = () => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const router = useRouter();
+  const { token } = useAuthStore();
+  const [error, setError] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
+  // First, check if authentication is complete
+  useEffect(() => {
+    // Set a flag to indicate we've checked auth status
+    // This prevents premature fetch attempts
+    const checkAuth = () => {
+      setAuthChecked(true);
+    };
+    
+    // Small timeout to allow auth store to initialize if it's async
+    const timer = setTimeout(checkAuth, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Only fetch data when we have a token and auth has been checked
   useEffect(() => {
     const fetchWarehouses = async () => {
+      // Don't try to fetch until auth is checked
+      if (!authChecked) return;
+      
+      // If no token after auth check, show error
+      if (!token) {
+        setLoading(false);
+        setError("No authentication token found. Please log in.");
+        return;
+      }
+
       try {
-        const res = await fetch("http://localhost:8800/api/warehouses");
+        setLoading(true);
+        const res = await fetch("http://localhost:8800/api/warehouses", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch warehouses: ${res.statusText}`);
+        }
+
         const data = await res.json();
-        setWarehouses(data);
+        setWarehouses(Array.isArray(data) ? data : []);
+        setError(null); // Clear any previous errors
       } catch (error) {
-        console.error("Error fetching warehouses:", error);
+        console.error("❌ Error fetching warehouses:", error);
+        setError("Error fetching warehouses. Please try again.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchWarehouses();
-  }, []);
+  }, [token, authChecked]);
 
   const handleSort = (key: keyof WarehouseType) => {
     let direction: "ascending" | "descending" = "ascending";
@@ -106,17 +147,56 @@ const WarehousesPage = () => {
     : 0;
 
   const refreshData = async () => {
+    if (!token) {
+      setError("No authentication token found. Please log in.");
+      return;
+    }
+    
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8800/api/warehouses");
+      const res = await fetch("http://localhost:8800/api/warehouses", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Failed to refresh warehouses: ${res.statusText}`);
+      }
+      
       const data = await res.json();
-      setWarehouses(data);
+      setWarehouses(Array.isArray(data) ? data : []);
+      setError(null); // Clear any previous errors
     } catch (error) {
       console.error("Error refreshing warehouses:", error);
+      setError("Error refreshing warehouses. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  // Show authentication error state
+  if (!loading && !token) {
+    return (
+      <>
+        <Header />
+        <DashboardLayout>
+          <div className="container mx-auto px-4 py-6 space-y-6">
+            <div className="flex flex-col items-center justify-center h-64 text-center">
+              <h3 className="text-lg font-medium">Authentication Required</h3>
+              <p className="text-muted-foreground mt-1">Please log in to view warehouse data</p>
+              <Button 
+                className="mt-4" 
+                onClick={() => router.push("/login")}
+              >
+                Go to Login
+              </Button>
+            </div>
+          </div>
+        </DashboardLayout>
+      </>
+    );
+  }
 
   return (
     <>
@@ -139,6 +219,13 @@ const WarehousesPage = () => {
               </Button>
             </div>
           </div>
+
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <strong className="font-bold">Error: </strong>
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 shadow-md">

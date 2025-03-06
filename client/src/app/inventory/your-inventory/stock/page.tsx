@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowDown, ArrowUp, Building2, Package2, Loader2, History, BarChart3 } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { useAuthStore } from "@/store/authStore";
 import {
   Table,
   TableBody,
@@ -21,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { headers } from "next/headers";
 
 interface Warehouse {
   id: string;
@@ -64,14 +66,34 @@ const StockManagementPage = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [recentTransactions, setRecentTransactions] = useState<StockTransaction[]>([]);
   const [warehouseStock, setWarehouseStock] = useState<any[]>([]);
+  const { token } = useAuthStore()
+  const [authChecked, setAuthChecked] = useState(false)
+
+   useEffect(() => {
+    // Set a flag to indicate we've checked auth status
+    // This prevents premature fetch attempts
+    const checkAuth = () => {
+      setAuthChecked(true);
+    };
+    
+    // Small timeout to allow auth store to initialize if it's async
+    const timer = setTimeout(checkAuth, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Fetch Warehouses & Products
   const fetchData = useCallback(async () => {
     setFetchingData(true);
     try {
-      const [warehousesRes, productsRes,] = await Promise.all([
-        fetch("http://localhost:8800/api/warehouses").then((res) => res.json()),
-        fetch("http://localhost:8800/api/products").then((res) => res.json()),
+      console.log(token)
+      const [warehousesRes, productsRes] = await Promise.all([
+        fetch("http://localhost:8800/api/warehouses", {
+          headers: { Authorization: `Bearer ${token}` },
+        }).then((res) => res.json()),
+      
+        fetch("http://localhost:8800/api/products", {
+          headers: { Authorization: `Bearer ${token}` },
+        }).then((res) => res.json()),
       ]);
       setWarehouses(warehousesRes);
       setProducts(productsRes);
@@ -81,7 +103,7 @@ const StockManagementPage = () => {
     } finally {
       setFetchingData(false);
     }
-  }, []);
+  }, [token, authChecked]);
 
   useEffect(() => {
     fetchData();
@@ -93,7 +115,9 @@ const StockManagementPage = () => {
       if (!warehouseId) return;
       
       try {
-        const res = await fetch(`http://localhost:8800/api/warehouses/${warehouseId}/stock`);
+        const res = await fetch(`http://localhost:8800/api/warehouses/${warehouseId}/stock`,{
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
         setWarehouseStock(data);
         
@@ -129,7 +153,11 @@ const StockManagementPage = () => {
     try {
       const response = await fetch(`http://localhost:8800/api/stock/${type}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        
+      headers: { 
+        "Content-Type": "application/json", 
+        Authorization: `Bearer ${token}` 
+      }, 
         body: JSON.stringify({ warehouseId, productId, quantity }),
       });
 

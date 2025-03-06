@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, ArrowDownRight, Calendar, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dynamic from "next/dynamic";
+import { useAuthStore } from "@/store/authStore";
 
 // Dynamically import the chart component to avoid SSR issues
 const StockChart = dynamic(() => import("@/components/inventory/stock-chart"), { ssr: false });
@@ -27,6 +28,7 @@ interface StockMovementsProps {
 }
 
 const StockMovementsTable = ({ productId }: StockMovementsProps) => {
+  const { token } = useAuthStore()
   const [movements, setMovements] = useState<Movement[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -39,7 +41,11 @@ const StockMovementsTable = ({ productId }: StockMovementsProps) => {
   useEffect(() => {
     const fetchMovements = async () => {
       try {
-        const res = await fetch(`http://localhost:8800/api/stock/movements/${productId}`);
+          const res = await fetch(`http://localhost:8800/api/stock/movements/${productId}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
         const data = await res.json();
         setMovements(data);
         

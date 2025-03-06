@@ -28,12 +28,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname()
 
     const navigation = [
-        { name: "Dashboard", href: "/inventory", icon: Home },
-    { name: "Products", href: "/inventory/products", icon: Package },
-    { name: "Orders", href: "/inventory/orders", icon: ClipboardList },
-    { name: "Warehouses", href: "/inventory/warehouse", icon: Warehouse },
-    { name: "Stock", href: "/inventory/stock", icon: Box },
-    { name: "Reports", href: "/inventory/reports", icon: BarChart3 },
+        { name: "Dashboard", href: "/inventory/your-inventory", icon: Home },
+    { name: "Products", href: "/inventory/your-inventory/products", icon: Package },
+    { name: "Orders", href: "/inventory/your-inventory/orders", icon: ClipboardList },
+    { name: "Warehouses", href: "/inventory/your-inventory/warehouse", icon: Warehouse },
+    { name: "Stock", href: "/inventory/your-inventory/stock", icon: Box },
+    { name: "Reports", href: "/inventory/your-inventory/reports", icon: BarChart3 },
   ]
 
   return (

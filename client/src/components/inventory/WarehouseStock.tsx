@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Package, Search, BarChart2, AlertTriangle, ArrowUpDown, Tag, DollarSign, Percent, Clock, ShoppingCart, Filter, RefreshCw } from 'lucide-react';
 import dynamic from "next/dynamic";
+import { useAuthStore } from "@/store/authStore";
 
 // Dynamically import chart components to avoid SSR issues
 const StockDistributionChart = dynamic(() => import("@/components/inventory/stock-distribution-chart"), { ssr: false });
@@ -54,6 +55,7 @@ export default function WarehouseStock({ warehouseId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const { token } = useAuthStore();
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Product | "quantity";
     direction: "ascending" | "descending";
@@ -68,7 +70,10 @@ export default function WarehouseStock({ warehouseId }: Props) {
   useEffect(() => {
     async function fetchWarehouseStock() {
       try {
-        const response = await fetch(`http://localhost:8800/api/stock/warehouse/${warehouseId}`);
+        console.log('this is our',token)
+        const response = await fetch(`http://localhost:8800/api/stock/warehouse/${warehouseId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!response.ok) throw new Error("Failed to fetch warehouse stock data");
 
         const result: StockItem[] = await response.json();

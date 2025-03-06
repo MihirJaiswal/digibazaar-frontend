@@ -29,6 +29,7 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false);
 
   // Initialize updated product with empty defaults to prevent uncontrolled inputs
   const [updatedProduct, setUpdatedProduct] = useState({
@@ -42,51 +43,72 @@ export default function ProductDetailPage() {
     margin: 0,
   })
 
+  console.log('token upper wala', token)
+
   useEffect(() => {
-    if (!id) return
+    // Set a flag to indicate we've checked auth status
+    // This prevents premature fetch attempts
+    const checkAuth = () => {
+      setAuthChecked(true);
+    };
+    
+    // Small timeout to allow auth store to initialize if it's async
+    const timer = setTimeout(checkAuth, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
-    const fetchProduct = async () => {
-      try {
-        const res = await fetch(`http://localhost:8800/api/products/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (!res.ok) throw new Error("Failed to fetch product")
-        const data = await res.json()
-        setProduct(data)
-        setUpdatedProduct({
-          title: data.title || "",
-          description: data.description || "",
-          price: data.price || 0,
-          sku: data.sku || "",
-          category: data.category || "",
-          profit: data.profit || 0,
-          costPerItem: data.costPerItem || 0,
-          margin: data.margin || 0,
-        })
-      } catch (error) {
-        console.error(error)
-        toast.error("Failed to load product details")
-      } finally {
-        setLoading(false)
-      }
-    }
 
-    const fetchStock = async () => {
-      try {
-        const res = await fetch(`http://localhost:8800/api/products/${id}/stock`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (!res.ok) throw new Error("Failed to fetch stock")
-        const data = await res.json()
-        setStock(data.stock)
-      } catch (error) {
-        console.error(error)
-      }
-    }
 
-    fetchProduct()
-    fetchStock()
-  }, [id, token])
+    useEffect(() => {
+      if (!id || !authChecked || !token) return; // Ensure auth is checked and token exists
+    
+      console.log('Making request with token:', token);
+    
+      const fetchProduct = async () => {
+        try {
+          const res = await fetch(`http://localhost:8800/api/products/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          console.log('Product Response:', res);
+          if (!res.ok) throw new Error("Failed to fetch product");
+          const data = await res.json();
+          setProduct(data);
+          setUpdatedProduct({
+            title: data.title || "",
+            description: data.description || "",
+            price: data.price || 0,
+            sku: data.sku || "",
+            category: data.category || "",
+            profit: data.profit || 0,
+            costPerItem: data.costPerItem || 0,
+            margin: data.margin || 0,
+          });
+        } catch (error) {
+          console.error(error);
+          toast.error("Failed to load product details");
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+      const fetchStock = async () => {
+        try {
+          const res = await fetch(`http://localhost:8800/api/products/${id}/stock`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          console.log('Stock Response:', res);
+          if (!res.ok) throw new Error("Failed to fetch stock");
+          const data = await res.json();
+          setStock(data.stock);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+    
+      fetchProduct();
+      fetchStock();
+    }, [id, authChecked, token]); // Ensure token is in the dependency array
+    
 
   // Handle input changes for updating product
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

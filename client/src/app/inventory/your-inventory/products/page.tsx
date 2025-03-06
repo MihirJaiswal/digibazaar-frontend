@@ -32,7 +32,7 @@ import {
   Search,
   X,
 } from "lucide-react"
-import { formatCurrency } from "@/app/inventory/lib/utils"
+import { formatCurrency } from "@/app/inventory/your-inventory/lib/utils"
 import { toast } from "sonner"
 import Header from "@/components/global/Header"
 import { useRouter } from "next/navigation"

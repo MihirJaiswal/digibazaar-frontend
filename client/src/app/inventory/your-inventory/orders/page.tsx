@@ -25,9 +25,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { CalendarIcon, ClipboardList, Eye, Filter, MoreHorizontal, Package, RefreshCw, Search, X } from "lucide-react"
-import { formatCurrency, formatDate } from "@/app/inventory/lib/utils"
+import { formatCurrency, formatDate } from "@/app/inventory/your-inventory/lib/utils"
 import { toast } from "sonner"
-import { useOrderStore } from "@/app/inventory/store/OrderStore"
+import { useOrderStore } from "@/app/inventory/your-inventory/store/OrderStore"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
@@ -36,6 +36,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useAuthStore } from "@/store/authStore"
 
 // Order status options
 const statusOptions = ["PENDING", "PROCESSING", "COMPLETED", "DELIVERED", "CANCELLED"]
@@ -73,44 +74,65 @@ export default function OrdersPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   const { filters, setFilters, resetFilters } = useOrderStore()
+  const { token, _hasRehydrated } = useAuthStore()
 
   // Fetch orders from API
   useEffect(() => {
+    if (!token || !_hasRehydrated) {
+      console.log("Waiting for token and rehydration to complete");
+      return;
+    }
     const fetchOrdersWithProducts = async () => {
       try {
-        const res = await fetch("http://localhost:8800/api/orders")
+        const res = await fetch("http://localhost:8800/api/orders", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         const ordersData = await res.json()
-
-        // Fetch product details for each item in every order
-        const enrichedOrders = await Promise.all(
-          ordersData.map(async (order: Order) => {
-            const productPromises = order.items.map(async (item) => {
-              try {
-                const productRes = await fetch(`http://localhost:8800/api/products/${item.productId}`)
-                const productData = await productRes.json()
-                return { ...item, product: productData }
-              } catch (error) {
-                console.error(`Error fetching product ${item.productId}:`, error)
-                return { ...item, product: { title: "Unknown Product" } }
-              }
-            })
-
-            const updatedItems = await Promise.all(productPromises)
-            return { ...order, items: updatedItems }
-          }),
-        )
-
-        setOrders(enrichedOrders)
+        console.log(ordersData)  // Log the response to inspect its structure
+    
+        // Check if ordersData is an array and is not empty
+        if (Array.isArray(ordersData) && ordersData.length > 0) {
+          // If data is an array and not empty, process the orders
+          const enrichedOrders = await Promise.all(
+            ordersData.map(async (order: Order) => {
+              const productPromises = order.items.map(async (item) => {
+                try {
+                  const productRes = await fetch(`http://localhost:8800/api/products/${item.productId}`, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  })
+                  const productData = await productRes.json()
+                  return { ...item, product: productData }
+                } catch (error) {
+                  console.error(`Error fetching product ${item.productId}:`, error)
+                  return { ...item, product: { title: "Unknown Product" } }
+                }
+              })
+    
+              const updatedItems = await Promise.all(productPromises)
+              return { ...order, items: updatedItems }
+            }),
+          )
+    
+          setOrders(enrichedOrders)
+        } else {
+          // If data is empty or not an array, set orders to an empty array
+          setOrders([])
+        }
         setIsLoading(false)
       } catch (error) {
         console.error("Error fetching orders:", error)
         toast.error("Failed to load orders")
         setIsLoading(false)
+        setOrders([])  // Handle error by resetting orders to an empty array
       }
     }
-
+    
     fetchOrdersWithProducts()
-  }, [])
+  }, [token, _hasRehydrated])
 
   // Filter orders based on search, status, and date range
   const filteredOrders = orders.filter((order) => {
@@ -145,7 +167,10 @@ export default function OrdersPage() {
     try {
       const res = await fetch(`http://localhost:8800/api/orders/${orderId}/status`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ status: newStatus }),
       })
 

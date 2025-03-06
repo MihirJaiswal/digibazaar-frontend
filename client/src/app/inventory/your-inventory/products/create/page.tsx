@@ -274,21 +274,15 @@ const CreateProductPage = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                           <Label htmlFor="storeId" className="text-base">Store</Label>
-                          <Select 
-                            value={formData.storeId} 
-                            onValueChange={(value) => handleSelectChange("storeId", value)}
-                          >
-                            <SelectTrigger className="h-11">
-                              <SelectValue placeholder="Select a store" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {stores.map(store => (
-                                <SelectItem key={store.id} value={store.id}>
-                                  {store.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <Input 
+                          type="id"
+                          id="storeId"
+                          name="storeId"
+                          value={formData.storeId} 
+                          onChange={handleInputChange} 
+                          placeholder="Enter store name"
+                          className="h-11"
+                          />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="categoryId" className="text-base">Category</Label>

@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import Header from "@/components/global/Header"
-import { formatNumber } from "@/app/inventory/lib/utils"
+import { formatNumber } from "@/app/inventory/your-inventory/lib/utils"
 import {
   Database,
   Package,
@@ -42,6 +42,7 @@ import { Select, SelectItem as UI_SelectItem } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import WarehouseStock from "@/components/inventory/WarehouseStock"
 import dynamic from "next/dynamic"
+import { useAuthStore } from "@/store/authStore"
 
 // Dynamically import chart component to avoid SSR issues
 const WarehouseCapacityChart = dynamic(() => import("@/components/inventory/warehouse-capacity-chart"), { ssr: false })
@@ -74,6 +75,10 @@ interface StockItem {
 const WarehouseDetailsPage = () => {
   const router = useRouter()
   const { id } = useParams()
+  const { token } = useAuthStore()
+  const [authChecked, setAuthChecked] = useState(false);
+
+  console.log(token)
 
   // Warehouse state
   const [warehouse, setWarehouse] = useState<Warehouse | null>(null)
@@ -101,21 +106,59 @@ const WarehouseDetailsPage = () => {
     location: "",
   })
 
+
+  useEffect(() => {
+    // Set a flag to indicate we've checked auth status
+    // This prevents premature fetch attempts
+    const checkAuth = () => {
+      setAuthChecked(true);
+    };
+    
+    // Small timeout to allow auth store to initialize if it's async
+    const timer = setTimeout(checkAuth, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+
   // Fetch warehouse details
   useEffect(() => {
     const fetchWarehouseDetails = async () => {
-      try {
-        const res = await fetch(`http://localhost:8800/api/warehouses/${id}`)
-        const data = await res.json()
-        setWarehouse(data)
-      } catch (error) {
-        console.error("Error fetching warehouse details:", error)
-      } finally {
-        setLoading(false)
+      if (!token) {
+        console.error("Token is missing!");
+        setLoading(false);
+        return;
       }
+  
+      console.log('Ye hai token hamara', token);
+      console.log('Ye hai id hamara', id);
+      setLoading(true); // Start loading state
+  
+      try {
+        const res = await fetch(`http://localhost:8800/api/warehouses/${id}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+  
+        if (!res.ok) {
+          throw new Error("Failed to fetch warehouse details.");
+        }
+  
+        const data = await res.json();
+        setWarehouse(data);
+      } catch (error) {
+        console.error("Error fetching warehouse details:", error);
+        // Optionally, set an error state here to show the error in the UI
+      } finally {
+        setLoading(false); // End loading state
+      }
+    };
+  
+    if (id && authChecked) {
+      fetchWarehouseDetails();
     }
-    if (id) fetchWarehouseDetails()
-  }, [id])
+  }, [id, authChecked, token]); // Adding token in the dependencies to ensure it updates when the token changes
+  
 
   // Pre-fill the update form when modal opens
   useEffect(() => {
@@ -127,27 +170,34 @@ const WarehouseDetailsPage = () => {
         contactInfo: warehouse.contactInfo ?? { phone: "", email: "" },
       })
     }
-  }, [isUpdateModalOpen, warehouse])
+  }, [isUpdateModalOpen, warehouse, authChecked])
 
   // Fetch warehouse stock
   useEffect(() => {
     const fetchWarehouseStock = async () => {
       try {
-        const res = await fetch(`http://localhost:8800/api/warehouses/${id}/stock`)
+        const res = await fetch(`http://localhost:8800/api/warehouses/${id}/stock`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        })
         const data = await res.json()
         setWarehouseStock(data)
       } catch (error) {
         console.error("Error fetching warehouse stock:", error)
       }
     }
-    if (id) fetchWarehouseStock()
-  }, [id])
+    if (id && authChecked) fetchWarehouseStock()
+  }, [id, authChecked ])
 
   // Delete warehouse
   const handleDelete = async () => {
     try {
       const res = await fetch(`http://localhost:8800/api/warehouses/${id}`, {
         method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
       })
       if (res.ok) {
         toast.success("Warehouse deleted successfully")
@@ -170,7 +220,10 @@ const WarehouseDetailsPage = () => {
     try {
       const res = await fetch(`http://localhost:8800/api/warehouses/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(updateForm),
       })
       if (res.ok) {
@@ -195,6 +248,7 @@ const WarehouseDetailsPage = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
           warehouseId: id,
@@ -207,7 +261,11 @@ const WarehouseDetailsPage = () => {
       toast.success("Product location assigned successfully")
 
       // Refresh warehouse stock
-      const stockRes = await fetch(`http://localhost:8800/api/warehouses/${id}/stock`)
+      const stockRes = await fetch(`http://localhost:8800/api/warehouses/${id}/stock`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      })
       const stockData = await stockRes.json()
       setWarehouseStock(stockData)
     } catch (error) {

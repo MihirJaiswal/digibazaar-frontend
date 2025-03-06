@@ -28,9 +28,10 @@ import {
   CalendarIcon,
   DollarSignIcon,
 } from "lucide-react"
+import { useAuthStore } from "@/store/authStore"
 
 // Utilities
-import { formatCurrency, formatDate } from "@/app/inventory/lib/utils"
+import { formatCurrency, formatDate } from "@/app/inventory/your-inventory/lib/utils"
 
 // Fix for default marker icon issues in React Leaflet
 const icon = L.icon({
@@ -112,12 +113,13 @@ export default function AssignInventoryPage() {
   const [order, setOrder] = useState<Order | null>(null)
   const [warehouses, setWarehouses] = useState<Warehouse[]>([])
   const [filteredWarehouses, setFilteredWarehouses] = useState<Warehouse[]>([])
-  const [selectedWarehouse, setSelectedWarehouse] = useState("")
+  const [selectedWarehouse, setSelectedWarehouse] = useState("select")
   const [inventory, setInventory] = useState<InventoryItem[]>([])
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([])
   const [nearestWarehouse, setNearestWarehouse] = useState<(Warehouse & { distance: number }) | null>(null)
   const [loading, setLoading] = useState(true)
   const [isProcessing, setIsProcessing] = useState(false)
+  const { token, _hasRehydrated } = useAuthStore()
 
   // Calculate distance between two geographic points
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -183,15 +185,27 @@ export default function AssignInventoryPage() {
 
   // Fetch order details
   useEffect(() => {
+    if (!token || !_hasRehydrated) {
+      console.log("Waiting for token and rehydration to complete");
+      return;
+    }
     const fetchOrderDetails = async () => {
       setLoading(true)
       try {
-        const res = await fetch(`http://localhost:8800/api/orders/${orderId}`)
+        const res = await fetch(`http://localhost:8800/api/orders/${orderId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         const orderData: Order = await res.json()
 
         // Fetch product details for each item
         const productPromises = orderData.items.map(async (item) => {
-          const productRes = await fetch(`http://localhost:8800/api/products/${item.productId}`)
+          const productRes = await fetch(`http://localhost:8800/api/products/${item.productId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
           const productData: Product = await productRes.json()
           return { ...item, product: productData }
         })
@@ -207,13 +221,17 @@ export default function AssignInventoryPage() {
     }
 
     fetchOrderDetails()
-  }, [orderId])
+  }, [orderId, token, _hasRehydrated])
 
   // Fetch warehouses
   useEffect(() => {
     const fetchWarehouses = async () => {
       try {
-        const res = await fetch("http://localhost:8800/api/warehouses")
+        const res = await fetch("http://localhost:8800/api/warehouses", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         const data: Warehouse[] = await res.json()
 
         const mappedWarehouses = data.map((warehouse) => ({
@@ -256,7 +274,11 @@ export default function AssignInventoryPage() {
 
       for (const warehouse of warehouses) {
         try {
-          const res = await fetch(`http://localhost:8800/api/warehouses/${warehouse.id}/stock`)
+          const res = await fetch(`http://localhost:8800/api/warehouses/${warehouse.id}/stock`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
           const stockData: InventoryItem[] = await res.json()
 
           const hasOrderedProduct = stockData.some((item) =>
@@ -274,7 +296,7 @@ export default function AssignInventoryPage() {
     }
 
     filterWarehousesWithStock()
-  }, [warehouses, order])
+  }, [warehouses, order, token, _hasRehydrated])
 
   // Handle warehouse selection
   const handleWarehouseSelect = async (warehouseId: string) => {
@@ -282,7 +304,11 @@ export default function AssignInventoryPage() {
     setLoading(true)
 
     try {
-      const res = await fetch(`http://localhost:8800/api/warehouses/${warehouseId}/stock`)
+      const res = await fetch(`http://localhost:8800/api/warehouses/${warehouseId}/stock`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       const data: InventoryItem[] = await res.json()
 
       const filteredInventory = data.filter((item) => order?.items.some((o) => o.productId === item.productId))
@@ -325,7 +351,10 @@ export default function AssignInventoryPage() {
     try {
       const res = await fetch(`http://localhost:8800/api/orders/${orderId}/assign-stock`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+          headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           orderId,
           items: itemsWithWarehouse,
@@ -670,35 +699,42 @@ export default function AssignInventoryPage() {
                   </Alert>
                 )}
 
-                <Select onValueChange={handleWarehouseSelect} value={selectedWarehouse}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a warehouse" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredWarehouses.length > 0 ? (
-                      filteredWarehouses.map((warehouse) => (
-                        <SelectItem key={warehouse.id} value={warehouse.id} className="py-3">
-                          <div className="flex items-center justify-between w-full">
-                            <span className="font-medium">{warehouse.name}</span>
-                            {order.shippingAddress.latitude && order.shippingAddress.longitude && (
-                              <Badge variant="outline" className="ml-2">
-                                {calculateDistance(
-                                  order.shippingAddress.latitude,
-                                  order.shippingAddress.longitude,
-                                  warehouse.coordinates.latitude,
-                                  warehouse.coordinates.longitude,
-                                ).toFixed(2)}{" "}
-                                km
-                              </Badge>
-                            )}
-                          </div>
+                    <Select onValueChange={handleWarehouseSelect} value={selectedWarehouse}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a warehouse" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="select" className="py-3">
+                          <span className="font-medium">Select a warehouse</span>
                         </SelectItem>
-                      ))
-                    ) : (
-                      <div className="p-3 text-slate-500 text-sm">No warehouse has the required products</div>
-                    )}
-                  </SelectContent>
-                </Select>
+                        {filteredWarehouses.length > 0 ? (
+                          filteredWarehouses.map((warehouse) => (
+                            <SelectItem key={warehouse.id} value={warehouse.id} className="py-3">
+                              <div className="flex items-center justify-between w-full">
+                                <span className="font-medium">{warehouse.name}</span>
+                                {order.shippingAddress.latitude && order.shippingAddress.longitude && (
+                                  <Badge variant="outline" className="ml-2">
+                                    {calculateDistance(
+                                      order.shippingAddress.latitude,
+                                      order.shippingAddress.longitude,
+                                      warehouse.coordinates.latitude,
+                                      warehouse.coordinates.longitude,
+                                    ).toFixed(2)}{" "}
+                                    km
+                                  </Badge>
+                                )}
+                              </div>
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="p-3 text-slate-500 text-sm">
+                            No warehouse has the required products
+                          </div>
+                        )}
+                      </SelectContent>
+                    </Select>
+
+
 
                 {selectedWarehouse && inventory.length > 0 && (
                   <div className="mt-6">

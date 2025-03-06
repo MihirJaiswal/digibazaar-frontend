@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Package, BarChart2, AlertTriangle } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import dynamic from "next/dynamic";
+import { useAuthStore } from "@/store/authStore";
 
 // Dynamically import the map component to avoid SSR issues
 const WarehouseMap = dynamic(() => import("./warehouse-map"), { ssr: false });
@@ -43,11 +44,18 @@ export default function ProductStock({ productId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedWarehouse, setSelectedWarehouse] = useState<string | null>(null);
+  const { token } = useAuthStore()
+
 
   useEffect(() => {
     async function fetchStock() {
-      try {
-        const response = await fetch(`http://localhost:8800/api/stock/product/${productId}`);
+        try {
+          console.log('ye hai ', token)
+        const response = await fetch(`http://localhost:8800/api/stock/product/${productId}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
         if (!response.ok) throw new Error("Failed to fetch stock data");
 
         const data: StockData[] = await response.json();

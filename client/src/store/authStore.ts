@@ -14,23 +14,32 @@ interface User {
   isSeller: boolean;
 }
 
-export interface AuthState {
+interface AuthState {
   user: User | null;
   token: string | null;
+  _hasRehydrated: boolean; // Add this flag
   setUser: (userData: User | null, token?: string | null) => void;
   logout: () => void;
+  setHasRehydrated: (state: boolean) => void; // Add this action
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      user: null, // Initially, no user is logged in
-      token: null, // Initially, no token is stored
+      user: null,
+      token: null,
+      _hasRehydrated: false, // Initial state
       setUser: (userData, token = null) => set({ user: userData, token }),
       logout: () => set({ user: null, token: null }),
+      setHasRehydrated: (state) => set({ _hasRehydrated: state }),
     }),
     {
-      name: "auth-storage", // Unique key for storing in localStorage
+      name: "auth-storage",
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHasRehydrated(true);
+        }
+      },
     }
   )
 );
