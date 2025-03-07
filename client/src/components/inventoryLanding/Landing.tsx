@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import Header from '@/components/global/Header';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-const Index = () => {
+const Landing = () => {
   const router = useRouter();
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -121,4 +121,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Landing;

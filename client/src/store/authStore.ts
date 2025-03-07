@@ -3,6 +3,20 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface User {
+  store: {
+    id: string;
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+    zip: string;
+    phone: string;
+    email: string;
+    website: string;
+    logo: string;
+    banner: string;
+  }
   id: string;
   username: string;
   email: string;
