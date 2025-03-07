@@ -1,12 +1,10 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import { StorePreview } from "@/components/store/store-preview";
 
-// Define a simple Product interface (optional)
-export interface Product {
+interface Product {
   id: string;
   name: string;
   price: number;
@@ -15,12 +13,13 @@ export interface Product {
   description?: string;
 }
 
+// Unwrapping the promise with use() (experimental)
 interface StorePageProps {
   params: Promise<{ storeName: string }>;
 }
 
 export default function StorePage({ params }: StorePageProps) {
-  // Unwrap the params promise using the experimental use hook.
+  // Unwrap the params promise
   const { storeName } = use(params);
   console.log("Store name from params:", storeName);
 
@@ -37,7 +36,7 @@ export default function StorePage({ params }: StorePageProps) {
         return;
       }
       try {
-        // Fetch the store details by storeName.
+        // Fetch store details by storeName.
         const resStore = await fetch(`http://localhost:8800/api/stores/${storeName}`, {
           headers: { "Content-Type": "application/json" },
         });
@@ -48,7 +47,7 @@ export default function StorePage({ params }: StorePageProps) {
         console.log("Store data:", storeData);
         setStore(storeData);
 
-        // Fetch products for this store (if your API supports filtering by storeId)
+        // Fetch products for this store (assuming API supports filtering by storeId).
         const resProducts = await fetch(`http://localhost:8800/api/product-display/store/${storeName}`, {
           headers: { "Content-Type": "application/json" },
         });
@@ -58,7 +57,7 @@ export default function StorePage({ params }: StorePageProps) {
         const productsData = await resProducts.json();
         setProducts(productsData);
 
-        // Fetch theme customization for this store
+        // Fetch theme customization for this store.
         const resCustomization = await fetch(
           `http://localhost:8800/api/stores/theme-customization/${storeName}`,
           {
@@ -88,9 +87,11 @@ export default function StorePage({ params }: StorePageProps) {
     );
   }
 
+  // For demonstration, assume userId is derived from token or similar.
+  const userId = token ? "user-from-token" : "guest";
+
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Instead of hard-coding the layout here, we simply render our imported template */}
       <StorePreview
         viewMode="desktop"
         currentPage="home"
@@ -100,7 +101,10 @@ export default function StorePage({ params }: StorePageProps) {
         storeLogo={store?.logo || "/images/placeholder.png"}
         products={products}
         themeCustomization={customization || {}}
+        storeId={store?.id}
+        userId={userId}
       />
     </div>
   );
 }
+

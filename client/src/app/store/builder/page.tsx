@@ -172,6 +172,8 @@ export default function BuilderPage() {
     window.open(`/store/stores/${store?.name}`, "_blank")
   }
 
+  const userId = token ? "user-from-token" : "guest";
+
   return (
     <div>
       <Header />
@@ -349,6 +351,8 @@ export default function BuilderPage() {
                     storeLogo={store?.logo || "/images/placeholder.png"}
                     products={products}
                     themeCustomization={themeCustomization as any}
+                    storeId={store?.id}
+                    userId={userId}
                   />
                 )}
               </div>
