@@ -52,35 +52,24 @@ const CreateProductPage = () => {
   useEffect(() => {
     const fetchStoresAndCategories = async () => {
       try {
-        // Fetch stores
         const storesRes = await fetch("http://localhost:8800/api/stores", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (storesRes.ok) {
           const storesData = await storesRes.json();
-          setStores(storesData);
-          if (storesData.length > 0) {
-            setFormData(prev => ({ ...prev, storeId: storesData[0].id }));
-          }
-        }
-
-        // Fetch categories
-        const categoriesRes = await fetch("http://localhost:8800/api/categories", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (categoriesRes.ok) {
-          const categoriesData = await categoriesRes.json();
-          setCategories(categoriesData);
+          console.log("Stores Data:", storesData); // Log the response
+          setStores(Array.isArray(storesData) ? storesData : []); // Ensure it's an array
         }
       } catch (error) {
-        console.error("Error fetching initial data:", error);
+        console.error("Error fetching stores:", error);
       }
     };
-
+  
     if (token) {
       fetchStoresAndCategories();
     }
   }, [token]);
+  
 
   // Handler for input changes
   const handleInputChange = (

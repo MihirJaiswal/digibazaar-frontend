@@ -31,7 +31,7 @@ import {
 import { useAuthStore } from "@/store/authStore"
 
 // Utilities
-import { formatCurrency, formatDate } from "@/app/inventory/your-inventory/lib/utils"
+import { formatCurrency, formatDate } from "@/app/inventory/lib/utils"
 
 // Fix for default marker icon issues in React Leaflet
 const icon = L.icon({
