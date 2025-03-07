@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Warehouse, BarChart3, Package, DollarSign, Plus, MapPin, Phone, ArrowUpDown, Filter, RefreshCw, Building2, LayoutGrid, ListFilter } from 'lucide-react';
-import { formatCurrency, formatNumber } from "@/app/inventory/your-inventory/lib/utils";
+import { formatCurrency, formatNumber } from "@/app/inventory/lib/utils";
 import Header from "@/components/global/Header";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import dynamic from "next/dynamic";

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { DashboardLayout } from "@/components/inventory/dashboard-layout"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatCurrency, formatNumber } from "@/app/inventory/your-inventory/lib/utils"
+import { formatCurrency, formatNumber } from "@/app/inventory/lib/utils"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, ArrowDown, ArrowUp, BarChart3, DollarSign, MapPin, Package, PackageCheck, PackageX, PieChart, ShoppingBag, ShoppingCart, TrendingUp, Truck, Users, WarehouseIcon } from 'lucide-react'
 import { Progress } from "@/components/ui/progress"
