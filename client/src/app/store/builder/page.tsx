@@ -27,6 +27,12 @@ import { SettingsPanel } from "@/components/store/settings-panel"
 import { StoreLayout } from "@/components/store/StoreSidebar"
 import Header from "@/components/global/Header"
 import { useAuthStore } from "@/store/authStore"
+import { ThemeSelector } from "@/components/store/ThemeSelector"
+
+interface ThemeCustomization {
+  theme?: string;
+  [key: string]: any;
+}
 
 export default function BuilderPage() {
   const router = useRouter()
@@ -34,7 +40,7 @@ export default function BuilderPage() {
   const [currentPage, setCurrentPage] = useState("home")
   const [isPublishing, setIsPublishing] = useState(false)
   const { token, _hasRehydrated, user } = useAuthStore()
-  const [themeCustomization, setThemeCustomization] = useState(null)
+  const [themeCustomization, setThemeCustomization] = useState<ThemeCustomization>({})
   const [isCustomizationLoading, setIsCustomizationLoading] = useState(true)
 
   // In a real app, storeSlug would come from the logged in user's data or route params.
@@ -265,6 +271,10 @@ export default function BuilderPage() {
                     <ArrowRight className="mr-2 h-4 w-4" />
                     Settings
                   </TabsTrigger>
+                  <TabsTrigger value="theme">
+                    <ArrowRight className="mr-2 h-4 w-4" />
+                    Theme
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="pages" className="p-4">
                   <div className="space-y-4">
@@ -304,6 +314,17 @@ export default function BuilderPage() {
                     initialCustomization={themeCustomization as any}
                     token={token as string}
                     onCustomizationUpdate={(updated) => setThemeCustomization(updated as any)}
+                  />
+                </TabsContent>
+                <TabsContent value="theme" className="p-0">
+                  <ThemeSelector
+                    initialTheme={themeCustomization?.theme || "default"}
+                    storeId={store?.id}
+                    token={token || ""}
+                    onThemeUpdate={(updatedTheme) => {
+                      // Update local state or trigger a re-fetch of the customization
+                      setThemeCustomization((prev: ThemeCustomization) => ({ ...prev, theme: updatedTheme }));
+                    }}
                   />
                 </TabsContent>
               </Tabs>

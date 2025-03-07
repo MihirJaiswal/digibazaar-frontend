@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useAuthStore } from "@/store/authStore"
-import { BarChart3, Box, ClipboardList, Home, LogOut, Package, Settings, ShoppingCart, Users } from "lucide-react"
+import { BarChart3, Box, ClipboardList, Home, LogOut, Package, Settings, ShoppingCart, Store, Users } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -32,6 +32,7 @@ export function StoreLayout({ children }: StoreLayoutProps) {
     { name: "Manage Invenotry", href: "/inventory", icon: Package },
     { name: "Build Store", href: "/store/builder", icon: ClipboardList },
     { name: "Domains", href: "/store/domains", icon: Users },
+    { name: "Explore stores", href: "/store/stores", icon: Store },
     { name: "Settings", href: "/store/settings", icon: Settings },
   ]
 

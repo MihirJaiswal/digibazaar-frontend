@@ -1,9 +1,6 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import { StorePreview } from "@/components/store/store-preview";
@@ -42,7 +39,7 @@ export default function StorePage({ params }: StorePageProps) {
       try {
         // Fetch the store details by storeName.
         const resStore = await fetch(`http://localhost:8800/api/stores/${storeName}`, {
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: { "Content-Type": "application/json" },
         });
         if (!resStore.ok) {
           throw new Error("Failed to fetch store");
@@ -52,8 +49,8 @@ export default function StorePage({ params }: StorePageProps) {
         setStore(storeData);
 
         // Fetch products for this store (if your API supports filtering by storeId)
-        const resProducts = await fetch(`http://localhost:8800/api/products?storeId=${storeData.id}`, {
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        const resProducts = await fetch(`http://localhost:8800/api/product-display/store/${storeName}`, {
+          headers: { "Content-Type": "application/json" },
         });
         if (!resProducts.ok) {
           throw new Error("Failed to fetch products");
@@ -65,7 +62,7 @@ export default function StorePage({ params }: StorePageProps) {
         const resCustomization = await fetch(
           `http://localhost:8800/api/stores/theme-customization/${storeName}`,
           {
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            headers: { "Content-Type": "application/json" },
           }
         );
         if (resCustomization.ok) {
