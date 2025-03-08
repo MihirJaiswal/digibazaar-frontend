@@ -262,7 +262,8 @@ function ModernTemplateInternal({
         <div className="flex items-center gap-4">
           <Image
             src={storeLogo || "/placeholder.svg"}
-            alt={storeName}
+            alt={storeName || "Store Logo"
+            }
             width={40}
             height={40}
             className="rounded-full object-cover"
@@ -335,7 +336,7 @@ function ModernTemplateInternal({
         <div className="absolute inset-0 z-0">
           <Image
             src={themeCustomization?.bannerImage || "/modern-hero.jpg"}
-            alt="Modern Hero"
+            alt={themeCustomization?.bannerText || "Modern Hero"}
             fill
             className="object-cover"
             priority
@@ -417,7 +418,7 @@ function ModernTemplateInternal({
                 <div className="relative aspect-square overflow-hidden">
                   <Image
                     src={product.image || "/placeholder.svg"}
-                    alt={product.name}
+                    alt={product.name || "Product Image"}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
@@ -512,7 +513,7 @@ function ModernTemplateInternal({
               <div className="relative h-[400px] w-full rounded-lg overflow-hidden shadow-2xl">
                 <Image
                   src="/placeholder.svg?height=400&width=600"
-                  alt="About our store"
+                  alt={themeCustomization?.bannerText || "About our store"}
                   fill
                   className="object-cover"
                 />

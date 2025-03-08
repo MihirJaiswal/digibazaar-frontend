@@ -262,7 +262,8 @@ function ClassicTemplateInternal({
         <div className="flex items-center gap-4">
           <Image
             src={storeLogo || "/placeholder.svg"}
-            alt={storeName}
+            alt={storeName || "Store Logo"
+            }
             width={40}
             height={40}
             className="rounded-full object-cover"
@@ -415,7 +416,7 @@ function ClassicTemplateInternal({
                 <div className="relative aspect-square overflow-hidden">
                   <Image
                     src={product.image || "/placeholder.svg"}
-                    alt={product.name}
+                    alt={product.name || "Product Image"}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
