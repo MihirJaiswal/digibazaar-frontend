@@ -1,30 +1,50 @@
 "use client";
 
 import { useEffect, useState, FormEvent, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { useAuthStore } from "@/store/authStore";
 import { io, Socket } from "socket.io-client";
+import { ArrowLeft, Send, Loader2, User, Users } from 'lucide-react';
+import { format } from "date-fns";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+
+interface Message {
+  id?: string;
+  senderId: string;
+  content: string;
+  createdAt: string;
+  status?: "sending" | "sent" | "delivered" | "read";
+}
+
+interface Conversation {
+  id: string;
+  title?: string;
+  participants?: { id: string; name: string }[];
+}
 
 export default function ChatConversationPage() {
-  // Extract dynamic parameter as id
   const { id } = useParams() as { id: string };
   const conversationId = id;
   const { token, user } = useAuthStore();
   const baseApiUrl = "http://localhost:8800/api";
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Use a ref for the socket instance so it persists across renders
   const socketRef = useRef<Socket | null>(null);
 
-  // Debug log: print conversationId from the route
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    console.log("Debug: conversationId from route:", conversationId);
-  }, [conversationId]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   // Setup socket connection and join room using a ref
   useEffect(() => {
@@ -51,6 +71,31 @@ export default function ChatConversationPage() {
     };
   }, [conversationId]);
 
+  // Fetch conversation details
+  useEffect(() => {
+    if (!token || !conversationId) return;
+    
+    const fetchConversation = async () => {
+      try {
+        const res = await fetch(`${baseApiUrl}/conversations/${conversationId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          setConversation(data);
+        }
+      } catch (err) {
+        console.error("Error fetching conversation:", err);
+      }
+    };
+    
+    fetchConversation();
+  }, [token, conversationId]);
+
   // Fetch initial messages from REST API
   useEffect(() => {
     if (!token || !conversationId) {
@@ -66,10 +111,8 @@ export default function ChatConversationPage() {
           },
           credentials: "include",
         });
-        console.log("Debug: Messages fetch status:", res.status);
         if (res.ok) {
           const msgs = await res.json();
-          console.log("Debug: Fetched messages:", msgs);
           setMessages(msgs);
         } else {
           console.error("❌ Failed to fetch messages, status:", res.status);
@@ -87,77 +130,214 @@ export default function ChatConversationPage() {
   // Send message via WebSocket and update local state
   const sendMessage = async (e: FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
-    if (!socketRef.current) {
-      console.error("Socket is not connected");
-      return;
-    }
-
+    if (!newMessage.trim() || !socketRef.current) return;
+    
+    setSending(true);
+    
+    const tempId = Date.now().toString();
     const messageData = {
       conversationId,
       message: {
+        id: tempId,
         senderId: user?.id,
         content: newMessage,
         createdAt: new Date().toISOString(),
-      },
+        status: "sending",
+      } as Message,
     };
 
-    console.log("Debug: Emitting newMessage event with data:", messageData);
-    socketRef.current.emit("newMessage", messageData);
-    
-    // Add the message locally so the sender sees it immediately
+    // Add message to local state immediately with "sending" status
     setMessages((prev) => [...prev, messageData.message]);
     setNewMessage("");
+
+    // Emit the message to the server
+    socketRef.current.emit("newMessage", messageData);
+    
+    // Simulate message being sent after a short delay
+    setTimeout(() => {
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === tempId 
+            ? { ...msg, status: "sent" } 
+            : msg
+        )
+      );
+      setSending(false);
+    }, 500);
   };
 
-  if (!token) return <div>Please log in to view this conversation.</div>;
+  const formatMessageDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    
+    if (date.toDateString() === today.toDateString()) {
+      return format(date, "h:mm a");
+    }
+    
+    return format(date, "MMM d, h:mm a");
+  };
+
+  const getInitials = (name: string = "User") => {
+    return name.charAt(0).toUpperCase();
+  };
+
+  if (!token) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[80vh] p-6">
+        <div className="text-center space-y-4 max-w-md">
+          <User className="h-16 w-16 text-primary mx-auto mb-4" />
+          <h2 className="text-2xl font-bold">Sign in to access this chat</h2>
+          <p className="text-muted-foreground">
+            Please log in to view and participate in this conversation.
+          </p>
+          <Button onClick={() => router.push("/login")} className="mt-4">
+            Sign In
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Conversation</h1>
-      
-      {loading ? (
-        <p>Loading messages...</p>
-      ) : (
-        <>
-          <div className="border rounded-lg p-4 h-[400px] overflow-y-auto mb-4 space-y-2">
-            {messages.length === 0 ? (
-              <p className="text-gray-500">No messages yet.</p>
-            ) : (
-              messages.map((msg, index) => (
-                <div
-                  key={msg.id || index}
-                  className={`flex ${msg.senderId === user?.id ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`p-2 rounded-md max-w-xs ${
-                      msg.senderId === user?.id ? "bg-blue-500 text-white" : "bg-gray-100"
-                    }`}
-                  >
-                    <strong className="block text-sm">
-                      {msg.senderId === user?.id ? "You" : "Other"}
-                    </strong>
-                    <span className="text-base">{msg.content}</span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-background">
+      {/* Chat header */}
+      <div className="border-b p-3 flex items-center gap-3">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="md:hidden"
+          onClick={() => router.push("/chats")}
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        
+        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+          {conversation?.title 
+            ? getInitials(conversation.title) 
+            : conversation?.participants?.length ? <Users className="h-5 w-5" /> : "C"}
+        </div>
+        
+        <div className="flex-1">
+          <h2 className="font-medium">
+            {conversation?.title || `Chat ${conversationId.slice(0, 8)}`}
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            {conversation?.participants?.length 
+              ? `${conversation.participants.length} participants` 
+              : "Loading conversation details..."}
+          </p>
+        </div>
+      </div>
 
-          <form onSubmit={sendMessage} className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Type your message..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit" className="px-4">
-              Send
-            </Button>
-          </form>
-        </>
-      )}
+      {/* Messages area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-accent/5">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center h-full">
+            <Loader2 className="h-8 w-8 text-primary animate-spin mb-2" />
+            <p className="text-sm text-muted-foreground">Loading messages...</p>
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+              <Users className="h-8 w-8" />
+            </div>
+            <h3 className="font-medium text-lg">No messages yet</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Send a message to start the conversation
+            </p>
+          </div>
+        ) : (
+          <>
+            {messages.map((msg, index) => {
+              const isCurrentUser = msg.senderId === user?.id;
+              const showAvatar = index === 0 || messages[index - 1]?.senderId !== msg.senderId;
+              const showTimestamp = index === messages.length - 1 || 
+                messages[index + 1]?.senderId !== msg.senderId;
+              
+              return (
+                <div key={msg.id || index} className={cn(
+                  "flex gap-2",
+                  isCurrentUser ? "justify-end" : "justify-start"
+                )}>
+                  {!isCurrentUser && showAvatar && (
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                        {getInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  
+                  <div className={cn(
+                    "max-w-[75%] flex flex-col",
+                    isCurrentUser ? "items-end" : "items-start"
+                  )}>
+                    <div className={cn(
+                      "px-3 py-2 rounded-lg",
+                      isCurrentUser 
+                        ? "bg-primary text-primary-foreground rounded-br-none" 
+                        : "bg-accent rounded-bl-none"
+                    )}>
+                      <p className="text-sm">{msg.content}</p>
+                    </div>
+                    
+                    {showTimestamp && (
+                      <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                        <span>{formatMessageDate(msg.createdAt)}</span>
+                        {isCurrentUser && msg.status && (
+                          <span className="ml-1">
+                            {msg.status === "sending" && "Sending..."}
+                            {msg.status === "sent" && "Sent"}
+                            {msg.status === "delivered" && "Delivered"}
+                            {msg.status === "read" && "Read"}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {isCurrentUser && showAvatar && (
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                        {getInitials(user?.username)}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
+              );
+            })}
+            <div ref={messagesEndRef} />
+          </>
+        )}
+      </div>
+
+      {/* Message input */}
+      <div className="border-t p-3">
+        <form onSubmit={sendMessage} className="flex items-center gap-2">
+          <Input
+            type="text"
+            placeholder="Type your message..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            className="flex-1"
+            disabled={sending}
+          />
+          <Button 
+            type="submit" 
+            size="icon" 
+            disabled={!newMessage.trim() || sending}
+            className={cn(
+              "transition-all",
+              !newMessage.trim() && "opacity-50"
+            )}
+          >
+            {sending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
