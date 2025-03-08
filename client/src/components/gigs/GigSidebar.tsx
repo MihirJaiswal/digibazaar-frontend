@@ -33,7 +33,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
   const [hasOrdered, setHasOrdered] = useState(false)
   const [orderData, setOrderData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isCancelling, setIsCancelling] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false)
   const baseApiUrl = "http://localhost:8800/api"
   const { token, user } = useAuthStore()
 
@@ -74,7 +74,6 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
         if (response.ok) {
           const orders = await response.json()
           // Check if any order contains this gig
-          console.log(orders)
           const existingOrder = orders.find((order: any) => order.gigId === gig.id)
           
           if (existingOrder) {
@@ -259,6 +258,38 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
     }
   };
 
+  // NEW: Create conversation when "Contact Seller" is clicked
+  const handleContactSeller = async () => {
+    if (!token) {
+      router.push("/login")
+      return
+    }
+    try {
+      const response = await fetch(`http://localhost:8800/api/conversations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          to: gig.user.id, // The seller's user id
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Failed to create conversation")
+      }
+      const conversation = await response.json()
+      // Redirect to the messaging page with the conversation id.
+      router.push(`/chats/${conversation.id}`)
+    } catch (error: any) {
+      console.error("Error creating conversation:", error)
+      alert(error.message || "Failed to create conversation")
+    }
+  }
+
   return (
     <>
       <div className="sticky top-4 space-y-6">
@@ -318,7 +349,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                 <div className="flex items-center">
                   <RefreshCw className="h-5 w-5 text-muted-foreground mr-3" />
                   <span>
-                    {gig.revisionNumber} revision{gig.revisionNumber !== 1 ? "s" : ""}
+                    {gig.revisionNumber} revision{gig.revisionNumber !== 1 ? "s" : ""} 
                   </span>
                 </div>
 
@@ -386,7 +417,12 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                 </Button>
               )}
 
-              <Button variant="outline" className="w-full mt-3">
+              {/* Contact Seller Button triggers conversation creation */}
+              <Button 
+                variant="outline" 
+                className="w-full mt-3"
+                onClick={handleContactSeller}
+              >
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Contact Seller
               </Button>
@@ -537,7 +573,6 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                   />
                 ))
               ) : (
-                // Fallback if features is not an array
                 <>
                   <Input 
                     placeholder="Feature 1" 
