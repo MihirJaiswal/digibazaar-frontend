@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,10 +33,17 @@ interface SettingsPanelProps {
   onCustomizationUpdate: (data: Customization) => void;
 }
 
-export function SettingsPanel({ storeId, initialCustomization, token, onCustomizationUpdate }: SettingsPanelProps) {
+export function SettingsPanel({
+  storeId,
+  initialCustomization,
+  token,
+  onCustomizationUpdate,
+}: SettingsPanelProps) {
+  // State for customization fields
   const [customization, setCustomization] = useState<Customization>({
     theme: initialCustomization?.theme || "",
     bannerText: initialCustomization?.bannerText || "",
+    // We still store an initial URL (if any) but it can be overridden by file upload
     bannerImage: initialCustomization?.bannerImage || "",
     footerText: initialCustomization?.footerText || "",
     backgroundColor: initialCustomization?.backgroundColor || "#ffffff",
@@ -42,24 +54,60 @@ export function SettingsPanel({ storeId, initialCustomization, token, onCustomiz
     fontColor: initialCustomization?.fontColor || "#000000",
   });
 
+  // State for banner image file upload
+  const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
+  const [bannerImagePreview, setBannerImagePreview] = useState<string>(
+    initialCustomization?.bannerImage || ""
+  );
+
+ 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
     setCustomization((prev) => ({ ...prev, [id]: value }));
   };
 
+  // Handler for banner image file input change
+  const handleBannerImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setBannerImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setBannerImagePreview(previewUrl);
+      // Optionally clear the text URL if a file is chosen
+      setCustomization((prev) => ({ ...prev, bannerImage: "" }));
+    }
+  };
+
+  // Handler for footer image file input change
+  
+
   const handleSaveChanges = async () => {
     try {
-      // If customization exists, update it; otherwise, create a new record.
+      // Determine whether to use POST or PUT based on existence of initialCustomization
       const method = initialCustomization ? "PUT" : "POST";
       const url = "http://localhost:8800/api/stores/theme-customization";
-
+      
+      // Build FormData payload so that we can include file uploads
+      const formPayload = new FormData();
+      // Append text fields from customization
+      for (const key in customization) {
+        formPayload.append(key, (customization as any)[key] || "");
+      }
+      // Append storeId
+      formPayload.append("storeId", storeId);
+      // Append banner image file if one was selected
+      if (bannerImageFile) {
+        formPayload.append("bannerImage", bannerImageFile);
+      }
+  
+      
       const response = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          // Let the browser set the Content-Type with proper boundary.
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ...customization, storeId }),
+        body: formPayload,
       });
 
       if (!response.ok) {
@@ -91,13 +139,22 @@ export function SettingsPanel({ storeId, initialCustomization, token, onCustomiz
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="bannerImage">Banner Image URL</Label>
+              <Label htmlFor="bannerImage">Banner Image</Label>
+              {/* File input for banner image */}
               <Input
                 id="bannerImage"
-                value={customization.bannerImage}
-                onChange={handleInputChange}
-                placeholder="Enter banner image URL"
+                type="file"
+                accept="image/*"
+                onChange={handleBannerImageChange}
               />
+              {/* Display preview if available */}
+              {bannerImagePreview && (
+                <img
+                  src={bannerImagePreview}
+                  alt="Banner Preview"
+                  className="mt-2 w-full rounded-md object-cover"
+                />
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="footerText">Footer Text</Label>

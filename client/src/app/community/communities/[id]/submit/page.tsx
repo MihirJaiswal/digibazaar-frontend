@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,19 +14,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
-import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle, FileImage, LinkIcon, Loader2, MessageSquare, Music, Send, Video } from 'lucide-react';
+import { motion } from "framer-motion";
+import { AlertCircle, FileImage, LinkIcon, Loader2, MessageSquare, Music, Send, Video } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 
 const schema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
   content: z.string().min(10, "Content must be at least 10 characters."),
   link: z.string().optional().default(""),
-  image: z.string().optional().default(""),
-  video: z.string().optional().default(""),
-  audio: z.string().optional().default(""),
+  // We'll handle media (image, video, audio) separately via file inputs.
 });
 
 export default function CreateCommunityPost() {
@@ -36,9 +32,17 @@ export default function CreateCommunityPost() {
   // Retrieve JWT token and user info from auth store
   const token = useAuthStore((state) => state.token);
   const user = useAuthStore((state) => state.user);
-  
+
   const [activeTab, setActiveTab] = useState("text");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Manage file state and previews for media uploads
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [videoPreview, setVideoPreview] = useState("");
+  const [audioPreview, setAudioPreview] = useState("");
 
   const {
     register,
@@ -50,34 +54,66 @@ export default function CreateCommunityPost() {
     mode: "onChange",
   });
 
-  // Watch form values for preview
+  // Watch form values for preview of text fields (like title, content, link)
   const watchedValues = watch();
 
-  async function onSubmit(formData: any) {
+  // Cleanup preview URLs when component unmounts or files change.
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+      if (videoPreview) URL.revokeObjectURL(videoPreview);
+      if (audioPreview) URL.revokeObjectURL(audioPreview);
+    };
+  }, [imagePreview, videoPreview, audioPreview]);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  }
+
+  function handleVideoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setVideoFile(file);
+      setVideoPreview(URL.createObjectURL(file));
+    }
+  }
+
+  function handleAudioChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setAudioFile(file);
+      setAudioPreview(URL.createObjectURL(file));
+    }
+  }
+
+  async function onSubmit(data: any) {
     try {
       setIsSubmitting(true);
-      
-      // Build the payload.
-      // We include communityId, the fields from the form, and the user ID from auth store.
-      const payload = {
-        communityId,
-        title: formData.title,
-        content: formData.content,
-        link: formData.link,
-        image: formData.image,
-        video: formData.video,
-        audio: formData.audio,
-        userId: user?.id, // Pass the authenticated user's id
-      };
+      // Build a FormData payload to support file uploads
+      const formData = new FormData();
+      formData.append("communityId", communityId as string);
+      formData.append("title", data.title);
+      formData.append("content", data.content);
+      formData.append("link", data.link || "");
+
+      // Append file fields if files have been selected
+      if (imageFile) formData.append("image", imageFile);
+      if (videoFile) formData.append("video", videoFile);
+      if (audioFile) formData.append("audio", audioFile);
 
       const response = await axios.post(
         "http://localhost:8800/api/community-posts",
-        payload,
+        formData,
         {
-          withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,
+            // Do not manually set Content-Type. Axios will set it with proper boundary.
           },
+          withCredentials: true,
         }
       );
 
@@ -91,7 +127,7 @@ export default function CreateCommunityPost() {
     }
   }
 
-  // Helper function to determine if a URL is valid
+  // Helper function to check if a URL is valid (for link preview)
   const isValidUrl = (url: string) => {
     if (!url) return false;
     try {
@@ -102,21 +138,20 @@ export default function CreateCommunityPost() {
     }
   };
 
-  // Media preview component
-  const MediaPreview = ({ type, url }: { type: string; url: string }) => {
-    if (!url || !isValidUrl(url)) return null;
-
+  // MediaPreview component shows a preview of the uploaded file
+  const MediaPreview = ({ type, previewUrl }: { type: string; previewUrl: string }) => {
+    if (!previewUrl) return null;
     return (
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="mt-4 rounded-lg overflow-hidden border bg-card"
       >
-        {type === 'image' && (
+        {type === "image" && (
           <div className="aspect-video bg-muted flex items-center justify-center overflow-hidden">
-            <img 
-              src={url || "/placeholder.svg"} 
-              alt="Preview" 
+            <img
+              src={previewUrl}
+              alt="Preview"
               className="w-full h-full object-cover"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=400";
@@ -124,18 +159,14 @@ export default function CreateCommunityPost() {
             />
           </div>
         )}
-        {type === 'video' && (
+        {type === "video" && (
           <div className="aspect-video bg-muted">
-            <video 
-              src={url} 
-              controls 
-              className="w-full h-full object-cover"
-            />
+            <video src={previewUrl} controls className="w-full h-full object-cover" />
           </div>
         )}
-        {type === 'audio' && (
+        {type === "audio" && (
           <div className="p-4 bg-muted/30">
-            <audio src={url} controls className="w-full" />
+            <audio src={previewUrl} controls className="w-full" />
           </div>
         )}
         <div className="p-3 text-sm text-muted-foreground">
@@ -147,11 +178,7 @@ export default function CreateCommunityPost() {
 
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <Card className="border-0 shadow-xl overflow-hidden bg-gradient-to-b from-card to-background">
           <CardHeader className="pb-4 border-b bg-muted/30">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
@@ -173,7 +200,6 @@ export default function CreateCommunityPost() {
               )}
             </div>
           </CardHeader>
-          
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent className="p-6">
               <div className="space-y-6">
@@ -182,12 +208,7 @@ export default function CreateCommunityPost() {
                   <Label htmlFor="title" className="text-base font-medium">
                     Title <span className="text-destructive">*</span>
                   </Label>
-                  <Input 
-                    id="title"
-                    placeholder="Write an interesting title..." 
-                    className="h-12 text-lg"
-                    {...register("title")} 
-                  />
+                  <Input id="title" placeholder="Write an interesting title..." className="h-12 text-lg" {...register("title")} />
                   {errors.title && (
                     <p className="text-sm text-destructive flex items-center gap-1 mt-1">
                       <AlertCircle className="h-4 w-4" />
@@ -195,7 +216,6 @@ export default function CreateCommunityPost() {
                     </p>
                   )}
                 </div>
-                
                 {/* Content Tabs */}
                 <Tabs defaultValue="text" value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <TabsList className="grid grid-cols-4 mb-4">
@@ -225,12 +245,7 @@ export default function CreateCommunityPost() {
                       <Label htmlFor="content" className="text-base font-medium">
                         Content <span className="text-destructive">*</span>
                       </Label>
-                      <Textarea 
-                        id="content"
-                        placeholder="Share your thoughts with the community..." 
-                        className="min-h-[200px] resize-y"
-                        {...register("content")} 
-                      />
+                      <Textarea id="content" placeholder="Share your thoughts with the community..." className="min-h-[200px] resize-y" {...register("content")} />
                       {errors.content && (
                         <p className="text-sm text-destructive flex items-center gap-1 mt-1">
                           <AlertCircle className="h-4 w-4" />
@@ -241,43 +256,32 @@ export default function CreateCommunityPost() {
                   </TabsContent>
                   
                   <TabsContent value="media" className="space-y-6 mt-0">
+                    {/* Image Upload */}
                     <div className="space-y-2">
                       <Label htmlFor="image" className="text-base font-medium flex items-center gap-2">
                         <FileImage className="h-4 w-4" />
-                        Image URL
+                        Upload Image
                       </Label>
-                      <Input 
-                        id="image"
-                        placeholder="https://example.com/image.jpg" 
-                        {...register("image")} 
-                      />
-                      <MediaPreview type="image" url={watchedValues.image || ""} />
+                      <Input id="image" type="file" accept="image/*" onChange={handleImageChange} />
+                      <MediaPreview type="image" previewUrl={imagePreview} />
                     </div>
-                    
+                    {/* Video Upload */}
                     <div className="space-y-2">
                       <Label htmlFor="video" className="text-base font-medium flex items-center gap-2">
                         <Video className="h-4 w-4" />
-                        Video URL
+                        Upload Video
                       </Label>
-                      <Input 
-                        id="video"
-                        placeholder="https://example.com/video.mp4" 
-                        {...register("video")} 
-                      />
-                      <MediaPreview type="video" url={watchedValues.video || ""} />
+                      <Input id="video" type="file" accept="video/*" onChange={handleVideoChange} />
+                      <MediaPreview type="video" previewUrl={videoPreview} />
                     </div>
-                    
+                    {/* Audio Upload */}
                     <div className="space-y-2">
                       <Label htmlFor="audio" className="text-base font-medium flex items-center gap-2">
                         <Music className="h-4 w-4" />
-                        Audio URL
+                        Upload Audio
                       </Label>
-                      <Input 
-                        id="audio"
-                        placeholder="https://example.com/audio.mp3" 
-                        {...register("audio")} 
-                      />
-                      <MediaPreview type="audio" url={watchedValues.audio || ""} />
+                      <Input id="audio" type="file" accept="audio/*" onChange={handleAudioChange} />
+                      <MediaPreview type="audio" previewUrl={audioPreview} />
                     </div>
                   </TabsContent>
                   
@@ -287,17 +291,13 @@ export default function CreateCommunityPost() {
                         <LinkIcon className="h-4 w-4" />
                         External Link
                       </Label>
-                      <Input 
-                        id="link"
-                        placeholder="https://example.com" 
-                        {...register("link")} 
-                      />
+                      <Input id="link" placeholder="https://example.com" {...register("link")} />
                       {watchedValues.link && isValidUrl(watchedValues.link) && (
                         <div className="mt-2 p-3 border rounded-md bg-muted/30 text-sm">
                           <span className="font-medium">Link preview: </span>
-                          <a 
-                            href={watchedValues.link} 
-                            target="_blank" 
+                          <a
+                            href={watchedValues.link}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-primary hover:underline break-all"
                           >
@@ -316,7 +316,6 @@ export default function CreateCommunityPost() {
                         ) : (
                           <div className="h-7 bg-muted/50 rounded animate-pulse w-3/4"></div>
                         )}
-                        
                         {watchedValues.content ? (
                           <p className="text-muted-foreground whitespace-pre-wrap">{watchedValues.content}</p>
                         ) : (
@@ -326,13 +325,12 @@ export default function CreateCommunityPost() {
                             <div className="h-4 bg-muted/50 rounded animate-pulse w-4/6"></div>
                           </div>
                         )}
-                        
                         {watchedValues.link && isValidUrl(watchedValues.link) && (
                           <div className="flex items-center gap-2 text-primary">
                             <LinkIcon className="h-4 w-4" />
-                            <a 
-                              href={watchedValues.link} 
-                              target="_blank" 
+                            <a
+                              href={watchedValues.link}
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="hover:underline text-sm break-all"
                             >
@@ -340,13 +338,11 @@ export default function CreateCommunityPost() {
                             </a>
                           </div>
                         )}
-                        
-                        <MediaPreview type="image" url={watchedValues.image || ""} />
-                        <MediaPreview type="video" url={watchedValues.video || ""} />
-                        <MediaPreview type="audio" url={watchedValues.audio || ""} />
+                        <MediaPreview type="image" previewUrl={imagePreview} />
+                        <MediaPreview type="video" previewUrl={videoPreview} />
+                        <MediaPreview type="audio" previewUrl={audioPreview} />
                       </div>
                     </div>
-                    
                     <div className="mt-4">
                       <Alert variant="default" className="bg-primary/5 border-primary/20">
                         <AlertDescription className="text-sm">
@@ -358,21 +354,11 @@ export default function CreateCommunityPost() {
                 </Tabs>
               </div>
             </CardContent>
-            
             <CardFooter className="flex justify-between p-6 bg-muted/20 border-t">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => router.back()}
-              >
+              <Button type="button" variant="outline" onClick={() => router.back()}>
                 Cancel
               </Button>
-              
-              <Button 
-                type="submit" 
-                disabled={!isValid || isSubmitting}
-                className="min-w-[120px]"
-              >
+              <Button type="submit" disabled={!isValid || isSubmitting} className="min-w-[120px]">
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

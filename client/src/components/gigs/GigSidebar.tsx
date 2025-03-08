@@ -37,14 +37,14 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
   const baseApiUrl = "http://localhost:8800/api"
   const { token, user } = useAuthStore()
 
-  // State for form fields
+  // State for form fields with safer initialization
   const [formData, setFormData] = useState({
     title: gig.title || "",
     shortDesc: gig.shortDesc || "",
     price: gig.price || 0,
     deliveryTime: gig.deliveryTime || 1,
     revisionNumber: gig.revisionNumber || 1,
-    features: gig.features || ["", "", ""]
+    features: Array.isArray(gig.features) ? gig.features : ["", "", ""]
   })
 
   // Format date
@@ -101,7 +101,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
       price: gig.price || 0,
       deliveryTime: gig.deliveryTime || 1,
       revisionNumber: gig.revisionNumber || 1,
-      features: gig.features || ["", "", ""]
+      features: Array.isArray(gig.features) ? gig.features : ["", "", ""]
     })
     setIsEditDialogOpen(true)
   }
@@ -117,11 +117,15 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
   }
 
   const handleFeatureChange = (index: number, value: string) => {
-    const updatedFeatures = [...formData.features]
-    updatedFeatures[index] = value
+    // Ensure features is an array before updating it
+    const currentFeatures = Array.isArray(formData.features) 
+      ? [...formData.features] 
+      : ["", "", ""]
+    
+    currentFeatures[index] = value
     setFormData({
       ...formData,
-      features: updatedFeatures
+      features: currentFeatures
     })
   }
 
@@ -158,8 +162,13 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
   const handleSubmitUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Ensure features is an array before filtering
+    const featuresToFilter = Array.isArray(formData.features) 
+      ? formData.features 
+      : ["", "", ""]
+      
     // Filter out empty features
-    const filteredFeatures = formData.features.filter(feature => feature.trim() !== "")
+    const filteredFeatures = featuresToFilter.filter(feature => feature.trim() !== "")
     
     const success = await handleUpdateGig({
       ...formData,
@@ -313,7 +322,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                   </span>
                 </div>
 
-                {gig.features && gig.features.filter((f) => f).length > 0 && (
+                {gig.features && Array.isArray(gig.features) && gig.features.filter((f) => f).length > 0 && (
                   <>
                     {gig.features.map(
                       (feature, index) =>
@@ -517,15 +526,36 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
 
             <div className="space-y-2">
               <Label>Features</Label>
-              {formData.features.map((feature, index) => (
-                <Input
-                  key={index}
-                  placeholder={`Feature ${index + 1}`}
-                  value={feature}
-                  onChange={(e) => handleFeatureChange(index, e.target.value)}
-                  className="mb-2"
-                />
-              ))}
+              {Array.isArray(formData.features) ? (
+                formData.features.map((feature, index) => (
+                  <Input
+                    key={index}
+                    placeholder={`Feature ${index + 1}`}
+                    value={feature}
+                    onChange={(e) => handleFeatureChange(index, e.target.value)}
+                    className="mb-2"
+                  />
+                ))
+              ) : (
+                // Fallback if features is not an array
+                <>
+                  <Input 
+                    placeholder="Feature 1" 
+                    onChange={(e) => handleFeatureChange(0, e.target.value)} 
+                    className="mb-2" 
+                  />
+                  <Input 
+                    placeholder="Feature 2" 
+                    onChange={(e) => handleFeatureChange(1, e.target.value)} 
+                    className="mb-2" 
+                  />
+                  <Input 
+                    placeholder="Feature 3" 
+                    onChange={(e) => handleFeatureChange(2, e.target.value)} 
+                    className="mb-2" 
+                  />
+                </>
+              )}
             </div>
 
             <DialogFooter className="mt-6">

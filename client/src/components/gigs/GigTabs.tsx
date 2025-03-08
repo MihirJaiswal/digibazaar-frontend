@@ -59,6 +59,9 @@ export default function GigTabs({ gig, isOwner }: GigTabsProps) {
 
   const canReview = user && !isOwner && !reviews.some((review) => review.userId === user.id)
 
+  // Ensure features is an array
+  const features = Array.isArray(gig.features) ? gig.features : [];
+
   return (
     <Tabs defaultValue="description" className="w-full">
       <TabsList className="grid grid-cols-4 mb-6">
@@ -85,17 +88,17 @@ export default function GigTabs({ gig, isOwner }: GigTabsProps) {
             <div className="mb-6">
               <h3 className="font-semibold text-lg mb-3">What you'll get:</h3>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {gig.features &&
-                  gig.features.map(
+                {features.length > 0 ? (
+                  features.map(
                     (feature, index) =>
                       feature && (
                         <li key={index} className="flex items-start">
                           <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
                           <span>{feature}</span>
                         </li>
-                      ),
-                  )}
-                {(!gig.features || gig.features.length === 0 || gig.features[0] === "") && (
+                      )
+                  )
+                ) : (
                   <li className="flex items-center">
                     <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
                     <span>Custom service based on your requirements</span>
@@ -266,4 +269,3 @@ export default function GigTabs({ gig, isOwner }: GigTabsProps) {
     </Tabs>
   )
 }
-

@@ -1,69 +1,97 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import Link from "next/link"
-import { useAuthStore } from "@/store/authStore"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { AlertCircle, User, Mail, Lock, Image, Globe, Phone, FileText, Loader2, ArrowRight } from 'lucide-react'
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { motion, AnimatePresence } from "framer-motion"
-import axios from "axios"
-import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import Link from "next/link";
+import { useAuthStore } from "@/store/authStore";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertCircle, User, Mail, Lock, Globe, Phone, FileText, Loader2, ArrowRight } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function SignUp() {
-  const { register: registerField, handleSubmit, watch, reset } = useForm()
-  const { user, setUser, token } = useAuthStore()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [step, setStep] = useState(1)
-  const router = useRouter()
+  const { register: registerField, handleSubmit, watch, reset } = useForm();
+  const { user, setUser, token } = useAuthStore();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState(1);
+  const router = useRouter();
 
-  const watchedFields = watch()
+  const watchedFields = watch();
+
+  // New state to store the selected profile image file and its preview
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string>("");
+
+  // Handler for file input change
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setProfileImageFile(file);
+      setProfileImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   const onSubmit = async (data: any) => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
-      const response = await axios.post("http://localhost:8800/api/auth/register", {
-        username: data.username,
-        email: data.email,
-        password: data.password,
-        profilePic: data.profilePic,
-        country: data.country,
-        phone: data.phone,
-        bio: data.desc,
-        isSeller: data.isSeller === "on",
-      })
+      // Build FormData payload
+      const formPayload = new FormData();
+      formPayload.append("username", data.username);
+      formPayload.append("email", data.email);
+      formPayload.append("password", data.password);
+      formPayload.append("country", data.country);
+      formPayload.append("phone", data.phone);
+      formPayload.append("bio", data.desc);
+      formPayload.append("isSeller", data.isSeller === "on" ? "true" : "false");
+
+      // Append profilePic file if selected
+      if (profileImageFile) {
+        formPayload.append("profilePic", profileImageFile);
+      } else if (data.profilePic) {
+        // Fallback: if the user enters a URL manually (if allowed)
+        formPayload.append("profilePic", data.profilePic);
+      }
+
+      const response = await axios.post("http://localhost:8800/api/auth/register", formPayload, {
+        headers: {
+          // Do not manually set Content-Type; let the browser set the multipart boundary.
+          Authorization: `Bearer ${token}`,
+        },
+      });
       
       if (response.data && !response.data.user) {
-        setUser(response.data)
+        setUser(response.data);
       } else {
-        setUser(response.data.user, response.data.token)
+        setUser(response.data.user, response.data.token);
       }
       
-      toast.success("Account created successfully!")
-      reset()
+      toast.success("Account created successfully!");
+      reset();
       setTimeout(() => {
-        router.push("/")
-      }, 500)
+        router.push("/");
+      }, 500);
     } catch (err: any) {
-      console.error("Error:", err)
-      setError(err.response?.data?.message || "Something went wrong")
+      console.error("Error:", err);
+      setError(err.response?.data?.message || "Something went wrong");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const nextStep = () => setStep(2)
-  const prevStep = () => setStep(1)
+  const nextStep = () => setStep(2);
+  const prevStep = () => setStep(1);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-background relative overflow-hidden">
@@ -213,10 +241,36 @@ export default function SignUp() {
                             />
                           </div>
                         </div>
-
+                        {/* Replace profilePic URL with a file input */}
+                        <div className="space-y-2">
+                          <Label htmlFor="profilePic">Profile Image</Label>
+                          <div className="relative">
+                            <Image 
+                              src="/icons/profile-upload.svg" 
+                              alt="Upload"
+                              width={16}
+                              height={16}
+                              className="absolute left-3 top-3 text-muted-foreground" 
+                            />
+                            <Input
+                              id="profilePic"
+                              type="file"
+                              accept="image/*"
+                              onChange={handleProfileImageChange}
+                              className="pl-10"
+                            />
+                          </div>
+                          {profileImagePreview && (
+                            <img
+                              src={profileImagePreview}
+                              alt="Profile Preview"
+                              className="mt-2 h-24 w-24 rounded-full object-cover"
+                            />
+                          )}
+                        </div>
                         <Button
                           type="button"
-                          onClick={nextStep}
+                          onClick={() => setStep(2)}
                           disabled={!watchedFields.username || !watchedFields.email || !watchedFields.password}
                           className="w-full"
                         >
@@ -237,19 +291,6 @@ export default function SignUp() {
                       >
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="profilePic">Profile Image URL</Label>
-                            <div className="relative">
-                              <Image className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input
-                                id="profilePic"
-                                placeholder="https://example.com/image.jpg"
-                                {...registerField("profilePic")}
-                                className="pl-10"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
                             <Label htmlFor="country">Country</Label>
                             <div className="relative">
                               <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -261,9 +302,7 @@ export default function SignUp() {
                               />
                             </div>
                           </div>
-                        </div>
 
-                        <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="phone">Phone</Label>
                             <div className="relative">
@@ -276,7 +315,9 @@ export default function SignUp() {
                               />
                             </div>
                           </div>
+                        </div>
 
+                        <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="desc">Description</Label>
                             <div className="relative">
@@ -328,5 +369,5 @@ export default function SignUp() {
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

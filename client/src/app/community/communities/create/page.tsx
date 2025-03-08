@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -23,17 +23,19 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useAuthStore } from "@/store/authStore"
 import { Switch } from "@/components/ui/switch"
 import { motion, AnimatePresence } from "framer-motion"
-import { AlertCircle, ArrowLeft, ArrowRight, Check, CheckCircle2, Globe, Image, Info, Loader2, Lock, Shield, Tag, Users } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowRight, Check, CheckCircle2, Globe, Image as ImageIcon, Info, Loader2, Lock, Shield, Tag, Upload, Users, X } from 'lucide-react'
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-// Define form schema
+// Modified form schema to handle file uploads
 const formSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters").max(50, "Name must be less than 50 characters"),
   description: z.string().min(10, "Description must be at least 10 characters").max(500, "Description must be less than 500 characters"),
-  image: z.string().optional(),
-  coverImage: z.string().optional(),
+  image: z.any().optional(), // Changed to handle File object
+  imageUrl: z.string().optional(), // For preview and existing URLs
+  coverImage: z.any().optional(), // Changed to handle File object
+  coverImageUrl: z.string().optional(), // For preview and existing URLs
   isPublic: z.boolean().default(true),
   allowNSFW: z.boolean().default(false),
   tags: z.string().optional(),
@@ -48,14 +50,24 @@ export default function CreateCommunityPage() {
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const totalSteps = 3
+  
+  // References for file inputs
+  const imageInputRef = useRef<HTMLInputElement>(null)
+  const coverImageInputRef = useRef<HTMLInputElement>(null)
+  
+  // State for image previews
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
-      image: "",
-      coverImage: "",
+      image: undefined,
+      imageUrl: "",
+      coverImage: undefined,
+      coverImageUrl: "",
       isPublic: true,
       allowNSFW: false,
       tags: "",
@@ -73,6 +85,60 @@ export default function CreateCommunityPage() {
     return true;
   }
 
+  // Handle file selection for community image
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      form.setValue('image', file);
+      
+      // Create a preview URL
+      const objectUrl = URL.createObjectURL(file);
+      setImagePreview(objectUrl);
+      form.setValue('imageUrl', objectUrl);
+    }
+  };
+  
+  // Handle file selection for cover image
+  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      form.setValue('coverImage', file);
+      
+      // Create a preview URL
+      const objectUrl = URL.createObjectURL(file);
+      setCoverImagePreview(objectUrl);
+      form.setValue('coverImageUrl', objectUrl);
+    }
+  };
+  
+  // Clear image selection
+  const clearImage = () => {
+    form.setValue('image', undefined);
+    form.setValue('imageUrl', '');
+    setImagePreview(null);
+    if (imageInputRef.current) {
+      imageInputRef.current.value = '';
+    }
+  };
+  
+  // Clear cover image selection
+  const clearCoverImage = () => {
+    form.setValue('coverImage', undefined);
+    form.setValue('coverImageUrl', '');
+    setCoverImagePreview(null);
+    if (coverImageInputRef.current) {
+      coverImageInputRef.current.value = '';
+    }
+  };
+
+  // Cleanup preview URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+      if (coverImagePreview) URL.revokeObjectURL(coverImagePreview);
+    };
+  }, [imagePreview, coverImagePreview]);
+
   if (!user) return (
     <div className="flex items-center justify-center min-h-[60vh]">
       <div className="animate-pulse flex flex-col items-center">
@@ -85,23 +151,60 @@ export default function CreateCommunityPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      setIsSubmitting(true)
-      const payload = { ...values, creatorId: user?.id }
+      setIsSubmitting(true);
+      
+      // Create FormData object for handling files
+      const formData = new FormData();
+      
+      // Important: Make sure all string values are explicitly converted to strings
+      formData.append('name', values.name);
+      formData.append('description', values.description);
+      formData.append('isPublic', String(values.isPublic));
+      formData.append('allowNSFW', String(values.allowNSFW));
+      
+      if (values.tags) formData.append('tags', values.tags);
+      if (values.rules) formData.append('rules', values.rules);
+      
+      // Append files if they exist - make sure you're appending the actual File objects
+      if (values.image instanceof File) {
+        formData.append('image', values.image);
+      }
+      
+      if (values.coverImage instanceof File) {
+        formData.append('coverImage', values.coverImage);
+      }
+      
+      // Log the formData entries to verify what's being sent
+      console.log("FormData contents:");
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+      
       const response = await axios.post(
         "http://localhost:8800/api/communities",
-        payload,
+        formData,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            // Don't set Content-Type manually, let axios set it with the boundary
+            // 'Content-Type': 'multipart/form-data'
+          },
         }
-      )
-      const community = response.data
-      toast.success(`Community r/${values.name} created successfully!`)
-      router.push(`/communities/${community.id}`)
-    } catch (error) {
-      toast.error("Failed to create community")
-      console.error(error)
+      );
+      
+      console.log("FormData contents:");
+for (const [key, value] of formData.entries()) {
+  console.log(key, value);
+}
+
+      const community = response.data;
+      toast.success(`Community r/${values.name} created successfully!`);
+      router.push(`/communities/${community.id}`);
+    } catch (error: any) {
+      toast.error("Failed to create community: " + (error.response?.data?.message || error.message));
+      console.error(error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -136,9 +239,9 @@ export default function CreateCommunityPage() {
   const CommunityPreview = () => (
     <div className="rounded-xl overflow-hidden border shadow-lg bg-card">
       <div className="h-32 bg-muted relative">
-        {watchedValues.coverImage && isValidUrl(watchedValues.coverImage) ? (
+        {(watchedValues.coverImageUrl || coverImagePreview) ? (
           <img 
-            src={watchedValues.coverImage || "/placeholder.svg"} 
+            src={coverImagePreview || watchedValues.coverImageUrl || "/placeholder.svg"} 
             alt="Cover" 
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -151,9 +254,9 @@ export default function CreateCommunityPage() {
         
         <div className="absolute -bottom-10 left-4">
           <div className="h-20 w-20 rounded-full border-4 border-background bg-muted overflow-hidden">
-            {watchedValues.image && isValidUrl(watchedValues.image) ? (
+            {(watchedValues.imageUrl || imagePreview) ? (
               <img 
-                src={watchedValues.image || "/placeholder.svg"} 
+                src={imagePreview || watchedValues.imageUrl || "/placeholder.svg"} 
                 alt="Community" 
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -165,7 +268,7 @@ export default function CreateCommunityPage() {
                 {watchedValues.name ? (
                   <span className="text-xl font-bold">{watchedValues.name.charAt(0).toUpperCase()}</span>
                 ) : (
-                  <Image className="h-8 w-8 text-muted-foreground/50" />
+                  <ImageIcon className="h-8 w-8 text-muted-foreground/50" />
                 )}
               </div>
             )}
@@ -426,41 +529,120 @@ export default function CreateCommunityPage() {
                             transition={{ duration: 0.3 }}
                             className="space-y-6"
                           >
+                            {/* Community Icon Upload */}
                             <FormField
                               control={form.control}
                               name="image"
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel className="text-base font-medium">Community Icon</FormLabel>
-                                  <FormControl>
-                                    <Input 
-                                      placeholder="https://example.com/icon.png" 
-                                      {...field} 
-                                    />
-                                  </FormControl>
-                                  <FormDescription>
-                                    A square image that represents your community (recommended size: 256x256px)
-                                  </FormDescription>
+                                  <div className="flex items-center gap-4 mb-2">
+                                    <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center overflow-hidden border">
+                                      {imagePreview ? (
+                                        <img 
+                                          src={imagePreview} 
+                                          alt="Preview" 
+                                          className="h-full w-full object-cover"
+                                        />
+                                      ) : (
+                                        <ImageIcon className="h-8 w-8 text-muted-foreground/50" />
+                                      )}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex gap-2">
+                                        <Button 
+                                          type="button" 
+                                          variant="outline" 
+                                          onClick={() => imageInputRef.current?.click()}
+                                          className="gap-2"
+                                        >
+                                          <Upload className="h-4 w-4" />
+                                          {imagePreview ? 'Change' : 'Upload'} Image
+                                        </Button>
+                                        {imagePreview && (
+                                          <Button 
+                                            type="button" 
+                                            variant="outline" 
+                                            onClick={clearImage}
+                                            size="icon"
+                                            className="text-destructive"
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </Button>
+                                        )}
+                                      </div>
+                                      <input
+                                        type="file"
+                                        ref={imageInputRef}
+                                        onChange={handleImageChange}
+                                        className="hidden"
+                                        accept="image/*"
+                                      />
+                                      <FormDescription className="mt-1">
+                                        A square image that represents your community (recommended size: 256x256px)
+                                      </FormDescription>
+                                    </div>
+                                  </div>
                                   <FormMessage />
                                 </FormItem>
                               )}
                             />
                             
+                            {/* Cover Image Upload */}
                             <FormField
                               control={form.control}
                               name="coverImage"
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel className="text-base font-medium">Cover Image</FormLabel>
-                                  <FormControl>
-                                    <Input 
-                                      placeholder="https://example.com/cover.jpg" 
-                                      {...field} 
+                                  <div className="mb-2">
+                                    <div className="h-32 rounded-lg bg-muted flex items-center justify-center overflow-hidden mb-3 border">
+                                      {coverImagePreview ? (
+                                        <img 
+                                          src={coverImagePreview} 
+                                          alt="Cover Preview" 
+                                          className="h-full w-full object-cover"
+                                        />
+                                      ) : (
+                                        <div className="flex flex-col items-center text-muted-foreground/70">
+                                          <ImageIcon className="h-8 w-8 mb-1" />
+                                          <span className="text-sm">Cover image</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <Button 
+                                        type="button" 
+                                        variant="outline" 
+                                        onClick={() => coverImageInputRef.current?.click()}
+                                        className="gap-2"
+                                      >
+                                        <Upload className="h-4 w-4" />
+                                        {coverImagePreview ? 'Change' : 'Upload'} Cover
+                                      </Button>
+                                      {coverImagePreview && (
+                                        <Button 
+                                          type="button" 
+                                          variant="outline" 
+                                          onClick={clearCoverImage}
+                                          size="icon"
+                                          className="text-destructive"
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                    <input
+                                      type="file"
+                                      ref={coverImageInputRef}
+                                      onChange={handleCoverImageChange}
+                                      className="hidden"
+                                      accept="image/*"
                                     />
-                                  </FormControl>
-                                  <FormDescription>
-                                    A banner image for your community (recommended size: 1200x400px)
-                                  </FormDescription>
+                                    <FormDescription className="mt-1">
+                                      A banner image for your community (recommended size: 1200x400px)
+                                    </FormDescription>
+                                  </div>
                                   <FormMessage />
                                 </FormItem>
                               )}

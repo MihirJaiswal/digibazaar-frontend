@@ -1,44 +1,66 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Package, Tag, DollarSign, Percent, Info, CheckCircle2, AlertCircle, ArrowLeft, Save, ImagePlus, Truck, Ruler, Weight, Layers, Store } from 'lucide-react';
+import {
+  Package,
+  Tag,
+  DollarSign,
+  Percent,
+  Info,
+  CheckCircle2,
+  AlertCircle,
+  ArrowLeft,
+  Save,
+  ImagePlus,
+  Truck,
+  Ruler,
+  Weight,
+  Layers,
+  Store,
+} from "lucide-react";
 import CreateProductVariant from "@/components/inventory/CreateProductVariant";
 
 const CreateProductPage = () => {
   const { token } = useAuthStore();
   const router = useRouter();
 
-  // State for the product creation form
+  // State for text fields – note that mainImage and images are now handled separately
   const [formData, setFormData] = useState({
     storeId: "",
     title: "",
     description: "",
     price: "",
     sku: "",
-    mainImage: "",
-    images: "",
     stock: "",
     weight: "",
     dimensions: "",
     tags: "",
     costPerItem: "",
     categoryId: "",
-    profit: "0",  // Auto-calculated
-    margin: "0",  // Auto-calculated
+    profit: "0", // Auto-calculated
+    margin: "0", // Auto-calculated
     isPublished: true,
+    resume: "",
   });
 
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -47,6 +69,12 @@ const CreateProductPage = () => {
   const [activeTab, setActiveTab] = useState("basic");
   const [stores, setStores] = useState<Array<{ id: string; name: string }>>([]);
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
+
+  // New states for file uploads
+  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
+  const [mainImagePreview, setMainImagePreview] = useState<string>("");
+  const [additionalImageFiles, setAdditionalImageFiles] = useState<File[]>([]);
+  const [additionalImagePreviews, setAdditionalImagePreviews] = useState<string[]>([]);
 
   // Fetch stores and categories
   useEffect(() => {
@@ -57,24 +85,21 @@ const CreateProductPage = () => {
         });
         if (storesRes.ok) {
           const storesData = await storesRes.json();
-          console.log("Stores Data:", storesData); // Log the response
-          setStores(Array.isArray(storesData) ? storesData : []); // Ensure it's an array
+          console.log("Stores Data:", storesData);
+          setStores(Array.isArray(storesData) ? storesData : []);
         }
       } catch (error) {
         console.error("Error fetching stores:", error);
       }
     };
-  
+
     if (token) {
       fetchStoresAndCategories();
     }
   }, [token]);
-  
 
-  // Handler for input changes
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  // Handler for input changes (text fields)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     let updatedData = { ...formData, [name]: value };
 
@@ -82,10 +107,8 @@ const CreateProductPage = () => {
     if (name === "price" || name === "costPerItem") {
       const price = parseFloat(updatedData.price) || 0;
       const costPerItem = parseFloat(updatedData.costPerItem) || 0;
-
       const profit = price - costPerItem;
       const margin = price > 0 ? (profit / price) * 100 : 0;
-
       updatedData.profit = profit.toFixed(2);
       updatedData.margin = margin.toFixed(2);
     }
@@ -103,38 +126,78 @@ const CreateProductPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Form submit handler to create a new product
+  // Handlers for file inputs
+  const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setMainImageFile(file);
+      setMainImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleAdditionalImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      setAdditionalImageFiles(files);
+      const previews = files.map(file => URL.createObjectURL(file));
+      setAdditionalImagePreviews(previews);
+    }
+  };
+
+  // Cleanup preview URLs when component unmounts or when files change
+  useEffect(() => {
+    return () => {
+      if (mainImagePreview) URL.revokeObjectURL(mainImagePreview);
+      additionalImagePreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [mainImagePreview, additionalImagePreviews]);
+
+  // Form submit handler to create a new product with file uploads using FormData
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
     setIsSubmitting(true);
-    
+
     try {
-      const payload = {
-        ...formData,
-        price: parseFloat(formData.price) || 0,
-        costPerItem: parseFloat(formData.costPerItem) || 0,
-        profit: parseFloat(formData.profit) || 0,
-        margin: parseFloat(formData.margin) || 0,
-        stock: parseInt(formData.stock, 10) || 0,
-        weight: formData.weight ? parseFloat(formData.weight) : null,
-        dimensions: formData.dimensions ? JSON.parse(formData.dimensions) : null,
-        tags: formData.tags ? formData.tags.split(",").map((s) => s.trim()) : [],
-        isPublished: formData.isPublished,
-      };
+      const formPayload = new FormData();
+
+      // Append text fields
+      formPayload.append("storeId", formData.storeId);
+      formPayload.append("title", formData.title);
+      formPayload.append("description", formData.description);
+      formPayload.append("price", formData.price);
+      formPayload.append("sku", formData.sku);
+      formPayload.append("stock", formData.stock);
+      formPayload.append("weight", formData.weight);
+      formPayload.append("dimensions", formData.dimensions);
+      formPayload.append("tags", formData.tags);
+      formPayload.append("costPerItem", formData.costPerItem);
+      formPayload.append("categoryId", formData.categoryId);
+      formPayload.append("profit", formData.profit);
+      formPayload.append("margin", formData.margin);
+      formPayload.append("isPublished", formData.isPublished ? "true" : "false");
+      formPayload.append("resume", formData.resume);
+
+      // Append files if available
+      if (mainImageFile) {
+        formPayload.append("mainImage", mainImageFile);
+      }
+      if (additionalImageFiles.length > 0) {
+        additionalImageFiles.forEach((file) => {
+          formPayload.append("images", file);
+        });
+      }
 
       const res = await fetch("http://localhost:8800/api/products", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          // Do not set Content-Type; the browser will set the correct boundary.
         },
-        body: JSON.stringify(payload),
+        body: formPayload,
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to create product");
-      }
+      if (!res.ok) throw new Error("Failed to create product");
 
       const data = await res.json();
       setProductId(data.id);
@@ -143,6 +206,7 @@ const CreateProductPage = () => {
       window.scrollTo(0, 0);
     } catch (error: any) {
       setMessage({ type: "error", text: error.message });
+      console.error("Error creating product:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -157,6 +221,25 @@ const CreateProductPage = () => {
       formData.costPerItem !== ""
     );
   };
+
+  // Steps configuration
+  const steps = [
+    {
+      title: "Basic Info",
+      icon: <Info className="h-5 w-5" />,
+      fields: ["title", "storeId", "description", "tags"],
+    },
+    {
+      title: "Pricing",
+      icon: <DollarSign className="h-5 w-5" />,
+      fields: ["price", "costPerItem", "profit", "margin"],
+    },
+    {
+      title: "Inventory & Media",
+      icon: <Store className="h-5 w-5" />,
+      fields: ["stock", "weight", "dimensions"],
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-10">
@@ -194,10 +277,7 @@ const CreateProductPage = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">Published</span>
-                    <Switch 
-                      checked={formData.isPublished} 
-                      onCheckedChange={handleSwitchChange} 
-                    />
+                    <Switch checked={formData.isPublished} onCheckedChange={handleSwitchChange} />
                   </div>
                 </div>
               </CardHeader>
@@ -214,7 +294,7 @@ const CreateProductPage = () => {
                     </TabsTrigger>
                     <TabsTrigger value="inventory" className="flex items-center gap-1">
                       <Layers className="h-4 w-4" />
-                      Inventory
+                      Inventory & Media
                     </TabsTrigger>
                   </TabsList>
 
@@ -225,10 +305,10 @@ const CreateProductPage = () => {
                           <Label htmlFor="title" className="text-base">
                             Product Title <span className="text-red-500">*</span>
                           </Label>
-                          <Input 
-                            id="title" 
-                            name="title" 
-                            value={formData.title} 
+                          <Input
+                            id="title"
+                            name="title"
+                            value={formData.title}
                             onChange={handleInputChange}
                             placeholder="Enter product name"
                             className="h-11"
@@ -236,54 +316,59 @@ const CreateProductPage = () => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="sku" className="text-base">SKU</Label>
-                          <Input 
-                            id="sku" 
-                            name="sku" 
-                            value={formData.sku} 
+                          <Label htmlFor="sku" className="text-base">
+                            SKU
+                          </Label>
+                          <Input
+                            id="sku"
+                            name="sku"
+                            value={formData.sku}
                             onChange={handleInputChange}
                             placeholder="Stock Keeping Unit"
                             className="h-11"
                           />
                         </div>
                       </div>
-
                       <div className="space-y-2">
-                        <Label htmlFor="description" className="text-base">Description</Label>
-                        <Textarea 
-                          id="description" 
-                          name="description" 
-                          value={formData.description} 
+                        <Label htmlFor="description" className="text-base">
+                          Description
+                        </Label>
+                        <Textarea
+                          id="description"
+                          name="description"
+                          value={formData.description}
                           onChange={handleInputChange}
                           placeholder="Describe your product"
                           className="min-h-[120px]"
                         />
                       </div>
-
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <Label htmlFor="storeId" className="text-base">Store</Label>
-                          <Input 
-                          type="id"
-                          id="storeId"
-                          name="storeId"
-                          value={formData.storeId} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter store name"
-                          className="h-11"
+                          <Label htmlFor="storeId" className="text-base">
+                            Store
+                          </Label>
+                          <Input
+                            id="storeId"
+                            name="storeId"
+                            value={formData.storeId}
+                            onChange={handleInputChange}
+                            placeholder="Enter store ID"
+                            className="h-11"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="categoryId" className="text-base">Category</Label>
-                          <Select 
-                            value={formData.categoryId} 
+                          <Label htmlFor="categoryId" className="text-base">
+                            Category
+                          </Label>
+                          <Select
+                            value={formData.categoryId}
                             onValueChange={(value) => handleSelectChange("categoryId", value)}
                           >
                             <SelectTrigger className="h-11">
                               <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
                             <SelectContent>
-                              {categories.map(category => (
+                              {categories.map((category) => (
                                 <SelectItem key={category.id} value={category.id}>
                                   {category.name}
                                 </SelectItem>
@@ -292,13 +377,14 @@ const CreateProductPage = () => {
                           </Select>
                         </div>
                       </div>
-
                       <div className="space-y-2">
-                        <Label htmlFor="tags" className="text-base">Tags</Label>
-                        <Input 
-                          id="tags" 
-                          name="tags" 
-                          value={formData.tags} 
+                        <Label htmlFor="tags" className="text-base">
+                          Tags
+                        </Label>
+                        <Input
+                          id="tags"
+                          name="tags"
+                          value={formData.tags}
                           onChange={handleInputChange}
                           placeholder="Enter tags separated by commas"
                           className="h-11"
@@ -307,13 +393,8 @@ const CreateProductPage = () => {
                           Tags help customers find your product through search and filtering
                         </p>
                       </div>
-
                       <div className="flex justify-end">
-                        <Button 
-                          type="button" 
-                          onClick={() => setActiveTab("pricing")}
-                          className="flex items-center gap-2"
-                        >
+                        <Button type="button" onClick={() => setActiveTab("pricing")} className="flex items-center gap-2">
                           Next: Pricing
                           <DollarSign className="h-4 w-4" />
                         </Button>
@@ -328,12 +409,12 @@ const CreateProductPage = () => {
                           </Label>
                           <div className="relative">
                             <DollarSign className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                            <Input 
-                              id="price" 
-                              name="price" 
-                              type="number" 
+                            <Input
+                              id="price"
+                              name="price"
+                              type="number"
                               step="0.01"
-                              value={formData.price} 
+                              value={formData.price}
                               onChange={handleInputChange}
                               placeholder="0.00"
                               className="h-11 pl-10"
@@ -347,12 +428,12 @@ const CreateProductPage = () => {
                           </Label>
                           <div className="relative">
                             <DollarSign className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                            <Input 
-                              id="costPerItem" 
-                              name="costPerItem" 
-                              type="number" 
+                            <Input
+                              id="costPerItem"
+                              name="costPerItem"
+                              type="number"
                               step="0.01"
-                              value={formData.costPerItem} 
+                              value={formData.costPerItem}
                               onChange={handleInputChange}
                               placeholder="0.00"
                               className="h-11 pl-10"
@@ -361,54 +442,47 @@ const CreateProductPage = () => {
                           </div>
                         </div>
                       </div>
-
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <Label htmlFor="profit" className="text-base">Profit</Label>
+                          <Label htmlFor="profit" className="text-base">
+                            Profit
+                          </Label>
                           <div className="relative">
                             <DollarSign className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                            <Input 
-                              id="profit" 
-                              name="profit" 
-                              type="number" 
-                              value={formData.profit} 
-                              disabled 
+                            <Input
+                              id="profit"
+                              name="profit"
+                              type="number"
+                              value={formData.profit}
+                              disabled
                               className="h-11 pl-10 bg-muted cursor-not-allowed"
                             />
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="margin" className="text-base">Margin</Label>
+                          <Label htmlFor="margin" className="text-base">
+                            Margin
+                          </Label>
                           <div className="relative">
                             <Percent className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                            <Input 
-                              id="margin" 
-                              name="margin" 
-                              type="number" 
-                              value={formData.margin} 
-                              disabled 
+                            <Input
+                              id="margin"
+                              name="margin"
+                              type="number"
+                              value={formData.margin}
+                              disabled
                               className="h-11 pl-10 bg-muted cursor-not-allowed"
                             />
                           </div>
                         </div>
                       </div>
-
                       <div className="flex justify-between">
-                        <Button 
-                          type="button" 
-                          variant="outline"
-                          onClick={() => setActiveTab("basic")}
-                          className="flex items-center gap-2"
-                        >
+                        <Button type="button" variant="outline" onClick={() => setActiveTab("basic")} className="flex items-center gap-2">
                           <ArrowLeft className="h-4 w-4" />
                           Back
                         </Button>
-                        <Button 
-                          type="button" 
-                          onClick={() => setActiveTab("inventory")}
-                          className="flex items-center gap-2"
-                        >
-                          Next: Inventory
+                        <Button type="button" onClick={() => setActiveTab("inventory")} className="flex items-center gap-2">
+                          Next: Inventory & Media
                           <Layers className="h-4 w-4" />
                         </Button>
                       </div>
@@ -420,11 +494,11 @@ const CreateProductPage = () => {
                           <Label htmlFor="stock" className="text-base">
                             Stock Quantity <span className="text-red-500">*</span>
                           </Label>
-                          <Input 
-                            id="stock" 
-                            name="stock" 
-                            type="number" 
-                            value={formData.stock} 
+                          <Input
+                            id="stock"
+                            name="stock"
+                            type="number"
+                            value={formData.stock}
                             onChange={handleInputChange}
                             placeholder="0"
                             className="h-11"
@@ -432,15 +506,17 @@ const CreateProductPage = () => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="weight" className="text-base">Weight (kg)</Label>
+                          <Label htmlFor="weight" className="text-base">
+                            Weight (kg)
+                          </Label>
                           <div className="relative">
                             <Weight className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                            <Input 
-                              id="weight" 
-                              name="weight" 
-                              type="number" 
+                            <Input
+                              id="weight"
+                              name="weight"
+                              type="number"
                               step="0.01"
-                              value={formData.weight} 
+                              value={formData.weight}
                               onChange={handleInputChange}
                               placeholder="0.00"
                               className="h-11 pl-10"
@@ -448,15 +524,16 @@ const CreateProductPage = () => {
                           </div>
                         </div>
                       </div>
-
                       <div className="space-y-2">
-                        <Label htmlFor="dimensions" className="text-base">Dimensions (JSON format)</Label>
+                        <Label htmlFor="dimensions" className="text-base">
+                          Dimensions (JSON format)
+                        </Label>
                         <div className="relative">
                           <Ruler className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                          <Input 
-                            id="dimensions" 
-                            name="dimensions" 
-                            value={formData.dimensions} 
+                          <Input
+                            id="dimensions"
+                            name="dimensions"
+                            value={formData.dimensions}
                             onChange={handleInputChange}
                             placeholder='{"length": 10, "width": 5, "height": 2}'
                             className="h-11 pl-10"
@@ -467,36 +544,56 @@ const CreateProductPage = () => {
                         </p>
                       </div>
 
+                      {/* Updated file input for Main Image */}
                       <div className="space-y-2">
-                        <Label htmlFor="mainImage" className="text-base">Main Image URL</Label>
-                        <div className="relative">
-                          <ImagePlus className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                          <Input 
-                            id="mainImage" 
-                            name="mainImage" 
-                            value={formData.mainImage} 
-                            onChange={handleInputChange}
-                            placeholder="https://example.com/image.jpg"
-                            className="h-11 pl-10"
+                        <Label htmlFor="mainImage" className="text-base">
+                          Main Image
+                        </Label>
+                        <Input
+                          id="mainImage"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleMainImageChange}
+                        />
+                        {mainImagePreview && (
+                          <img
+                            src={mainImagePreview}
+                            alt="Main Image Preview"
+                            className="w-full h-48 object-cover mt-2 rounded"
                           />
+                        )}
+                      </div>
+
+                      {/* File input for Additional Images */}
+                      <div className="space-y-2">
+                        <Label htmlFor="additionalImages" className="text-base">
+                          Additional Images
+                        </Label>
+                        <Input
+                          id="additionalImages"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleAdditionalImagesChange}
+                        />
+                        <div className="flex flex-wrap mt-2 gap-2">
+                          {additionalImagePreviews.map((preview, index) => (
+                            <img
+                              key={index}
+                              src={preview}
+                              alt={`Additional Image ${index + 1} Preview`}
+                              className="w-24 h-24 object-cover rounded"
+                            />
+                          ))}
                         </div>
                       </div>
 
                       <div className="flex justify-between">
-                        <Button 
-                          type="button" 
-                          variant="outline"
-                          onClick={() => setActiveTab("pricing")}
-                          className="flex items-center gap-2"
-                        >
+                        <Button type="button" variant="outline" onClick={() => setActiveTab("pricing")} className="flex items-center gap-2">
                           <ArrowLeft className="h-4 w-4" />
                           Back
                         </Button>
-                        <Button 
-                          type="submit"
-                          disabled={!isFormValid() || isSubmitting}
-                          className="flex items-center gap-2"
-                        >
+                        <Button type="submit" disabled={!isFormValid() || isSubmitting} className="flex items-center gap-2">
                           {isSubmitting ? (
                             <>
                               <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
@@ -526,10 +623,10 @@ const CreateProductPage = () => {
                 {formData.title ? (
                   <>
                     <div className="aspect-square bg-muted rounded-md flex items-center justify-center">
-                      {formData.mainImage ? (
-                        <img 
-                          src={formData.mainImage || "/placeholder.svg"} 
-                          alt={formData.title} 
+                      {mainImagePreview ? (
+                        <img
+                          src={mainImagePreview}
+                          alt={formData.title}
                           className="max-h-full max-w-full object-contain"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=200";
@@ -567,7 +664,7 @@ const CreateProductPage = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Store className="h-4 w-4 text-muted-foreground" />
-                        <span>{stores.find(s => s.id === formData.storeId)?.name || "No store"}</span>
+                        <span>{stores.find((s) => s.id === formData.storeId)?.name || "No store"}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Percent className="h-4 w-4 text-muted-foreground" />
@@ -609,7 +706,6 @@ const CreateProductPage = () => {
             </Card>
           </div>
         </div>
-
         {productId && (
           <Card className="mt-8 shadow-lg border-t-4 border-t-green-500">
             <CardHeader>
