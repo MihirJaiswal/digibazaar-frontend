@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Roboto } from 'next/font/google';
+import { ThemeProvider } from "@/components/theme-provider";
+
 import "./globals.css";
 import { Toaster } from "sonner";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: ['400', '700'], // Regular and Bold weights
+  style: ['normal', 'italic'], // Normal and Italic styles
+  display: 'swap',
+  variable: '--font-poppins', // Optional: Define a CSS variable for the font
 });
 
 export const metadata: Metadata = {
@@ -23,12 +24,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <main>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${roboto.variable}  antialiased`}>
+        <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+        >
+          <Toaster />
           {children}
-        </main>
-        <Toaster/>
+        </ThemeProvider>
       </body>
     </html>
   );
