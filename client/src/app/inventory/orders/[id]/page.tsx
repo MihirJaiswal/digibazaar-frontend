@@ -379,14 +379,14 @@ export default function AssignInventoryPage() {
     if (!order?.shippingAddress || warehouses.length === 0) {
       return (
         <Card className="mt-4 border-slate-200 shadow-md">
-          <CardHeader className="bg-slate-50 border-b border-slate-200">
+          <CardHeader className="border-b border-slate-200">
             <div className="flex items-center gap-2">
               <MapPinIcon className="h-5 w-5 text-slate-500" />
               <CardTitle className="text-xl">Warehouse Locations</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="flex items-center justify-center h-40 bg-slate-50 rounded-md border border-dashed border-slate-300">
+            <div className="flex items-center justify-center h-40 rounded-md border border-dashed border-slate-300">
               <p className="text-slate-500 flex items-center gap-2">
                 <InfoIcon className="h-4 w-4" />
                 Unable to display map: Missing location information
@@ -403,7 +403,7 @@ export default function AssignInventoryPage() {
 
     return (
       <Card className="mt-6 border-slate-200 shadow-md overflow-hidden">
-        <CardHeader className="bg-slate-50 border-b border-slate-200 pb-4">
+        <CardHeader className=" border-b border-slate-200 pb-4">
           <div className="flex items-center gap-2">
             <MapPinIcon className="h-5 w-5 text-primary" />
             <div>
@@ -476,7 +476,7 @@ export default function AssignInventoryPage() {
             </MapContainer>
 
             {/* Map Legend */}
-            <div className="absolute bottom-4 right-4 bg-white p-3 rounded-md shadow-md z-[1000] border border-slate-200">
+            <div className="absolute bottom-4 right-4 p-3 rounded-md shadow-md z-[1000] border border-slate-200">
               <div className="text-sm font-medium mb-2">Map Legend</div>
               <div className="flex items-center gap-2 text-xs">
                 <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
@@ -537,7 +537,7 @@ export default function AssignInventoryPage() {
 
       {/* Order Summary */}
       <Card className="border-slate-200 shadow-md overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+        <CardHeader className=" border-b border-slate-200">
           <div className="flex items-center gap-2">
             <InfoIcon className="h-5 w-5 text-primary" />
             <div>
@@ -615,7 +615,7 @@ export default function AssignInventoryPage() {
 
       {/* Ordered Products */}
       <Card className="mt-6 border-slate-200 shadow-md">
-        <CardHeader className="bg-slate-50 border-b border-slate-200">
+        <CardHeader className=" border-b border-slate-200">
           <div className="flex items-center gap-2">
             <PackageIcon className="h-5 w-5 text-primary" />
             <CardTitle className="text-xl">Ordered Products</CardTitle>
@@ -623,7 +623,7 @@ export default function AssignInventoryPage() {
         </CardHeader>
         <CardContent className="p-0">
           <Table>
-            <TableHeader className="bg-slate-50">
+            <TableHeader>
               <TableRow>
                 <TableHead className="w-[80px]">Image</TableHead>
                 <TableHead>Product</TableHead>
@@ -653,7 +653,7 @@ export default function AssignInventoryPage() {
             </TableBody>
           </Table>
         </CardContent>
-        <CardFooter className="flex justify-end p-4 bg-slate-50 border-t border-slate-200">
+        <CardFooter className="flex justify-end p-4  border-t border-slate-200">
           <div className="text-right">
             <p className="text-sm text-slate-500">Order Total</p>
             <p className="text-xl font-bold text-primary">{formatCurrency(order.totalPrice)}</p>
@@ -667,7 +667,7 @@ export default function AssignInventoryPage() {
       {/* Warehouse Selection */}
       {order?.status === "ACCEPTED" && (
         <Card className="mt-6 border-slate-200 shadow-md">
-          <CardHeader className="bg-slate-50 border-b border-slate-200">
+          <CardHeader className="border-b border-slate-200">
             <div className="flex items-center gap-2">
               <BuildingIcon className="h-5 w-5 text-primary" />
               <div>
@@ -685,7 +685,7 @@ export default function AssignInventoryPage() {
             ) : (
               <>
                 {nearestWarehouse && (
-                  <Alert className="mb-4 bg-green-50 border-green-200">
+                  <Alert className="mb-4 border-green-200">
                     <CheckCircleIcon className="h-4 w-4 text-green-600" />
                     <AlertTitle className="text-green-700 font-medium">Recommended Warehouse</AlertTitle>
                     <AlertDescription className="text-green-600">
@@ -735,7 +735,7 @@ export default function AssignInventoryPage() {
                 {selectedWarehouse && inventory.length > 0 && (
                   <div className="mt-6">
                     <h3 className="text-lg font-medium mb-3">Available Inventory</h3>
-                    <div className="bg-slate-50 rounded-md p-4 border border-slate-200">
+                    <div className="rounded-md p-4 border border-slate-200">
                       <Table>
                         <TableHeader className="bg-white">
                           <TableRow>
@@ -775,7 +775,7 @@ export default function AssignInventoryPage() {
               </>
             )}
           </CardContent>
-          <CardFooter className="flex justify-between p-4 bg-slate-50 border-t border-slate-200">
+          <CardFooter className="flex justify-between p-4 border-t border-slate-200">
             <Button variant="outline">Cancel</Button>
             <Button
               onClick={handleAssignInventory}

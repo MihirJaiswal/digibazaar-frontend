@@ -1,37 +1,56 @@
-"use client"
+"use client";
 
-import type React from "react"
+import React, { useEffect, useState, useCallback } from "react";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter, useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Edit,
+  Trash2,
+  ArrowLeft,
+  Tag,
+  DollarSign,
+  Percent,
+  Clock,
+  AlertTriangle,
+} from "lucide-react";
+import ManageProductVariants from "@/components/inventory/ManageProductVariants";
+import StockMovementsTable from "@/components/inventory/StockMovementsTable";
+import ProductStock from "@/components/inventory/ProductStock";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
-import { useEffect, useState } from "react"
-import { useAuthStore } from "@/store/authStore"
-import { useRouter, useParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { toast } from "sonner"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Edit, Trash2, ArrowLeft, Tag, DollarSign, Percent, Clock, AlertTriangle } from "lucide-react"
-import ManageProductVariants from "@/components/inventory/ManageProductVariants"
-import StockMovementsTable from "@/components/inventory/StockMovementsTable"
-import ProductStock from "@/components/inventory/ProductStock"
+// Create a QueryClient instance
+const queryClient = new QueryClient();
 
-export default function ProductDetailPage() {
-  const { token } = useAuthStore()
-  const { id } = useParams()
-  const router = useRouter()
-  const [product, setProduct] = useState<any>(null)
-  const [stock, setStock] = useState<number | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [authChecked, setAuthChecked] = useState(false);
+export function ProductDetailPageComponent() {
+  const { token } = useAuthStore();
+  const { id } = useParams();
+  const router = useRouter();
 
-  // Initialize updated product with empty defaults to prevent uncontrolled inputs
+  // States for editing modal
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [updatedProduct, setUpdatedProduct] = useState({
     title: "",
     description: "",
@@ -41,82 +60,81 @@ export default function ProductDetailPage() {
     profit: 0,
     costPerItem: 0,
     margin: 0,
-  })
+  });
 
-  console.log('token upper wala', token)
+  // Use React Query to fetch product details
+  const {
+    data: product,
+    isLoading: productLoading,
+    error: productError,
+  } = useQuery(
+    ["product", id],
+    async () => {
+      const res = await fetch(`http://localhost:8800/api/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error("Failed to fetch product");
+      return res.json();
+    },
+    { enabled: !!id && !!token }
+  );
 
+  // Use React Query to fetch product stock
+  const {
+    data: stockData,
+    isLoading: stockLoading,
+    error: stockError,
+  } = useQuery(
+    ["stock", id],
+    async () => {
+      const res = await fetch(`http://localhost:8800/api/products/${id}/stock`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error("Failed to fetch stock");
+      return res.json();
+    },
+    { enabled: !!id && !!token }
+  );
+
+  // Combine loading states
+  const loading = productLoading || stockLoading;
+
+  // Derive stock from stockData (assuming API returns an object with a "stock" property)
+  const stock = stockData?.stock;
+
+  // Update local state for editing when product data arrives
   useEffect(() => {
-    // Set a flag to indicate we've checked auth status
-    // This prevents premature fetch attempts
-    const checkAuth = () => {
-      setAuthChecked(true);
-    };
-    
-    // Small timeout to allow auth store to initialize if it's async
-    const timer = setTimeout(checkAuth, 300);
-    return () => clearTimeout(timer);
-  }, []);
+    if (product) {
+      setUpdatedProduct({
+        title: product.title || "",
+        description: product.description || "",
+        price: product.price || 0,
+        sku: product.sku || "",
+        category: product.category || "",
+        profit: product.profit || 0,
+        costPerItem: product.costPerItem || 0,
+        margin: product.margin || 0,
+      });
+    }
+  }, [product]);
 
+  // Handle input changes in edit form
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setUpdatedProduct((prev) => ({
+        ...prev,
+        [name]:
+          name === "price" || name === "costPerItem" ? Number(value) : value,
+      }));
+    },
+    []
+  );
 
-
-    useEffect(() => {
-      if (!id || !authChecked || !token) return; // Ensure auth is checked and token exists
-    
-      console.log('Making request with token:', token);
-    
-      const fetchProduct = async () => {
-        try {
-          const res = await fetch(`http://localhost:8800/api/products/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          console.log('Product Response:', res);
-          if (!res.ok) throw new Error("Failed to fetch product");
-          const data = await res.json();
-          setProduct(data);
-          setUpdatedProduct({
-            title: data.title || "",
-            description: data.description || "",
-            price: data.price || 0,
-            sku: data.sku || "",
-            category: data.category || "",
-            profit: data.profit || 0,
-            costPerItem: data.costPerItem || 0,
-            margin: data.margin || 0,
-          });
-        } catch (error) {
-          console.error(error);
-          toast.error("Failed to load product details");
-        } finally {
-          setLoading(false);
-        }
-      };
-    
-      const fetchStock = async () => {
-        try {
-          const res = await fetch(`http://localhost:8800/api/products/${id}/stock`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          console.log('Stock Response:', res);
-          if (!res.ok) throw new Error("Failed to fetch stock");
-          const data = await res.json();
-          setStock(data.stock);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-    
-      fetchProduct();
-      fetchStock();
-    }, [id, authChecked, token]); // Ensure token is in the dependency array
-    
-
-  // Handle input changes for updating product
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setUpdatedProduct({ ...updatedProduct, [e.target.name]: e.target.value })
-  }
-
-  // Update product (PUT request)
-  const handleUpdateProduct = async () => {
+  // Update product handler
+  const handleUpdateProduct = useCallback(async () => {
     try {
       const res = await fetch(`http://localhost:8800/api/products/${id}`, {
         method: "PUT",
@@ -125,40 +143,40 @@ export default function ProductDetailPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(updatedProduct),
-      })
+      });
+      if (!res.ok) throw new Error("Failed to update product");
 
-      if (!res.ok) throw new Error("Failed to update product")
-
-      toast.success("Product updated successfully!")
-      setProduct({ ...product, ...updatedProduct })
-      setIsEditModalOpen(false) // Close modal
+      toast.success("Product updated successfully!");
+      // Optionally update local cache or refetch queries here
+      // For simplicity, we update local product state
+      // (In a full app, you might call queryClient.invalidateQueries(['product', id]) )
+      setIsEditModalOpen(false);
     } catch (error) {
-      console.error(error)
-      toast.error("Failed to update product.")
+      console.error("Error updating product:", error);
+      toast.error("Failed to update product.");
     }
-  }
+  }, [id, token, updatedProduct]);
 
-  // Delete product (DELETE request)
-  const handleDeleteProduct = async () => {
+  // Delete product handler
+  const handleDeleteProduct = useCallback(async () => {
     try {
       const res = await fetch(`http://localhost:8800/api/products/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
-      })
+      });
+      if (!res.ok) throw new Error("Failed to delete product");
 
-      if (!res.ok) throw new Error("Failed to delete product")
-
-      toast.success("Product deleted successfully!")
-      router.push("/products") // Redirect back to products list
+      toast.success("Product deleted successfully!");
+      router.push("/products");
     } catch (error) {
-      console.error(error)
-      toast.error("Failed to delete product.")
+      console.error("Error deleting product:", error);
+      toast.error("Failed to delete product.");
     } finally {
-      setIsDeleteDialogOpen(false)
+      setIsDeleteDialogOpen(false);
     }
-  }
+  }, [id, token, router]);
 
-  if (loading)
+  if (loading) {
     return (
       <div className="container mx-auto p-6 flex items-center justify-center h-[50vh]">
         <div className="flex flex-col items-center gap-2">
@@ -166,7 +184,16 @@ export default function ProductDetailPage() {
           <p className="text-muted-foreground">Loading product details...</p>
         </div>
       </div>
-    )
+    );
+  }
+
+  if (productError || !product) {
+    return (
+      <div className="container mx-auto p-6 flex items-center justify-center h-[50vh]">
+        <p className="text-muted-foreground">Failed to load product details.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -202,37 +229,55 @@ export default function ProductDetailPage() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-2xl">{product?.title}</CardTitle>
-                    <CardDescription>SKU: {product?.sku || "N/A"}</CardDescription>
+                    <CardTitle className="text-2xl">{product.title}</CardTitle>
+                    <CardDescription>SKU: {product.sku || "N/A"}</CardDescription>
                   </div>
-                  <Badge variant={stock && stock > 10 ? "default" : stock && stock > 0 ? "secondary" : "destructive"}>
-                    {stock && stock > 10 ? "In Stock" : stock && stock > 0 ? "Low Stock" : "Out of Stock"}
+                  <Badge
+                    variant={
+                      stock && stock > 10
+                        ? "default"
+                        : stock && stock > 0
+                        ? "secondary"
+                        : "destructive"
+                    }
+                  >
+                    {stock && stock > 10
+                      ? "In Stock"
+                      : stock && stock > 0
+                      ? "Low Stock"
+                      : "Out of Stock"}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Description</h3>
-                    <p className="text-sm">{product?.description || "No description available."}</p>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                      Description
+                    </h3>
+                    <p className="text-sm">
+                      {product.description || "No description available."}
+                    </p>
                   </div>
-
                   <Separator />
-
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground mb-1">Category</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                        Category
+                      </h3>
                       <div className="flex items-center gap-2">
                         <Tag className="h-4 w-4 text-primary" />
-                        <span>{product?.category || "Uncategorized"}</span>
+                        <span>{product.category || "Uncategorized"}</span>
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground mb-1">Created</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                        Created
+                      </h3>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-primary" />
                         <span>
-                          {product?.createdAt
+                          {product.createdAt
                             ? new Date(product.createdAt).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "short",
@@ -257,30 +302,44 @@ export default function ProductDetailPage() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="bg-muted/40 p-4 rounded-lg">
-                    <div className="text-3xl font-bold text-primary">${product?.price?.toFixed(2)}</div>
-                    <div className="text-sm text-muted-foreground">Selling Price</div>
+                    <div className="text-3xl font-bold text-primary">
+                      ${product.price?.toFixed(2)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Selling Price
+                    </div>
                   </div>
-
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground mb-1">Cost</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                        Cost
+                      </h3>
                       <div className="flex items-center gap-1">
-                        <span className="text-lg font-semibold">${product?.costPerItem?.toFixed(2)}</span>
+                        <span className="text-lg font-semibold">
+                          ${product.costPerItem?.toFixed(2)}
+                        </span>
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground mb-1">Profit</h3>
+                      <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                        Profit
+                      </h3>
                       <div className="flex items-center gap-1">
-                        <span className="text-lg font-semibold text-green-600">${product?.profit?.toFixed(2)}</span>
+                        <span className="text-lg font-semibold text-green-600">
+                          ${product.profit?.toFixed(2)}
+                        </span>
                       </div>
                     </div>
                   </div>
-
                   <div>
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">Margin</h3>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                      Margin
+                    </h3>
                     <div className="flex items-center gap-2">
                       <Percent className="h-4 w-4 text-primary" />
-                      <span className="text-lg font-semibold">{product?.margin?.toFixed(2)}%</span>
+                      <span className="text-lg font-semibold">
+                        {product.margin?.toFixed(2)}%
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -300,7 +359,7 @@ export default function ProductDetailPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Edit Product Modal */}
+      {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -402,7 +461,7 @@ export default function ProductDetailPage() {
           </DialogHeader>
           <div className="py-4">
             <p>
-              Are you sure you want to delete <strong>{product?.title}</strong>?
+              Are you sure you want to delete <strong>{product.title}</strong>?
             </p>
             <p className="text-sm text-muted-foreground mt-2">
               This action cannot be undone. This will permanently delete the product and all associated data.
@@ -419,6 +478,14 @@ export default function ProductDetailPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
 
+// Wrap the component with QueryClientProvider to enable React Query
+export default function ProductDetailPage() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ProductDetailPageComponent />
+    </QueryClientProvider>
+  );
+}

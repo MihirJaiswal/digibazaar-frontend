@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { DashboardLayout } from "@/components/inventory/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,9 +37,55 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAuthStore } from "@/store/authStore"
+import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-// Order status options
+// Status options and color maps (moved outside component to prevent recreation)
 const statusOptions = ["PENDING", "PROCESSING", "COMPLETED", "DELIVERED", "CANCELLED"]
+
+const statusColorMap = {
+  PENDING: {
+    button: "bg-amber-500 hover:bg-amber-600 text-white",
+    badge: "bg-amber-100 text-amber-800 hover:bg-amber-200 border-amber-200"
+  },
+  PROCESSING: {
+    button: "bg-blue-500 hover:bg-blue-600 text-white",
+    badge: "bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200"
+  },
+  SHIPPED: {
+    button: "bg-indigo-500 hover:bg-indigo-600 text-white",
+    badge: "bg-indigo-100 text-indigo-800 hover:bg-indigo-200 border-indigo-200"
+  },
+  DELIVERED: {
+    button: "bg-emerald-500 hover:bg-emerald-600 text-white",
+    badge: "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-emerald-200"
+  },
+  CANCELLED: {
+    button: "bg-rose-500 hover:bg-rose-600 text-white",
+    badge: "bg-rose-100 text-rose-800 hover:bg-rose-200 border-rose-200"
+  },
+  REJECTED: {
+    button: "bg-rose-500 hover:bg-rose-600 text-white",
+    badge: "bg-rose-100 text-rose-800 hover:bg-rose-200 border-rose-200"
+  },
+  ACCEPTED: {
+    button: "bg-green-500 hover:bg-green-600 text-white",
+    badge: "bg-green-100 text-green-800 hover:bg-green-200 border-green-200"
+  },
+  IN_PROGRESS: {
+    button: "bg-violet-500 hover:bg-violet-600 text-white",
+    badge: "bg-violet-100 text-violet-800 hover:bg-violet-200 border-violet-200"
+  },
+  REFUNDED: {
+    button: "bg-slate-500 hover:bg-slate-600 text-white",
+    badge: "bg-slate-100 text-slate-800 hover:bg-slate-200 border-slate-200"
+  }
+}
+
+// Default status style for fallback
+const defaultStatusStyle = {
+  button: "bg-gray-500 hover:bg-gray-600 text-white",
+  badge: "bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-200"
+}
 
 // Type definition for Order
 type Order = {
@@ -64,180 +110,29 @@ type Order = {
   }[]
 }
 
-export default function OrdersPage() {
-  const router = useRouter()
-  const [orders, setOrders] = useState<Order[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [activeTab, setActiveTab] = useState("all")
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
+// Create a client wrapper to handle React Query Provider setup
+function OrdersPageWithQueryClient() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000, // 1 minute
+        retry: 1,
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
 
-  const { filters, setFilters, resetFilters } = useOrderStore()
-  const { token, _hasRehydrated } = useAuthStore()
+  return (
+    <QueryClientProvider client={queryClient}>
+      <OrdersPage />
+    </QueryClientProvider>
+  );
+}
 
-  // Fetch orders from API
-  useEffect(() => {
-    if (!token || !_hasRehydrated) {
-      console.log("Waiting for token and rehydration to complete");
-      return;
-    }
-    const fetchOrdersWithProducts = async () => {
-      try {
-        const res = await fetch("http://localhost:8800/api/orders", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        const ordersData = await res.json()
-        console.log(ordersData)  // Log the response to inspect its structure
-    
-        // Check if ordersData is an array and is not empty
-        if (Array.isArray(ordersData) && ordersData.length > 0) {
-          // If data is an array and not empty, process the orders
-          const enrichedOrders = await Promise.all(
-            ordersData.map(async (order: Order) => {
-              const productPromises = order.items.map(async (item) => {
-                try {
-                  const productRes = await fetch(`http://localhost:8800/api/products/${item.productId}`, {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  })
-                  const productData = await productRes.json()
-                  return { ...item, product: productData }
-                } catch (error) {
-                  console.error(`Error fetching product ${item.productId}:`, error)
-                  return { ...item, product: { title: "Unknown Product" } }
-                }
-              })
-    
-              const updatedItems = await Promise.all(productPromises)
-              return { ...order, items: updatedItems }
-            }),
-          )
-    
-          setOrders(enrichedOrders)
-        } else {
-          // If data is empty or not an array, set orders to an empty array
-          setOrders([])
-        }
-        setIsLoading(false)
-      } catch (error) {
-        console.error("Error fetching orders:", error)
-        toast.error("Failed to load orders")
-        setIsLoading(false)
-        setOrders([])  // Handle error by resetting orders to an empty array
-      }
-    }
-    
-    fetchOrdersWithProducts()
-  }, [token, _hasRehydrated])
-
-  // Filter orders based on search, status, and date range
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order.id.toLowerCase().includes(filters.search.toLowerCase()) ||
-      order.shippingAddress.phone.includes(filters.search)
-
-    const matchesStatus = !filters.status || order.status === filters.status
-
-    // Filter by tab
-    const matchesTab =
-      activeTab === "all" ||
-      (activeTab === "pending" && order.status === "PENDING") ||
-      (activeTab === "processing" && order.status === "PROCESSING") ||
-      (activeTab === "completed" && order.status === "COMPLETED") ||
-      (activeTab === "delivered" && order.status === "DELIVERED") ||
-      (activeTab === "cancelled" && order.status === "CANCELLED")
-
-    let matchesDateRange = true
-    if (filters.dateRange[0] && filters.dateRange[1]) {
-      const orderDate = new Date(order.createdAt)
-      const startDate = filters.dateRange[0]
-      const endDate = filters.dateRange[1]
-      matchesDateRange = orderDate >= startDate && orderDate <= endDate
-    }
-
-    return matchesSearch && matchesStatus && matchesDateRange && matchesTab
-  })
-
-  // Handle status change
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
-    try {
-      const res = await fetch(`http://localhost:8800/api/orders/${orderId}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: newStatus }),
-      })
-
-      if (!res.ok) throw new Error("Failed to update order")
-
-      setOrders((prevOrders) =>
-        prevOrders.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)),
-      )
-
-      toast.success(`Order ${orderId} status changed to ${newStatus}`)
-      setIsViewDialogOpen(false)
-    } catch (error) {
-      console.error(error)
-      toast.error("Failed to update order.")
-    }
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "bg-amber-500 hover:bg-amber-600 text-white"
-      case "PROCESSING":
-        return "bg-blue-500 hover:bg-blue-600 text-white"
-      case "SHIPPED":
-        return "bg-indigo-500 hover:bg-indigo-600 text-white"
-      case "DELIVERED":
-        return "bg-emerald-500 hover:bg-emerald-600 text-white"
-      case "CANCELLED":
-      case "REJECTED":
-        return "bg-rose-500 hover:bg-rose-600 text-white"
-      case "ACCEPTED":
-        return "bg-green-500 hover:bg-green-600 text-white"
-      case "IN_PROGRESS":
-        return "bg-violet-500 hover:bg-violet-600 text-white"
-      case "REFUNDED":
-        return "bg-slate-500 hover:bg-slate-600 text-white"
-      default:
-        return "bg-gray-500 hover:bg-gray-600 text-white"
-    }
-  }
-
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "bg-amber-100 text-amber-800 hover:bg-amber-200 border-amber-200"
-      case "PROCESSING":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200"
-      case "SHIPPED":
-        return "bg-indigo-100 text-indigo-800 hover:bg-indigo-200 border-indigo-200"
-      case "DELIVERED":
-        return "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-emerald-200"
-      case "CANCELLED":
-      case "REJECTED":
-        return "bg-rose-100 text-rose-800 hover:bg-rose-200 border-rose-200"
-      case "ACCEPTED":
-        return "bg-green-100 text-green-800 hover:bg-green-200 border-green-200"
-      case "IN_PROGRESS":
-        return "bg-violet-100 text-violet-800 hover:bg-violet-200 border-violet-200"
-      case "REFUNDED":
-        return "bg-slate-100 text-slate-800 hover:bg-slate-200 border-slate-200"
-      default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-200"
-    }
-  }
-
-  // Get counts for dashboard cards
-  const getOrderCounts = () => {
+// Order status counters component for better performance
+const OrderCounters = ({ orders, activeTab, setActiveTab, isLoading }) => {
+  // Memoized counts calculation
+  const counts = useMemo(() => {
     const total = orders.length
     const pending = orders.filter((order) => order.status === "PENDING").length
     const processing = orders.filter((order) => order.status === "PROCESSING").length
@@ -246,9 +141,254 @@ export default function OrdersPage() {
     const cancelled = orders.filter((order) => order.status === "CANCELLED").length
 
     return { total, pending, processing, completed, delivered, cancelled }
+  }, [orders])
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-sm  dark:bg-gradient-to-br dark:from-slate-300 dark:to-slate-400 dark:border-slate-500">
+        <CardHeader className="pb-2">
+          <CardDescription  className="text-gray-700 dark:text-gray-600">Total Orders</CardDescription>
+          <CardTitle className="text-2xl text-gray-800">
+            {isLoading ? <Skeleton className="h-8 w-16" /> : counts.total}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      <Card
+        className={cn(
+          "cursor-pointer transition-all duration-200",
+          activeTab === "pending"
+            ? "ring-2 ring-amber-500 ring-offset-2"
+            : "bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 dark:bg-gradient-to-br dark:from-amber-300 dark:to-amber-400 dark:border-amber-500",
+        )}
+        onClick={() => setActiveTab(activeTab === "pending" ? "all" : "pending")}
+      >
+        <CardHeader className="pb-2">
+          <CardDescription className="text-gray-700 dark:text-gray-500">Pending</CardDescription>
+          <CardTitle className="text-2xl text-yellow-800">
+            {isLoading ? <Skeleton className="h-8 w-16" /> : counts.pending}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      <Card
+        className={cn(
+          "cursor-pointer transition-all duration-200",
+          activeTab === "processing"
+            ? "ring-2 ring-blue-500 ring-offset-2"
+            : "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200  dark:bg-gradient-to-br dark:from-blue-300 dark:to-blue-400 dark:border-blue-500",
+        )}
+        onClick={() => setActiveTab(activeTab === "processing" ? "all" : "processing")}
+      >
+        <CardHeader className="pb-2">
+          <CardDescription className="text-gray-700 dark:text-gray-600">Processing</CardDescription>
+          <CardTitle className="text-2xl text-blue-800">
+            {isLoading ? <Skeleton className="h-8 w-16" /> : counts.processing}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      <Card
+        className={cn(
+          "cursor-pointer transition-all duration-200",
+          activeTab === "completed"
+            ? "ring-2 ring-indigo-500 ring-offset-2"
+            : "bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200 dark:bg-gradient-to-br dark:from-indigo-300 dark:to-indigo-400 dark:border-indigo-500",
+        )}
+        onClick={() => setActiveTab(activeTab === "completed" ? "all" : "completed")}
+      >
+        <CardHeader className="pb-2">
+          <CardDescription className="text-gray-700 dark:text-gray-600" >Completed</CardDescription>
+          <CardTitle className="text-2xl text-purple-800">
+            {isLoading ? <Skeleton className="h-8 w-16" /> : counts.completed}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      <Card
+        className={cn(
+          "cursor-pointer transition-all duration-200",
+          activeTab === "delivered"
+            ? "ring-2 ring-emerald-500 ring-offset-2"
+            : "bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 dark:bg-gradient-to-br dark:from-emerald-300 dark:to-emerald-400 dark:border-emerald-500",
+        )}
+        onClick={() => setActiveTab(activeTab === "delivered" ? "all" : "delivered")}
+      >
+        <CardHeader className="pb-2">
+          <CardDescription className="text-gray-700 dark:text-gray-600" >Delivered</CardDescription>
+          <CardTitle className="text-2xl text-green-800">
+            {isLoading ? <Skeleton className="h-8 w-16" /> : counts.delivered}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      <Card
+        className={cn(
+          "cursor-pointer transition-all duration-200",
+          activeTab === "cancelled"
+            ? "ring-2 ring-rose-500 ring-offset-2"
+            : "bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200 dark:bg-gradient-to-br dark:from-rose-300 dark:to-rose-400 dark:border-rose-500",
+        )}
+        onClick={() => setActiveTab(activeTab === "cancelled" ? "all" : "cancelled")}
+      >
+        <CardHeader className="pb-2">
+          <CardDescription className="text-gray-700 dark:text-gray-600">Cancelled</CardDescription>
+          <CardTitle className="text-2xl text-red-800">
+            {isLoading ? <Skeleton className="h-8 w-16" /> : counts.cancelled}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+    </div>
+  )
+}
+
+function OrdersPage() {
+  const router = useRouter()
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [activeTab, setActiveTab] = useState("all")
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  
+  // Get from store only the values we need
+  const { filters, setFilters, resetFilters } = useOrderStore()
+  const { token, _hasRehydrated } = useAuthStore()
+  
+  // Use React Query's queryClient for cache invalidation
+  const queryClient = useQueryClient()
+
+  // Helper functions for status colors - memoized to prevent re-renders
+  const getStatusColor = (status: string) => {
+    return statusColorMap[status]?.button || defaultStatusStyle.button
   }
 
-  const counts = getOrderCounts()
+  const getStatusBadgeColor = (status: string) => {
+    return statusColorMap[status]?.badge || defaultStatusStyle.badge
+  }
+
+  // Fetch orders query using React Query
+  const { data: orders = [], isLoading } = useQuery({
+    queryKey: ['orders'],
+    queryFn: async () => {
+      const res = await fetch("http://localhost:8800/api/orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (!res.ok) throw new Error("Failed to fetch orders");
+      
+      const ordersData = await res.json();
+      
+      if (Array.isArray(ordersData) && ordersData.length > 0) {
+        // Batch the product fetches into a single Promise.all
+        const enrichedOrders = await Promise.all(
+          ordersData.map(async (order: Order) => {
+            // Create an array of promises for all items in this order
+            const productPromises = order.items.map(async (item) => {
+              try {
+                // Use React Query's queryClient to check if we already have the product data
+                const cachedProduct = queryClient.getQueryData(['product', item.productId]);
+                if (cachedProduct) {
+                  return { ...item, product: cachedProduct };
+                }
+                
+                const productRes = await fetch(`http://localhost:8800/api/products/${item.productId}`, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                });
+                
+                if (!productRes.ok) throw new Error("Failed to fetch product");
+                
+                const productData = await productRes.json();
+                
+                // Cache the product data for future use
+                queryClient.setQueryData(['product', item.productId], productData);
+                
+                return { ...item, product: productData };
+              } catch (error) {
+                console.error(`Error fetching product ${item.productId}:`, error);
+                return { ...item, product: { title: "Unknown Product" } };
+              }
+            });
+
+            // Wait for all product fetches for this order to complete
+            const updatedItems = await Promise.all(productPromises);
+            return { ...order, items: updatedItems };
+          })
+        );
+
+        return enrichedOrders;
+      }
+      
+      return [];
+    },
+    enabled: !!token && _hasRehydrated,
+    refetchOnWindowFocus: false,
+  });
+
+  // Update order status mutation
+  const updateOrderStatusMutation = useMutation({
+    mutationFn: async ({ orderId, newStatus }: { orderId: string; newStatus: string }) => {
+      const res = await fetch(`http://localhost:8800/api/orders/${orderId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update order");
+      return { orderId, newStatus };
+    },
+    onSuccess: ({ orderId, newStatus }) => {
+      // Update cache with the new status
+      queryClient.setQueryData(['orders'], (old: Order[]) =>
+        old.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order))
+      );
+      toast.success(`Order ${orderId} status changed to ${newStatus}`);
+      setIsViewDialogOpen(false);
+    },
+    onError: () => {
+      toast.error("Failed to update order.");
+    },
+  });
+
+  // Memoize the filtered orders to prevent recalculation on every render
+  const filteredOrders = useMemo(() => {
+    return (orders || []).filter((order) => {
+      const matchesSearch =
+        order.id.toLowerCase().includes(filters.search.toLowerCase()) ||
+        order.shippingAddress.phone.includes(filters.search);
+
+      const matchesStatus = !filters.status || order.status === filters.status;
+
+      const matchesTab =
+        activeTab === "all" ||
+        (activeTab === "pending" && order.status === "PENDING") ||
+        (activeTab === "processing" && order.status === "PROCESSING") ||
+        (activeTab === "completed" && order.status === "COMPLETED") ||
+        (activeTab === "delivered" && order.status === "DELIVERED") ||
+        (activeTab === "cancelled" && order.status === "CANCELLED");
+
+      let matchesDateRange = true;
+      if (filters.dateRange[0] && filters.dateRange[1]) {
+        const orderDate = new Date(order.createdAt);
+        const startDate = filters.dateRange[0];
+        const endDate = filters.dateRange[1];
+        matchesDateRange = orderDate >= startDate && orderDate <= endDate;
+      }
+
+      return matchesSearch && matchesStatus && matchesDateRange && matchesTab;
+    });
+  }, [orders, filters.search, filters.status, filters.dateRange, activeTab]);
+
+  // Handle status change
+  const updateOrderStatus = (orderId: string, newStatus: string) => {
+    updateOrderStatusMutation.mutate({ orderId, newStatus });
+  };
+
+  // Handle refresh - simply refetch the orders query
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['orders'] });
+    toast.success("Refreshing orders...");
+  };
 
   return (
     <>
@@ -274,109 +414,22 @@ export default function OrdersPage() {
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
-                onClick={() => {
-                  setIsLoading(true)
-                  setTimeout(() => setIsLoading(false), 1000)
-                  toast.success("Orders refreshed")
-                }}
+                onClick={handleRefresh}
+                disabled={isLoading}
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className={cn("h-4 w-4", { "animate-spin": isLoading })} />
                 Refresh
               </Button>
             </div>
           </div>
 
-          {/* Dashboard Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-sm">
-              <CardHeader className="pb-2">
-                <CardDescription>Total Orders</CardDescription>
-                <CardTitle className="text-2xl">
-                  {isLoading ? <Skeleton className="h-8 w-16" /> : counts.total}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card
-              className={cn(
-                "cursor-pointer transition-all duration-200",
-                activeTab === "pending"
-                  ? "ring-2 ring-amber-500 ring-offset-2"
-                  : "bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200",
-              )}
-              onClick={() => setActiveTab(activeTab === "pending" ? "all" : "pending")}
-            >
-              <CardHeader className="pb-2">
-                <CardDescription>Pending</CardDescription>
-                <CardTitle className="text-2xl">
-                  {isLoading ? <Skeleton className="h-8 w-16" /> : counts.pending}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card
-              className={cn(
-                "cursor-pointer transition-all duration-200",
-                activeTab === "processing"
-                  ? "ring-2 ring-blue-500 ring-offset-2"
-                  : "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200",
-              )}
-              onClick={() => setActiveTab(activeTab === "processing" ? "all" : "processing")}
-            >
-              <CardHeader className="pb-2">
-                <CardDescription>Processing</CardDescription>
-                <CardTitle className="text-2xl">
-                  {isLoading ? <Skeleton className="h-8 w-16" /> : counts.processing}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card
-              className={cn(
-                "cursor-pointer transition-all duration-200",
-                activeTab === "completed"
-                  ? "ring-2 ring-indigo-500 ring-offset-2"
-                  : "bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200",
-              )}
-              onClick={() => setActiveTab(activeTab === "completed" ? "all" : "completed")}
-            >
-              <CardHeader className="pb-2">
-                <CardDescription>Completed</CardDescription>
-                <CardTitle className="text-2xl">
-                  {isLoading ? <Skeleton className="h-8 w-16" /> : counts.completed}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card
-              className={cn(
-                "cursor-pointer transition-all duration-200",
-                activeTab === "delivered"
-                  ? "ring-2 ring-emerald-500 ring-offset-2"
-                  : "bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200",
-              )}
-              onClick={() => setActiveTab(activeTab === "delivered" ? "all" : "delivered")}
-            >
-              <CardHeader className="pb-2">
-                <CardDescription>Delivered</CardDescription>
-                <CardTitle className="text-2xl">
-                  {isLoading ? <Skeleton className="h-8 w-16" /> : counts.delivered}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card
-              className={cn(
-                "cursor-pointer transition-all duration-200",
-                activeTab === "cancelled"
-                  ? "ring-2 ring-rose-500 ring-offset-2"
-                  : "bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200",
-              )}
-              onClick={() => setActiveTab(activeTab === "cancelled" ? "all" : "cancelled")}
-            >
-              <CardHeader className="pb-2">
-                <CardDescription>Cancelled</CardDescription>
-                <CardTitle className="text-2xl">
-                  {isLoading ? <Skeleton className="h-8 w-16" /> : counts.cancelled}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-          </div>
+          {/* Dashboard Cards - Extracted to a separate component */}
+          <OrderCounters 
+            orders={orders || []} 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            isLoading={isLoading} 
+          />
 
           {/* Filters */}
           {isFilterOpen && (
@@ -392,7 +445,7 @@ export default function OrdersPage() {
               <CardContent>
                 <div className="flex flex-col md:flex-row gap-4">
                   <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4" />
                     <Input
                       placeholder="Search orders by ID or phone..."
                       className="pl-8"
@@ -400,12 +453,12 @@ export default function OrdersPage() {
                       onChange={(e) => setFilters({ search: e.target.value })}
                     />
                   </div>
-                  <Select value={filters.status || ""} onValueChange={(value) => setFilters({ status: value })}>
+                  <Select value={filters.status || "all"} onValueChange={(value) => setFilters({ status: value === "all" ? "" : value })}>
                     <SelectTrigger className="w-full md:w-[180px]">
                       <SelectValue placeholder="All Statuses" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Statuses</SelectItem>
+                      <SelectItem value="all">All Statuses</SelectItem>
                       {statusOptions.map((status) => (
                         <SelectItem key={status} value={status}>
                           {status}
@@ -478,7 +531,7 @@ export default function OrdersPage() {
             <CardContent className="p-0">
               {isLoading ? (
                 <div className="p-8 space-y-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
+                  {[1, 2, 3].map((i) => (
                     <div key={i} className="flex items-center space-x-4">
                       <Skeleton className="h-12 w-12 rounded-full" />
                       <div className="space-y-2">
@@ -492,7 +545,7 @@ export default function OrdersPage() {
                 <div className="rounded-md border-0">
                   <Table>
                     <TableHeader>
-                      <TableRow className="bg-slate-50 hover:bg-slate-50">
+                      <TableRow className="bg-slate-50 hover:bg-slate-50 dark:bg-zinc-800">
                         <TableHead className="font-semibold">Order ID</TableHead>
                         <TableHead className="font-semibold">Product</TableHead>
                         <TableHead className="font-semibold">Customer</TableHead>
@@ -507,7 +560,7 @@ export default function OrdersPage() {
                         <TableRow>
                           <TableCell colSpan={7} className="text-center py-12">
                             <div className="flex flex-col items-center justify-center">
-                              <ClipboardList className="h-12 w-12 text-muted-foreground mb-2" />
+                              <ClipboardList className="h-12 w-12 mb-2" />
                               <p className="text-muted-foreground font-medium">No orders found</p>
                               <p className="text-sm text-muted-foreground mt-1">Try adjusting your filters</p>
                               {activeTab !== "all" && (
@@ -519,7 +572,8 @@ export default function OrdersPage() {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        filteredOrders.map((order) => (
+                        // Only render visible items to improve performance
+                        filteredOrders.slice(0, 30).map((order) => (
                           <TableRow key={order.id} className="group">
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
@@ -613,22 +667,20 @@ export default function OrdersPage() {
             </CardContent>
           </Card>
 
-          {/* View Order Dialog */}
-          <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-            <DialogContent className="sm:max-w-[700px]">
-              <DialogHeader>
-                <DialogTitle className="text-xl">Order Details</DialogTitle>
-                <DialogDescription>
-                  {selectedOrder && (
+          {/* View Order Dialog - Only render when open */}
+          {isViewDialogOpen && selectedOrder && (
+            <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+              <DialogContent className="sm:max-w-[700px]">
+                <DialogHeader>
+                  <DialogTitle className="text-xl">Order Details</DialogTitle>
+                  <DialogDescription>
                     <span className="flex items-center gap-2 mt-1">
                       <span className="font-mono text-sm">{selectedOrder.id}</span>
                       <span>•</span>
                       <span>{formatDate(selectedOrder.createdAt)}</span>
                     </span>
-                  )}
-                </DialogDescription>
-              </DialogHeader>
-              {selectedOrder && (
+                  </DialogDescription>
+                </DialogHeader>
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-6">
                     <Card className="border shadow-sm">
@@ -686,7 +738,7 @@ export default function OrdersPage() {
                     <CardContent className="p-0">
                       <Table>
                         <TableHeader>
-                          <TableRow className="bg-slate-50 hover:bg-slate-50">
+                          <TableRow>
                             <TableHead className="font-medium">Product</TableHead>
                             <TableHead className="font-medium text-right">Quantity</TableHead>
                             <TableHead className="font-medium text-right">Unit Price</TableHead>
@@ -705,7 +757,7 @@ export default function OrdersPage() {
                               <TableCell className="text-right">{formatCurrency(item.totalPrice)}</TableCell>
                             </TableRow>
                           ))}
-                          <TableRow className="bg-slate-50">
+                          <TableRow>
                             <TableCell colSpan={3} className="text-right font-medium">
                               Total
                             </TableCell>
@@ -718,7 +770,6 @@ export default function OrdersPage() {
                     </CardContent>
                   </Card>
                 </div>
-              )}
               <DialogFooter className="flex flex-col sm:flex-row gap-2">
                 <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
                   Close
@@ -761,9 +812,11 @@ export default function OrdersPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </div>
+          )}
+          </div>
       </DashboardLayout>
     </>
   )
 }
 
+export default OrdersPageWithQueryClient;

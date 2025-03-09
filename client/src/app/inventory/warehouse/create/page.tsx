@@ -120,7 +120,7 @@ const CreateWarehousePage = () => {
 
       if (!res.ok) throw new Error("Failed to create warehouse");
       toast.success("Warehouse created successfully!");
-      router.push("/warehouses");
+      router.push("/inventory/warehouse");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -129,12 +129,12 @@ const CreateWarehousePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <Button 
           variant="ghost" 
-          className="mb-6 flex items-center text-gray-600 hover:text-gray-900"
-          onClick={() => router.push("/warehouses")}
+          className="mb-6 flex items-center text-gray-700 dark:text-gray-300 hover:text-gray-900"
+          onClick={() => router.push("/inventory/warehouse")}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Warehouses
@@ -272,7 +272,7 @@ const CreateWarehousePage = () => {
                         step="any" 
                         {...register("latitude", { required: true })} 
                         disabled 
-                        className="bg-gray-50" 
+                        className="bg-gray-50 dark:bg-gray-800" 
                       />
                     </div>
                     <div className="space-y-2">
@@ -283,7 +283,7 @@ const CreateWarehousePage = () => {
                         step="any" 
                         {...register("longitude", { required: true })} 
                         disabled 
-                        className="bg-gray-50" 
+                        className="bg-gray-50 dark:bg-gray-800" 
                       />
                     </div>
                   </div>
@@ -329,7 +329,7 @@ const CreateWarehousePage = () => {
                   </div>
 
                   {/* Available Capacity (Auto-calculated) */}
-                  <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
+                  <div className="space-y-2 p-4 rounded-lg">
                     <div className="flex justify-between items-center">
                       <Label className="text-sm font-medium">Available Capacity</Label>
                       <span className="text-sm font-medium">{availableCapacity} units</span>

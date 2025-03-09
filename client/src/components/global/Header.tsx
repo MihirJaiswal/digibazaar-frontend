@@ -84,7 +84,7 @@ export default function Header() {
               height={32}
               />
             </div>
-            <span className="text-xl hidden md:inline">igiBazar</span>
+            <span className="text-xl hidden md:inline">igiBazaar</span>
           </Link>
         </div>
 

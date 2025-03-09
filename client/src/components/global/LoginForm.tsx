@@ -1,49 +1,60 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import { useAuthStore } from "@/store/authStore"
-import { Label } from "@/components/ui/label"
-import { AlertCircle, User, Lock, Loader2, ArrowRight } from 'lucide-react'
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { motion } from "framer-motion"
-import Link from "next/link"
-import axios from "axios"
-import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
+import { useAuthStore } from "@/store/authStore";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, User, Lock, Loader2, ArrowRight } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import axios from "axios";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
+// Dynamically import framer-motion's motion.div to reduce initial bundle size.
+const MotionDiv = dynamic(
+  () => import("framer-motion").then((mod) => mod.motion.div),
+  { ssr: false }
+);
 
 export default function Login() {
-  const { register, handleSubmit, reset } = useForm()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const {  setUser, token } = useAuthStore()
-  const router = useRouter()
+  const { register, handleSubmit, reset } = useForm();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { setUser } = useAuthStore();
+  const router = useRouter();
 
   const onSubmit = async (data: any) => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
       const response = await axios.post("http://localhost:8800/api/auth/login", {
         username: data.username,
         password: data.password,
-      })
-       
-      console.log("Login successful", response.data)
-      setUser(response.data.user, response.data.token)
-      console.log(response.data.token)
-      toast.success("Logged in successfully!")
-      reset()
-      router.push("/")
+      });
+      console.log("Login successful", response.data);
+      setUser(response.data.user, response.data.token);
+      toast.success("Logged in successfully!");
+      reset();
+      router.push("/");
     } catch (err: any) {
-      console.error("Error:", err)
-      setError(err.response?.data?.message || "Invalid credentials")
+      console.error("Error:", err);
+      setError(err.response?.data?.message || "Invalid credentials");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-background relative overflow-hidden">
@@ -54,7 +65,7 @@ export default function Login() {
       </div>
 
       <div className="container relative flex items-center justify-center min-h-screen py-20 px-4">
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -62,7 +73,7 @@ export default function Login() {
         >
           <Card className="border-0 shadow-2xl bg-background/80 backdrop-blur-xl">
             <CardHeader className="space-y-1 pb-8">
-              <motion.div
+              <MotionDiv
                 initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5 }}
@@ -73,7 +84,7 @@ export default function Login() {
                 <CardDescription className="text-center text-base">
                   Sign in to your account to continue
                 </CardDescription>
-              </motion.div>
+              </MotionDiv>
             </CardHeader>
 
             <CardContent>
@@ -166,8 +177,8 @@ export default function Login() {
               </p>
             </CardFooter>
           </Card>
-        </motion.div>
+        </MotionDiv>
       </div>
     </div>
-  )
+  );
 }

@@ -38,12 +38,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <div className="hidden md:flex md:flex-shrink-0">
+      <div className="hidden md:flex md:flex-shrink-0 border-right border-r border-gray-800">
         <div className="flex flex-col w-64">
-          <div className="flex flex-col flex-grow pt-5 overflow-y-auto bg-primary text-primary-foreground">
+          <div className="flex flex-col flex-grow pt-5 overflow-y-auto bg-gradient-to-br from-indigo-900 to-blue-900 dark:bg-gradient dark:from-black ">
             <div className="flex items-center flex-shrink-0 px-4 mb-5">
-              <Truck className="h-8 w-8 mr-2" />
-              <span className="text-xl font-bold">WMS</span>
+              <Truck className="h-8 w-8 mr-2 text-white" />
+              <span className="text-xl font-bold text-white">WMS</span>
             </div>
             <div className="flex flex-col flex-grow">
               <nav className="flex-1 px-2 pb-4 space-y-1">
@@ -53,8 +53,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     href={item.href}
                     className={cn(
                       pathname === item.href
-                        ? "bg-primary-foreground/20 text-white"
-                        : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-white",
+                        ? "dark:bg-zinc-800 bg-blue-950 text-white"
+                        : "text-primary-foreground/70 text-gray-200 hover:bg-primary-foreground/10 hover:text-white",
                       "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
                     )}
                   >

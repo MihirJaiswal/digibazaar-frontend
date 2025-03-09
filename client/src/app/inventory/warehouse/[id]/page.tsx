@@ -107,57 +107,38 @@ const WarehouseDetailsPage = () => {
   })
 
 
-  useEffect(() => {
-    // Set a flag to indicate we've checked auth status
-    // This prevents premature fetch attempts
-    const checkAuth = () => {
-      setAuthChecked(true);
-    };
-    
-    // Small timeout to allow auth store to initialize if it's async
-    const timer = setTimeout(checkAuth, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-
   // Fetch warehouse details
   useEffect(() => {
-    const fetchWarehouseDetails = async () => {
-      if (!token) {
-        console.error("Token is missing!");
-        setLoading(false);
-        return;
-      }
-  
-      console.log('Ye hai token hamara', token);
-      console.log('Ye hai id hamara', id);
-      setLoading(true); // Start loading state
-  
+    if (!id || !token) return;
+    
+    const fetchData = async () => {
+      setLoading(true);
+      
       try {
-        const res = await fetch(`http://localhost:8800/api/warehouses/${id}`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-  
-        if (!res.ok) {
-          throw new Error("Failed to fetch warehouse details.");
-        }
-  
-        const data = await res.json();
-        setWarehouse(data);
+        // Make API calls in parallel
+        const [warehouseRes, stockRes] = await Promise.all([
+          fetch(`http://localhost:8800/api/warehouses/${id}`, {
+            headers: { "Authorization": `Bearer ${token}` },
+          }),
+          fetch(`http://localhost:8800/api/warehouses/${id}/stock`, {
+            headers: { "Authorization": `Bearer ${token}` },
+          })
+        ]);
+        
+        const warehouseData = await warehouseRes.json();
+        const stockData = await stockRes.json();
+        
+        setWarehouse(warehouseData);
+        setWarehouseStock(stockData);
       } catch (error) {
-        console.error("Error fetching warehouse details:", error);
-        // Optionally, set an error state here to show the error in the UI
+        console.error("Error fetching data:", error);
       } finally {
-        setLoading(false); // End loading state
+        setLoading(false);
       }
     };
-  
-    if (id && authChecked) {
-      fetchWarehouseDetails();
-    }
-  }, [id, authChecked, token]); // Adding token in the dependencies to ensure it updates when the token changes
+    
+    fetchData();
+  }, [id, token]);; // Adding token in the dependencies to ensure it updates when the token changes
   
 
   // Pre-fill the update form when modal opens
