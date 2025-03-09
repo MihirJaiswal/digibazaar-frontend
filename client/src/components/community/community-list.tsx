@@ -108,7 +108,7 @@ export function CommunityList() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-4">
       {/* ✅ Search Bar */}
       <div className="relative w-full max-w-7xl mx-auto">
         <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
@@ -117,7 +117,7 @@ export function CommunityList() {
           placeholder="Search communities..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="pl-10 pr-4 py-2 w-full border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="pl-10 pr-4 py-2 w-full border bg-white dark:bg-zinc-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 
@@ -125,7 +125,7 @@ export function CommunityList() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {filteredCommunities.length > 0 ? (
           filteredCommunities.map((community) => (
-            <Card key={community.id} className="rounded-md shadow-sm transition-transform hover:scale-105">
+            <Card key={community.id} className="rounded-md shadow-sm transition-transform hover:scale-105 bg-white dark:bg-zinc-950 border dark:border-gray-700 ">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   {/* Community Image */}
@@ -143,19 +143,19 @@ export function CommunityList() {
                     </div>
                   )}
                   <div className="flex flex-col gap-2 ml-2">
-                    <CardTitle>r/{community.name}</CardTitle>
-                    <CardDescription className="flex items-center gap-1 text-gray-500">
+                    <CardTitle>{community.name}</CardTitle>
+                    <CardDescription className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                       <Users className="h-4 w-4" />
-                      <span>{memberCounts[community.id] || 0} members</span>
+                      <span className="dark:text-gray-400">{memberCounts[community.id] || 0} members</span>
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="line-clamp-3 text-sm text-gray-600">{community.description}</p>
+                <p className="line-clamp-3 text-sm text-gray-600 dark:text-gray-400">{community.description}</p>
               </CardContent>
               <CardFooter>
-                <Button asChild className="w-full">
+                <Button asChild className="w-full bg-gradient-to-r from-purple-500 to-cyan-600 text-white">
                   <Link href={`/community/communities/${community.id}`}>View Community</Link>
                 </Button>
               </CardFooter>

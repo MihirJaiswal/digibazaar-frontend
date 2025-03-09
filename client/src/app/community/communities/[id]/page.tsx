@@ -163,8 +163,8 @@ export default function CommunityPage() {
                 <CardContent>
                   <ul className="space-y-3">
                     {rules.map((rule: string, index: number) => (
-                      <li key={index} className="bg-gray-100 p-3 rounded-md border">
-                        <span className="font-medium text-gray-700">{rule}</span>
+                      <li key={index} className="bg-gray-100 dark:bg-zinc-800  p-3 rounded-md border">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">{rule}</span>
                       </li>
                     ))}
                   </ul>

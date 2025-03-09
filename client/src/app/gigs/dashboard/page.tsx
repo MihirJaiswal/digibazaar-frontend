@@ -209,7 +209,7 @@ export default function OrdersDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Header */}
       <Header />
 
@@ -222,8 +222,8 @@ export default function OrdersDashboard() {
           <div className="max-w-7xl mx-auto">
             {/* Dashboard Title */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">Seller Dashboard</h1>
-              <p className="text-gray-500 mt-1">Manage your orders and track your earnings</p>
+              <h1 className="text-3xl font-bold">Seller Dashboard</h1>
+              <p className="text-gray-500 dark:text-gray-300 mt-1">Manage your orders and track your earnings</p>
             </div>
 
             {/* Summary Section */}
@@ -231,25 +231,25 @@ export default function OrdersDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Total Earnings Card */}
                 <Card className="overflow-hidden shadow-md border-gray-200 hover:shadow-lg transition-shadow duration-200">
-                  <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 border-b pb-3">
+                  <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 dark:bg-gradient-to-r dark:from-green-600 dark:to-cyan-700 border-b pb-3">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      <DollarSign className="h-5 w-5 text-green-600" />
+                      <DollarSign className="h-5 w-5 text-green-700 dark:text-green-950" />
                       Total Earnings
                     </CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardDescription className="text-gray-600 dark:text-gray-50">
                       From completed orders
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-4">
                     <div className="flex items-baseline">
-                      <p className="text-3xl font-bold text-gray-900">
+                      <p className="text-3xl font-bold text-gray-900 dark:text-gray-200">
                         ₹{totalEarnings.toLocaleString()}
                       </p>
-                      <span className="ml-2 text-sm text-gray-500">INR</span>
+                      <span className="ml-2 text-sm text-gray-500 dark:text-gray-200">INR</span>
                     </div>
                   </CardContent>
-                  <CardFooter className="bg-gray-50 border-t py-2 px-4">
-                    <p className="text-xs text-gray-500 flex items-center">
+                  <CardFooter className="bg-gray-50 dark:bg-zinc-900 border-t py-2 px-4">
+                    <p className="text-xs flex items-center">
                       <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                       From {countByStatus["COMPLETED"] || 0} completed orders
                     </p>
@@ -258,23 +258,23 @@ export default function OrdersDashboard() {
 
                 {/* Total Orders Card */}
                 <Card className="overflow-hidden shadow-md border-gray-200 hover:shadow-lg transition-shadow duration-200">
-                  <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b pb-3">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 pb-3">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      <Package className="h-5 w-5 text-blue-600" />
+                      <Package className="h-5 w-5 text-blue-600 dark:text-blue-900" />
                       Total Orders
                     </CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardDescription className="text-gray-600 dark:text-gray-100">
                       All orders received
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-4">
                     <div className="flex items-baseline">
-                      <p className="text-3xl font-bold text-gray-900">{orders.length}</p>
-                      <span className="ml-2 text-sm text-gray-500">orders</span>
+                      <p className="text-3xl font-bold text-gray-900 dark:text-gray-200">{orders.length}</p>
+                      <span className="ml-2 text-sm text-gray-500 dark:text-gray-200">orders</span>
                     </div>
                   </CardContent>
-                  <CardFooter className="bg-gray-50 border-t py-2 px-4">
-                    <p className="text-xs text-gray-500 flex items-center">
+                  <CardFooter className="bg-gray-50 dark:bg-zinc-900 border-t py-2 px-4">
+                    <p className="text-xs flex items-center">
                       <Clock className="h-3 w-3 mr-1 text-blue-500" />
                       {countByStatus["PENDING"] || 0} pending orders
                     </p>
@@ -283,12 +283,12 @@ export default function OrdersDashboard() {
 
                 {/* Order Breakdown Card */}
                 <Card className="overflow-hidden shadow-md border-gray-200 hover:shadow-lg transition-shadow duration-200">
-                  <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 border-b pb-3">
+                  <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100  dark:bg-gradient-to-r dark:from-pink-500 dark:to-purple-700 border-b pb-3">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      <BarChart3 className="h-5 w-5 text-purple-600" />
+                      <BarChart3 className="h-5 w-5 text-purple-600 dark:text-purple-950" />
                       Order Breakdown
                     </CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardDescription className="text-gray-600 dark:text-gray-100">
                       By status
                     </CardDescription>
                   </CardHeader>

@@ -30,37 +30,12 @@ const Sidebar = () => {
   ]
 
   return (
-    <aside className="w-64 bg-white border-r border-neutral-200 h-screen sticky top-0 flex flex-col overflow-y-auto">
-      {/* User Profile Section */}
-      {user && (
-        <div className="p-4 border-b border-neutral-100">
-          <div className="flex items-center gap-3 mb-3">
-            <Avatar className="h-10 w-10 border border-neutral-200">
-              <AvatarImage src={user.profilePic || "/placeholder-user.svg"} alt={user.username} />
-              <AvatarFallback>{user.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
-            </Avatar>
-            <div className="overflow-hidden">
-              <p className="font-medium text-neutral-900 truncate">{user.username}</p>
-              <p className="text-xs text-neutral-500 truncate">{user.email}</p>
-            </div>
-          </div>
-          <Link href="/profile">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full text-xs justify-between border-neutral-200 text-neutral-700 font-normal"
-            >
-              View Profile
-              <ChevronRight className="h-3 w-3 opacity-70" />
-            </Button>
-          </Link>
-        </div>
-      )}
-
+    <aside className="w-64 h-screen bg-white dark:bg-black sticky top-0 flex flex-col overflow-y-auto border-r border-gray-300 dark:border-gray-800">
+   
       {/* Main Navigation */}
       <div className="flex-1 py-4 px-3">
         <div className="mb-1 px-3">
-          <p className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Navigation</p>
+          <p className="text-lg mb-6 font-medium text-blue-600 dark:text-white uppercase tracking-wider">COMMUNITY</p>
         </div>
         <nav className="space-y-1">
           {navItems.map((item) => {
@@ -71,7 +46,7 @@ const Sidebar = () => {
                 href={item.href}
                 className={`
                   flex items-center px-3 py-2 rounded-md text-sm group transition-colors
-                  ${isActive ? "bg-primary/10 text-primary font-medium" : "text-neutral-700 hover:bg-neutral-100"}
+                  ${isActive ? "bg-primary/10 text-primary font-medium" : "text-neutral-900 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"}
                 `}
               >
                 <item.icon
@@ -87,7 +62,7 @@ const Sidebar = () => {
         {user && (
           <div className="mt-6 px-3">
             <Link href="/community/communities/create">
-              <Button className="w-full flex items-center gap-2 bg-primary hover:bg-primary/90">
+              <Button className="w-full flex items-center gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white">
                 <PlusCircle className="h-4 w-4" />
                 Create Community
               </Button>
@@ -97,7 +72,7 @@ const Sidebar = () => {
 
         {/* Secondary Navigation */}
         <div className="mt-8 mb-1 px-3">
-          <p className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Support</p>
+          <p className="text-xs font-medium text-neutral-900 dark:text-neutral-200  uppercase tracking-wider">Support</p>
         </div>
         <nav className="space-y-1">
           {secondaryNavItems.map((item) => {
@@ -111,7 +86,7 @@ const Sidebar = () => {
                   ${
                     isActive
                       ? "bg-neutral-100 text-neutral-900 font-medium"
-                      : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                      : "text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-900 dark:hover:text-neutral-100"
                   }
                 `}
               >
@@ -124,6 +99,32 @@ const Sidebar = () => {
           })}
         </nav>
       </div>
+         {/* User Profile Section */}
+         {user && (
+        <div className="p-4 border-b border-neutral-100">
+          <div className="flex items-center gap-3 mb-3">
+            <Avatar className="h-10 w-10 border border-neutral-200">
+              <AvatarImage src={user.profilePic || "/placeholder-user.svg"} alt={user.username} />
+              <AvatarFallback>{user.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+            </Avatar>
+            <div className="overflow-hidden">
+              <p className="font-medium text-neutral-900 dark:text-neutral-100 truncate">{user.username}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-200 truncate">{user.email}</p>
+            </div>
+          </div>
+          <Link href="/profile">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full text-xs justify-between border-neutral-200 font-normal"
+            >
+              View Profile
+              <ChevronRight className="h-3 w-3 opacity-70" />
+            </Button>
+          </Link>
+        </div>
+      )}
+
 
       {/* Footer */}
       {!user && (

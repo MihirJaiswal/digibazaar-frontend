@@ -30,37 +30,13 @@ const GigsSidebar = () => {
   ]
 
   return (
-    <aside className="w-64 bg-black text-white border-r border-neutral-200 h-screen sticky top-0 flex flex-col overflow-y-auto">
-      {/* User Profile Section */}
-      {user && (
-        <div className="p-4 border-b border-neutral-100">
-          <div className="flex items-center gap-3 mb-3 text-white">
-            <Avatar className="h-10 w-10 border border-neutral-200">
-              <AvatarImage src={user.profilePic || "/placeholder-user.svg"} alt={user.username} />
-              <AvatarFallback>{user.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
-            </Avatar>
-            <div className="overflow-hidden">
-              <p className="font-medium text-neutral-100 truncate ">{user.username}</p>
-              <p className="text-xs text-neutral-300 truncate">{user.email}</p>
-            </div>
-          </div>
-          <Link href="/profile">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full text-xs justify-between border-neutral-200 text-neutral-800 font-normal"
-            >
-              View Profile
-              <ChevronRight className="h-3 w-3 opacity-70" />
-            </Button>
-          </Link>
-        </div>
-      )}
+    <aside className="w-64 h-screen bg-white dark:bg-black sticky top-0 flex flex-col overflow-y-auto border-r border-gray-300 dark:border-gray-800">
+     
 
       {/* Main Navigation */}
       <div className="flex-1 py-4 px-3">
         <div className="mb-1 px-3">
-          <p className="text-xs font-medium text-neutral-200 uppercase tracking-wider">Menu</p>
+          <p className="text-lg mb-6 font-medium text-blue-600 dark:text-white uppercase tracking-wider">Navigation</p>
         </div>
         <nav className="space-y-1">
           {navItems.map((item) => {
@@ -71,15 +47,20 @@ const GigsSidebar = () => {
                 href={item.href}
                 className={`
                   flex items-center px-3 py-2 rounded-md text-sm group transition-colors
-                  ${isActive ? "bg-primary/10 text-primary font-medium" : "text-neutral-300 hover:bg-neutral-100"}
-                  ${item.highlight && !isActive ? "text-primary hover:bg-primary/5" : ""}
+                  ${
+                    isActive
+                      ? "bg-primary/10 text-primary font-medium"
+                      : item.highlight
+                      ? "text-primary hover:bg-primary/5"
+                      : "text-neutral-900 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  }
                 `}
               >
                 <item.icon
                   className={`w-4 h-4 mr-3 ${isActive ? "text-primary" : "text-neutral-500 group-hover:text-neutral-700"}`}
                 />
                 <span>{item.label}</span>
-                {item.highlight && !isActive && (
+                {!isActive && item.highlight && (
                   <Badge className="ml-auto bg-primary/10 text-primary text-xs font-normal py-0.5">New</Badge>
                 )}
               </Link>
@@ -89,7 +70,7 @@ const GigsSidebar = () => {
 
         {/* Secondary Navigation */}
         <div className="mt-8 mb-1 px-3">
-          <p className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Support</p>
+          <p className="text-xs font-medium text-neutral-900 dark:text-neutral-200 uppercase tracking-wider">Support</p>
         </div>
         <nav className="space-y-1">
           {secondaryNavItems.map((item) => {
@@ -103,12 +84,12 @@ const GigsSidebar = () => {
                   ${
                     isActive
                       ? "bg-neutral-100 text-neutral-900 font-medium"
-                      : "text-neutral-300 hover:bg-neutral-100 hover:text-neutral-900"
+                      : "text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-900 dark:hover:text-neutral-100"
                   }
                 `}
               >
                 <item.icon
-                  className={`w-4 h-4 mr-3 ${isActive ? "text-neutral-100" : "text-neutral-400 group-hover:text-neutral-200"}`}
+                  className={`w-4 h-4 mr-3 ${isActive ? "text-neutral-900" : "text-neutral-400 group-hover:text-neutral-200"}`}
                 />
                 <span>{item.label}</span>
               </Link>
@@ -116,6 +97,32 @@ const GigsSidebar = () => {
           })}
         </nav>
       </div>
+
+       {/* User Profile Section */}
+       {user && (
+        <div className="p-4 border-b border-neutral-100">
+          <div className="flex items-center gap-3 mb-3">
+            <Avatar className="h-10 w-10 border border-neutral-200">
+              <AvatarImage src={user.profilePic || "/placeholder-user.svg"} alt={user.username} />
+              <AvatarFallback>{user.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+            </Avatar>
+            <div className="overflow-hidden">
+              <p className="font-medium text-neutral-900 dark:text-neutral-100 truncate">{user.username}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-200 truncate">{user.email}</p>
+            </div>
+          </div>
+          <Link href="/profile">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full text-xs justify-between border-neutral-200 font-normal"
+            >
+              View Profile
+              <ChevronRight className="h-3 w-3 opacity-70" />
+            </Button>
+          </Link>
+        </div>
+      )}
 
       {/* Footer */}
       {!user && (
@@ -135,4 +142,3 @@ const GigsSidebar = () => {
 }
 
 export default GigsSidebar
-

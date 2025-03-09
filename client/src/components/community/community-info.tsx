@@ -95,7 +95,7 @@ export function CommunityInfo({ community }: CommunityInfoProps) {
 
         {/* Community Info */}
         <div className="text-center sm:text-left">
-          <h1 className="text-2xl font-bold">r/{community.name}</h1>
+          <h1 className="text-2xl font-bold">{community.name}</h1>
           <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
             <div className="flex items-center gap-1">
               <Users className="h-4 w-4" />
@@ -112,7 +112,7 @@ export function CommunityInfo({ community }: CommunityInfoProps) {
       {/* Right Section (Join/Leave Button) */}
       {user && (
         <Button
-          className="px-5 py-2 rounded-full text-sm mt-4 sm:mt-0 sm:ml-auto"
+          className="px-5 py-2 rounded-full text-sm mt-4 sm:mt-0 sm:ml-auto bg-gradient-to-r from-purple-500 to-cyan-600 text-white"
           variant={isMember ? "outline" : "default"}
           onClick={handleJoinLeave}
         >

@@ -197,7 +197,7 @@ for (const [key, value] of formData.entries()) {
 }
 
       const community = response.data;
-      toast.success(`Community r/${values.name} created successfully!`);
+      toast.success(`Community ${values.name} created successfully!`);
       router.push(`/community/communities/${community.id}`);
     } catch (error: string | any) {
       toast.error("Failed to create community: " + (error.response?.data?.message || error.message));
@@ -286,7 +286,7 @@ for (const [key, value] of formData.entries()) {
       
       <div className="pt-12 p-4">
         <h3 className="font-bold text-lg">
-          r/{watchedValues.name || "community"}
+          {watchedValues.name || "community"}
         </h3>
         
         <p className="text-sm text-muted-foreground mt-2 line-clamp-3">
@@ -369,7 +369,7 @@ for (const [key, value] of formData.entries()) {
                                   </FormLabel>
                                   <FormControl>
                                     <div className="relative">
-                                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">r/</span>
+                                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"></span>
                                       <Input 
                                         placeholder="community-name" 
                                         className="pl-8 h-12" 
@@ -648,8 +648,8 @@ for (const [key, value] of formData.entries()) {
                                   <FormControl>
                                     <Textarea 
                                       placeholder="1. Be respectful to others
-2. No spam or self-promotion
-3. Stay on topic" 
+                                      2. No spam or self-promotion
+                                      3. Stay on topic" 
                                       className="min-h-[120px] resize-y" 
                                       {...field} 
                                     />
