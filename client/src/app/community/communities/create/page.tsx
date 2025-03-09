@@ -24,7 +24,6 @@ import { useAuthStore } from "@/store/authStore"
 import { Switch } from "@/components/ui/switch"
 import { motion, AnimatePresence } from "framer-motion"
 import { AlertCircle, ArrowLeft, ArrowRight, Check, CheckCircle2, Globe, Image as ImageIcon, Info, Loader2, Lock, Shield, Tag, Upload, Users, X } from 'lucide-react'
-import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
@@ -176,7 +175,7 @@ export default function CreateCommunityPage() {
       
       // Log the formData entries to verify what's being sent
       console.log("FormData contents:");
-      for (let pair of formData.entries()) {
+      for (const pair of formData.entries()) {
         console.log(pair[0], pair[1]);
       }
       
@@ -199,25 +198,14 @@ for (const [key, value] of formData.entries()) {
 
       const community = response.data;
       toast.success(`Community r/${values.name} created successfully!`);
-      router.push(`/communities/${community.id}`);
-    } catch (error: any) {
+      router.push(`/community/communities/${community.id}`);
+    } catch (error: string | any) {
       toast.error("Failed to create community: " + (error.response?.data?.message || error.message));
       console.error(error);
     } finally {
       setIsSubmitting(false);
     }
   }
-
-  // Helper function to determine if a URL is valid
-  const isValidUrl = (url: string) => {
-    if (!url) return false;
-    try {
-      new URL(url);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
 
   // Progress indicator component
   const ProgressIndicator = () => (
@@ -533,7 +521,7 @@ for (const [key, value] of formData.entries()) {
                             <FormField
                               control={form.control}
                               name="image"
-                              render={({ field }) => (
+                              render={() => (
                                 <FormItem>
                                   <FormLabel className="text-base font-medium">Community Icon</FormLabel>
                                   <div className="flex items-center gap-4 mb-2">
@@ -592,7 +580,7 @@ for (const [key, value] of formData.entries()) {
                             <FormField
                               control={form.control}
                               name="coverImage"
-                              render={({ field }) => (
+                              render={() => (
                                 <FormItem>
                                   <FormLabel className="text-base font-medium">Cover Image</FormLabel>
                                   <div className="mb-2">

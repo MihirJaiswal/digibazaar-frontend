@@ -117,7 +117,7 @@ export default function OrdersPage() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>No Orders Found</AlertTitle>
-                <AlertDescription>You haven't placed any orders yet.</AlertDescription>
+                <AlertDescription>You haven&apos;t placed any orders yet.</AlertDescription>
               </Alert>
             ) : (
               <div className="space-y-6">

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, BarChart3, Layers, MessageSquare, ShoppingCart, Zap } from "lucide-react"
+import { BarChart3, Layers, MessageSquare, ShoppingCart, Zap } from "lucide-react"
 import ServiceCard from "./service-card"
 import { HeroVideoDialog } from "../ui/hero-video-dialog"
 import { Button } from "@/components/ui/button"
@@ -145,7 +145,7 @@ export default function ServicesPage() {
                     <div>
                       <h3 className="font-medium">Continuous Innovation</h3>
                       <p className="text-muted-foreground">
-                        We're constantly adding new features and improvements to keep you ahead of the competition.
+                        We&apos;re constantly adding new features and improvements to keep you ahead of the competition.
                       </p>
                     </div>
                   </li>

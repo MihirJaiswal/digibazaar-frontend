@@ -3,7 +3,7 @@ import GigsSidebar from "@/components/gigs/GigsSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowRight, CheckCircle, Search, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   // Mock data for featured categories
@@ -16,37 +16,7 @@ export default function Home() {
     { id: 6, name: "Voice Over", icon: "🎤", count: 480 },
   ];
 
-  // Mock data for top gigs
-  const topGigs = [
-    {
-      id: 1,
-      title: "I will design a professional website for your business",
-      price: 120,
-      rating: 4.9,
-      reviews: 342,
-      seller: { name: "JohnDev", avatar: "/placeholder.svg?height=40&width=40", level: "Top Rated" },
-      image: "/placeholder.svg?height=200&width=300",
-    },
-    {
-      id: 2,
-      title: "I will create stunning logo designs for your brand",
-      price: 85,
-      rating: 4.8,
-      reviews: 217,
-      seller: { name: "DesignPro", avatar: "/placeholder.svg?height=40&width=40", level: "Level 2" },
-      image: "/placeholder.svg?height=200&width=300",
-    },
-    {
-      id: 3,
-      title: "I will write SEO-optimized content for your website",
-      price: 65,
-      rating: 4.7,
-      reviews: 189,
-      seller: { name: "ContentQueen", avatar: "/placeholder.svg?height=40&width=40", level: "Level 2" },
-      image: "/placeholder.svg?height=200&width=300",
-    },
-  ];
-
+  // Mock data for top gi
   return (
     <div className="flex flex-col min-h-screen">
       <Header />

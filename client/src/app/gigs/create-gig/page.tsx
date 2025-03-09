@@ -263,7 +263,7 @@ export default function CreateGigPage() {
       if (field === "cover" || field === "images") {
         return step !== 3 || coverFile !== null;
       }
-      // @ts-ignore - Dynamic access
+      // @ts-ignore-error - Dynamic access
       const value = formData[field];
       return value !== undefined && value !== "";
     });
@@ -337,7 +337,7 @@ export default function CreateGigPage() {
       if (!response.ok) throw new Error("Failed to create gig");
 
       toast.success("Gig created successfully!");
-      router.push("/my-gigs");
+      router.push("/gigs/gig");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
       console.error("Error creating gig:", error);

@@ -17,7 +17,7 @@ interface Conversation {
 }
 
 export default function ChatsPage() {
-  const { token, user } = useAuthStore();
+  const { token } = useAuthStore();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();

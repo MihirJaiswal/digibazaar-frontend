@@ -1,5 +1,5 @@
 import { DragHandleDots2Icon } from "@radix-ui/react-icons"
-import { Box, Columns, Heading, Image, LayoutGrid, List, MessageSquare, ShoppingCart, Type } from "lucide-react"
+import { Box, Columns, Heading, ImageIcon , LayoutGrid, List, MessageSquare, ShoppingCart, Type } from "lucide-react"
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card, CardContent } from "@/components/ui/card"
@@ -56,7 +56,7 @@ export function ElementsPanel() {
             <Card>
               <CardContent className="p-3 flex items-center gap-3">
                 <DragHandleDots2Icon className="h-5 w-5 text-muted-foreground" />
-                <Image className="h-4 w-4 text-muted-foreground" />
+                <ImageIcon className="h-4 w-4 text-muted-foreground" />
                 <div className="text-sm">Image</div>
               </CardContent>
             </Card>

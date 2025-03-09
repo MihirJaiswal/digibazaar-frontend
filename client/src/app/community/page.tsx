@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/community/Sidebar";
-import { CommunityList } from "@/components/community/community-list";
 import Posts from "@/components/community/AllPost";
 import UserPosts from "@/components/community/UserPost";
 import UserCommunities from "@/components/community/UserCommunities";

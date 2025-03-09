@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useAuthStore } from "@/store/authStore"
-import { BarChart3, Box, ClipboardList, Home, LogOut, Package, Settings, Truck, User, Warehouse } from "lucide-react"
+import { Box, ClipboardList, Home, LogOut, Package, Settings, Truck, User, Warehouse } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"

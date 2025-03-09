@@ -30,7 +30,7 @@ interface ShippingMethod {
 export default function ShippingSelection() {
   const { id: orderId } = useParams();
   const router = useRouter();
-  const { user, token } = useAuthStore();
+  const {  token } = useAuthStore();
 
   const [warehouseId, setWarehouseId] = useState<string | null>(null);
   const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([]);

@@ -68,7 +68,7 @@ export default function GigsPage() {
   ]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 300]);
-  const [deliveryTime, setDeliveryTime] = useState<number[]>([7]);
+  const [deliveryTime, setDeliveryTime] = useState<number[]>([30]);
   const [sortBy, setSortBy] = useState<string>("recommended");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [gigs, setGigs] = useState<Gig[]>([]);
@@ -184,7 +184,7 @@ export default function GigsPage() {
   const resetFilters = () => {
     setSelectedCategory("All");
     setPriceRange([0, 300]);
-    setDeliveryTime([7]);
+    setDeliveryTime([30]);
   };
 
   return (
@@ -474,7 +474,7 @@ export default function GigsPage() {
               <Briefcase className="h-12 w-12 mx-auto text-neutral-300 mb-4" />
               <h3 className="text-lg font-medium text-neutral-900 mb-2">No gigs found</h3>
               <p className="text-neutral-500 max-w-md mx-auto mb-6">
-                We couldn't find any gigs matching your current filters. Try adjusting your search criteria.
+                We couldn&apos;t find any gigs matching your current filters. Try adjusting your search criteria.
               </p>
               <Button onClick={resetFilters} variant="outline" className="border-neutral-300">
                 Reset Filters

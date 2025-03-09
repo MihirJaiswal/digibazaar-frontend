@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardFooter,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -31,8 +30,6 @@ import {
   AlertCircle,
   ArrowLeft,
   Save,
-  ImagePlus,
-  Truck,
   Ruler,
   Weight,
   Layers,
@@ -68,7 +65,7 @@ const CreateProductPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("basic");
   const [stores, setStores] = useState<Array<{ id: string; name: string }>>([]);
-  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
+  const [categories] = useState<Array<{ id: string; name: string }>>([]);
 
   // New states for file uploads
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
@@ -101,7 +98,7 @@ const CreateProductPage = () => {
   // Handler for input changes (text fields)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    let updatedData = { ...formData, [name]: value };
+    const updatedData = { ...formData, [name]: value };
 
     // Auto-calculate profit & margin when price or costPerItem changes
     if (name === "price" || name === "costPerItem") {
@@ -221,25 +218,6 @@ const CreateProductPage = () => {
       formData.costPerItem !== ""
     );
   };
-
-  // Steps configuration
-  const steps = [
-    {
-      title: "Basic Info",
-      icon: <Info className="h-5 w-5" />,
-      fields: ["title", "storeId", "description", "tags"],
-    },
-    {
-      title: "Pricing",
-      icon: <DollarSign className="h-5 w-5" />,
-      fields: ["price", "costPerItem", "profit", "margin"],
-    },
-    {
-      title: "Inventory & Media",
-      icon: <Store className="h-5 w-5" />,
-      fields: ["stock", "weight", "dimensions"],
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-10">

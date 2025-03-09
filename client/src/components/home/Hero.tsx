@@ -29,10 +29,6 @@ export default function Hero() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Toggle theme function
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
-  }
 
   // Determine if we're in dark mode
   const isDarkMode = mounted && theme === "dark"

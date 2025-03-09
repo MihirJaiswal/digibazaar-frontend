@@ -118,7 +118,7 @@ export default function SetupWizardPage() {
       toast.success("Store created successfully!", {
         description: "Your store is now ready to be customized."
       });
-      router.push("/dashboard");
+      router.push("/store");
     } catch (err: any) {
       toast.error("Failed to create store", {
         description: err.message || "Please check your input and try again."

@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
 import {
   Menu,
   X,
@@ -16,7 +15,7 @@ import {
   LayoutDashboard,
 } from "lucide-react"
 import { useAuthStore } from "@/store/authStore"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +24,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { ModeToggle } from "./ModeToggle"
@@ -37,12 +35,14 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import Image from "next/image"
+import router from "next/navigation"
 
 export default function Header() {
   const { user, logout } = useAuthStore()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
 
   // Update state on scroll
   useEffect(() => {
@@ -131,7 +131,7 @@ export default function Header() {
           )}
 
           {/* Desktop User Dropdown (Only when logged in) */}
-          {user && (
+          {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -181,7 +181,13 @@ export default function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
+          ) :  (
+            
+              <Button variant="ghost" size="sm" className="rounded-full p-2" onClick={() => router.push("/auth/login")}>
+                Sign In
+              </Button>
+            )
+            }
 
           {/* Dark Mode Toggle */}
           <ModeToggle />

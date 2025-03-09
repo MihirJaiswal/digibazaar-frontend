@@ -173,7 +173,7 @@ function ConfirmOrderContent() {
       
       // Show success state briefly before redirecting
       setTimeout(() => {
-        router.push("/dashboard/orders");
+        router.push("/gigs/orders");
       }, 1500);
       
     } catch (error: any) {
@@ -201,7 +201,7 @@ function ConfirmOrderContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-2xl">Complete Your Order</CardTitle>
-                  <CardDescription>You're almost there! Just a few more details.</CardDescription>
+                  <CardDescription>You&apos;re almost there! Just a few more details.</CardDescription>
                 </div>
                 <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
                   ${gig.price}

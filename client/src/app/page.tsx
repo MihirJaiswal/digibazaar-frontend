@@ -1,7 +1,6 @@
 import Header from '@/components/global/Header'
 import { About } from '@/components/home/About'
 import Hero from '@/components/home/Hero'
-import Process from '@/components/home/Process'
 import Footer from '@/components/global/Footer'
 import Cta from '@/components/home/Cta'
 import ServicesPage from '@/components/home/Process'

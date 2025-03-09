@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Package, Search, BarChart2, AlertTriangle, ArrowUpDown, Tag, DollarSign, Percent, Clock, ShoppingCart, Filter, RefreshCw } from 'lucide-react';
+import { Package, Search, AlertTriangle, ArrowUpDown, Tag, DollarSign, Percent, Clock, ShoppingCart, Filter, RefreshCw } from 'lucide-react';
 import dynamic from "next/dynamic";
 import { useAuthStore } from "@/store/authStore";
 

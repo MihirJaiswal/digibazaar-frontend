@@ -7,7 +7,6 @@ import {
   ArrowRight,
   Check,
   Code,
-  Columns,
   Eye,
   Laptop,
   Redo,
@@ -35,7 +34,6 @@ interface ThemeCustomization {
 }
 
 export default function BuilderPage() {
-  const router = useRouter()
   const [viewMode, setViewMode] = useState<"desktop" | "tablet" | "mobile">("desktop")
   const [currentPage, setCurrentPage] = useState("home")
   const [isPublishing, setIsPublishing] = useState(false)
@@ -44,7 +42,6 @@ export default function BuilderPage() {
   const [isCustomizationLoading, setIsCustomizationLoading] = useState(true)
 
   // In a real app, storeSlug would come from the logged in user's data or route params.
-  const storeSlug = user?.store
 
   // Fetch the store data from your API
   const [store, setStore] = useState<any>(null)

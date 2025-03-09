@@ -18,7 +18,6 @@ import {
   DollarSign, 
   Edit, 
   Trash, 
-  Settings,
   AlertCircle
 } from "lucide-react"
 import { toast } from "sonner"
@@ -189,7 +188,7 @@ export default function StoreDashboardPage() {
       <AlertCircle className="h-4 w-4" />
       <AlertTitle>No store found</AlertTitle>
       <AlertDescription>
-        You haven't created a store yet. Create one to get started.
+        You haven&apos;t created a store yet. Create one to get started.
       </AlertDescription>
     </Alert>
   )

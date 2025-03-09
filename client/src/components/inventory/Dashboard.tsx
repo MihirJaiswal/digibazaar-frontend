@@ -5,12 +5,11 @@ import { DashboardLayout } from "@/components/inventory/dashboard-layout"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency, formatNumber } from "@/app/inventory/lib/utils"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, ArrowDown, ArrowUp, BarChart3, DollarSign, MapPin, Package, PackageCheck, PackageX, PieChart, ShoppingBag, ShoppingCart, TrendingUp, Truck, Users, WarehouseIcon } from 'lucide-react'
+import { AlertCircle, ArrowDown, ArrowUp, BarChart3, DollarSign, MapPin,  PackageCheck, PackageX, ShoppingBag, TrendingUp, WarehouseIcon } from 'lucide-react'
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAuthStore } from "@/store/authStore"
 import { 
@@ -18,8 +17,6 @@ import {
   Area, 
   BarChart, 
   Bar, 
-  LineChart, 
-  Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -203,9 +200,6 @@ export default function Dashboard() {
   console.log("[0] Component render - Token:", token, "Rehydrated:", _hasRehydrated);
   
   // Calculate summary metrics
-  const totalWarehouses = warehouses.length
-  const totalProducts = products.length
-  const totalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0)
   const totalRevenue = salesReport?.totalRevenue || 0
   const totalOrders = orders.length
   const pendingOrders = orders.filter(o => o.status === "PENDING").length

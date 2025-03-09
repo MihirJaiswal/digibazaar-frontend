@@ -85,7 +85,7 @@ const LetterG = ({ position, isDarkMode }: { position: [number, number, number];
   const primaryColor = isDarkMode ? "#6366f1" : "#4f46e5"
   const metalColor = isDarkMode ? "#94a3b8" : "#64748b"
 
-  useFrame((state) => {
+  useFrame(() => {
     if (gearRef.current) {
       gearRef.current.rotation.z -= 0.01
     }
@@ -195,8 +195,8 @@ const ConveyorBelt = ({ position, length, isDarkMode }: { position: [number, num
   const primaryColor = isDarkMode ? "#8b5cf6" : "#7c3aed"
   const secondaryColor = isDarkMode ? "#6366f1" : "#4f46e5"
 
-  useFrame((state) => {
-    boxRefs.current.forEach((box, i) => {
+  useFrame(() => {
+    boxRefs.current.forEach((box) => {
       if (box) {
         box.position.x += 0.02
         if (box.position.x > length / 2) {
@@ -332,7 +332,6 @@ const LetterR = ({ position, isDarkMode }: { position: [number, number, number];
 
 export default function DigiBazaarScene({ isDarkMode = true }) {
   const isMobile = useMobile()
-  const { viewport } = useThree()
   const scale = isMobile ? 0.6 : 1
   
   // Floor color based on theme

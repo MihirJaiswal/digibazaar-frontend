@@ -19,7 +19,7 @@ type GigDelivery = {
 };
 
 export default function BuyerDeliveryReview() {
-  const { token, user } = useAuthStore();
+  const { token } = useAuthStore();
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -29,7 +29,7 @@ export default function BuyerDeliveryReview() {
   console.log("🔍 Query Params from useSearchParams():", searchParams.toString());
 
   // ✅ Extract gigOrderId from URL path or query string
-  let gigOrderId = params?.gigOrderId || params?.id || searchParams.get("id");
+  const gigOrderId = params?.gigOrderId || params?.id || searchParams.get("id");
 
   console.log("🔄 Extracted gigOrderId:", gigOrderId);
 
@@ -159,7 +159,7 @@ export default function BuyerDeliveryReview() {
             </a>
           </p>
           <p className="mb-4">
-            <strong>📝 Seller's Message:</strong> {delivery.message || "No message provided."}
+            <strong>📝 Seller&apos;s Message:</strong> {delivery.message || "No message provided."}
           </p>
           <p className="mb-4 text-sm text-gray-500">
             📅 Delivered on: {new Date(delivery.createdAt).toLocaleString()}

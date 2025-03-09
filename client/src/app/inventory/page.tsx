@@ -4,8 +4,9 @@ import Dashboard from '@/components/inventory/Dashboard'
 import { useAuthStore } from '@/store/authStore'
 import Landing from '@/components/inventoryLanding/Landing'
 
-export default function page() {
+export default function Page() { 
   const { user } = useAuthStore()
+  
   if (!user) {
     return <Landing/>
   }

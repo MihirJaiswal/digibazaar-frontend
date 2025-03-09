@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Clipboard, Package } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { CommunityList } from "./community-list";
 import { useAuthStore } from "@/store/authStore";
 export default function HeroSection() {
   const [copyText, setCopyText] = useState("npm i preline");

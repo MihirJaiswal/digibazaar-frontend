@@ -27,7 +27,6 @@ export default function StockValueChart({ labels, data }: StockValueChartProps) 
     const chartHeight = canvas.height - padding * 2;
     
     // Find max value for scaling
-    const maxValue = Math.max(...data);
     const total = data.reduce((sum, value) => sum + value, 0);
     
     // Clear canvas

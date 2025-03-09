@@ -19,7 +19,7 @@ export default function Login() {
   const { register, handleSubmit, reset } = useForm()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { user, setUser, token } = useAuthStore()
+  const {  setUser, token } = useAuthStore()
   const router = useRouter()
 
   const onSubmit = async (data: any) => {

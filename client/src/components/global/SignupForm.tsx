@@ -4,15 +4,14 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertCircle, User, Mail, Lock, Globe, Phone, FileText, Loader2, ArrowRight } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { toast } from "sonner";
@@ -21,7 +20,7 @@ import Image from "next/image";
 
 export default function SignUp() {
   const { register: registerField, handleSubmit, watch, reset } = useForm();
-  const { user, setUser, token } = useAuthStore();
+  const {  setUser, token } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
@@ -90,7 +89,6 @@ export default function SignUp() {
     }
   };
 
-  const nextStep = () => setStep(2);
   const prevStep = () => setStep(1);
 
   return (

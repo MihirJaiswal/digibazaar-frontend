@@ -34,11 +34,7 @@ import { useAuthStore } from "@/store/authStore"
 import { formatCurrency, formatDate } from "@/app/inventory/lib/utils"
 
 // Fix for default marker icon issues in React Leaflet
-const icon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-})
+
 
 // Custom marker icons
 const warehouseIcon = L.icon({
@@ -156,7 +152,7 @@ export default function AssignInventoryPage() {
       return null
     }
 
-    let nearestWarehouse = null
+    let nearestWarehouse: (Warehouse & { distance: number }) | null = null;
     let minDistance = Number.POSITIVE_INFINITY
 
     warehouses.forEach((warehouse) => {
@@ -176,7 +172,7 @@ export default function AssignInventoryPage() {
             longitude: warehouse.coordinates.longitude,
           },
           distance,
-        }
+        } as Warehouse & { distance: number }
       }
     })
 

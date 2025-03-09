@@ -22,7 +22,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { headers } from "next/headers";
 
 interface Warehouse {
   id: string;

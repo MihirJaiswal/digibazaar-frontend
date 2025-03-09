@@ -86,7 +86,7 @@ export default function GigTabs({ gig, isOwner }: GigTabsProps) {
             <p className="text-gray-700 mb-6">{gig.shortDesc}</p>
 
             <div className="mb-6">
-              <h3 className="font-semibold text-lg mb-3">What you'll get:</h3>
+              <h3 className="font-semibold text-lg mb-3">What you&apos;ll get:</h3>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {features.length > 0 ? (
                   features.map(
@@ -242,7 +242,7 @@ export default function GigTabs({ gig, isOwner }: GigTabsProps) {
               <div className="border rounded-lg p-4">
                 <h3 className="font-medium mb-2">How do revisions work?</h3>
                 <p className="text-muted-foreground">
-                  You can request up to {gig.revisionNumber} revision(s) to ensure you're completely satisfied with the
+                  You can request up to {gig.revisionNumber} revision(s) to ensure you&apos;re completely satisfied with the
                   final result.
                 </p>
               </div>
@@ -250,7 +250,7 @@ export default function GigTabs({ gig, isOwner }: GigTabsProps) {
               <div className="border rounded-lg p-4">
                 <h3 className="font-medium mb-2">What information do you need to get started?</h3>
                 <p className="text-muted-foreground">
-                  To begin working on your project, I'll need a clear description of your requirements, any reference
+                  To begin working on your project, I&apos;ll need a clear description of your requirements, any reference
                   materials, and your timeline expectations.
                 </p>
               </div>

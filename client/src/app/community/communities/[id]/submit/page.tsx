@@ -118,7 +118,7 @@ export default function CreateCommunityPost() {
       );
 
       toast.success("Community post created!");
-      router.push(`/communities/${communityId}/posts/${response.data.id}`);
+      router.push(`/community/communities/${communityId}/posts/${response.data.id}`);
     } catch (error) {
       toast.error("Failed to create community post");
       console.error("Error creating community post:", error);
@@ -133,7 +133,7 @@ export default function CreateCommunityPost() {
     try {
       new URL(url);
       return true;
-    } catch (e) {
+    } catch (error) {
       return false;
     }
   };
