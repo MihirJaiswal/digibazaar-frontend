@@ -105,7 +105,7 @@ export const Header = () => {
   return (
     <div className="max-w-7xl relative mx-auto py-20 md:py-40 px-4 w-full left-0 top-0">
     <h1 className="text-2xl md:text-7xl font-bold dark:text-white">
-      Build & Launch <br /> Your Online Store Instantly
+      <span className="text-purple-500" >Build</span> & <span className="text-blue-500" >Launch</span> <br /> Your Online Store Instantly
     </h1>
     <p className="max-w-2xl text-base md:text-xl mt-8 dark:text-neutral-200">
       Create stunning online stores effortlessly with DigiBazar. Choose from  

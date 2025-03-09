@@ -36,6 +36,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
+import Image from "next/image"
 
 export default function Header() {
   const { user, logout } = useAuthStore()
@@ -75,8 +76,13 @@ export default function Header() {
             href="/"
             className="flex items-center gap-2 font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent dark:from-purple-300 dark:to-cyan-400"
           >
-            <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-              <span className="text-purple-700 dark:text-purple-400">D</span>
+            <div className="w-8 h-8 flex items-center justify-center">
+              <Image
+              src="/logo.png"
+              alt="logo"
+              width={32}
+              height={32}
+              />
             </div>
             <span className="text-xl hidden md:inline">igiBazar</span>
           </Link>

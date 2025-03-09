@@ -67,7 +67,7 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        <section className="py-20  px-24 dark:bg-gradient-to-t from-black">
+        <section className="p-28 dark:bg-gradient-to-t from-black">
           <div className="container">
             <div className="grid gap-12 lg:grid-cols-2 items-center">
               <div className="space-y-6">
@@ -78,7 +78,7 @@ export default function ServicesPage() {
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
-                    <div className="rounded-full bg-primary/10 p-1">
+                    <div className="rounded-full bg-purple-200 dark:bg-purple-500 p-1">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="24"
@@ -102,7 +102,7 @@ export default function ServicesPage() {
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="rounded-full bg-primary/10 p-1">
+                    <div className="rounded-full bg-purple-200 dark:bg-purple-500 p-1">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="24"
@@ -126,7 +126,7 @@ export default function ServicesPage() {
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="rounded-full bg-primary/10 p-1">
+                    <div className="rounded-full bg-purple-200 dark:bg-purple-500 p-1">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="24"
@@ -150,7 +150,7 @@ export default function ServicesPage() {
                     </div>
                   </li>
                 </ul>
-                <Button size="lg" asChild>
+                <Button size="lg" asChild className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:bg-purple-600">
                   <Link href="/learn-more">Learn More</Link>
                 </Button>
               </div>

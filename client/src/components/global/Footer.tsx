@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { TextHoverEffect } from "@/components/ui/text-hover-effect"
 import AnimationContainer from '../ui/Animation-container';
 import { Icons } from '../ui/Icons';
+import Image from 'next/image';
 
 const Footer = () => {
     return (
@@ -14,7 +15,8 @@ const Footer = () => {
                 <AnimationContainer delay={0.1}>
                     <div className="flex flex-col items-start justify-start md:max-w-[200px]">
                         <div className="flex items-start">
-                            <Icons.logo className="w-7 h-7" />
+                            <Image src="/logo.png" alt="DigiBazar" width={40} height={40} />
+                            <h2 className="text-xl font-bold text-white ml-2">IGI-BAZAAR</h2>
                         </div>
                         <p className="text-muted-foreground mt-4 text-sm text-start">
                             Manage your warehouse and store with ease.
