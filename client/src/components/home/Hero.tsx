@@ -41,7 +41,7 @@ export default function Hero() {
   const environmentPreset = isDarkMode ? "night" : "park"
 
   // Background color based on theme
-  const bgColor = isDarkMode ? "bg-gradient-to-b from-black to-yellow-900" : "bg-gradient-to-t from-blue-500 to-purple-200"
+  const bgColor = isDarkMode ? "bg-gradient-to-b from-black to-yellow-900" : "bg-gradient-to-b from-white to-purple-200"
 
   // Heading text colors based on theme
   const headingClass = isDarkMode 

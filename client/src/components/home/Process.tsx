@@ -1,28 +1,13 @@
 import Link from "next/link"
 import { ArrowRight, BarChart3, Layers, MessageSquare, ShoppingCart, Zap } from "lucide-react"
 import ServiceCard from "./service-card"
-import AnimatedGradient from "@/components/ui/animated-gradient"
+import { HeroVideoDialog } from "../ui/hero-video-dialog"
 import { Button } from "@/components/ui/button"
 
 export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-background ">
       <main>
-        <section className="relative overflow-hidden py-20 md:py-32 bg-gradient-to-b from-purple-100 via-blue-100 to-white dark:bg-gradient-to-b dark:from-yellow-950 dark:to-black">
-          <AnimatedGradient className="absolute inset-0 -z-10" />
-          <div className="container relative z-10">
-            <div className="mx-auto max-w-3xl text-center">
-              <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-                Cutting-Edge Solutions for Your Digital Presence
-              </h1>
-              <p className="mb-10 text-xl text-muted-foreground">
-                Discover how DigiBazar's innovative platform can transform your online business with customizable
-                templates and powerful tools.
-              </p>
-            </div>
-          </div>
-        </section>
-
         <section className="py-20 dark:bg-gradient-to-b dark:from-black" id="services">
           <div className="container max-w-7xl mx-auto">
             <div className="mb-16 text-center">
@@ -169,28 +154,23 @@ export default function ServicesPage() {
                   <Link href="/learn-more">Learn More</Link>
                 </Button>
               </div>
-              <div className="relative aspect-video overflow-hidden rounded-xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/10 backdrop-blur-sm">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Button size="lg" variant="outline" className="bg-background/80 backdrop-blur-sm">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-2 h-5 w-5"
-                      >
-                        <polygon points="5 3 19 12 5 21 5 3" />
-                      </svg>
-                      Watch Demo
-                    </Button>
+              <div className="relative aspect-video overflow-hidden rounded-xl">\
+                <div className="relative">
+                    <HeroVideoDialog
+                      className="block dark:hidden"
+                      animationStyle="from-center"
+                      videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
+                      thumbnailSrc="https://startup-template-sage.vercel.app/hero-light.png"
+                      thumbnailAlt="Hero Video"
+                    />
+                    <HeroVideoDialog
+                      className="hidden dark:block"
+                      animationStyle="from-center"
+                      videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
+                      thumbnailSrc="https://startup-template-sage.vercel.app/hero-dark.png"
+                      thumbnailAlt="Hero Video"
+                    />
                   </div>
-                </div>
               </div>
             </div>
           </div>

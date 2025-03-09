@@ -29,7 +29,7 @@ export default function ServiceCard({
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden transition-all duration-300 hover:shadow-lg",
+        "group relative overflow-hidden transition-all duration-300 hover:shadow-lg shadow-purple-500",
         isHovered && "translate-y-[-8px]",
         className,
       )}
