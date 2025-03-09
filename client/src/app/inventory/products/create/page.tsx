@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +40,6 @@ const CreateProductPage = () => {
   const { token } = useAuthStore();
   const router = useRouter();
 
-  // State for text fields – note that mainImage and images are now handled separately
   const [formData, setFormData] = useState({
     storeId: "",
     title: "",
@@ -54,8 +52,8 @@ const CreateProductPage = () => {
     tags: "",
     costPerItem: "",
     categoryId: "",
-    profit: "0", // Auto-calculated
-    margin: "0", // Auto-calculated
+    profit: "0",
+    margin: "0",
     isPublished: true,
     resume: "",
   });
@@ -65,83 +63,61 @@ const CreateProductPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("basic");
   const [stores, setStores] = useState<Array<{ id: string; name: string }>>([]);
-  const [categories] = useState<Array<{ id: string; name: string }>>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // New states for file uploads
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [mainImagePreview, setMainImagePreview] = useState<string>("");
   const [additionalImageFiles, setAdditionalImageFiles] = useState<File[]>([]);
   const [additionalImagePreviews, setAdditionalImagePreviews] = useState<string[]>([]);
 
-  // Fetch stores and categories
   useEffect(() => {
-    const fetchStoresAndCategories = async () => {
+    const fetchStores = async () => {
+      if (!token) {
+        setMessage({ type: "error", text: "No authentication token available" });
+        setIsLoading(false);
+        return;
+      }
+
       try {
+        setIsLoading(true);
         const storesRes = await fetch("http://localhost:8800/api/stores", {
           headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
         });
-        if (storesRes.ok) {
-          const storesData = await storesRes.json();
-          console.log("Stores Data:", storesData);
-          setStores(Array.isArray(storesData) ? storesData : []);
+
+        if (!storesRes.ok) {
+          throw new Error(`HTTP error! Status: ${storesRes.status}`);
         }
-      } catch (error) {
+
+        const storesData = await storesRes.json();
+        console.log("Raw API Response:", storesData); // Debug the raw response
+
+        // Handle both single object and array responses
+        let validStores: Array<{ id: string; name: string }> = [];
+        if (Array.isArray(storesData)) {
+          validStores = storesData;
+        } else if (storesData && typeof storesData === "object" && storesData.id && storesData.name) {
+          validStores = [storesData]; // Convert single object to array
+        }
+
+        setStores(validStores);
+
+        if (validStores.length > 0) {
+          setFormData((prev) => ({ ...prev, storeId: validStores[0].id }));
+        } else {
+          setMessage({ type: "error", text: "No stores found in response" });
+        }
+      } catch (error:any ) {
         console.error("Error fetching stores:", error);
+        setMessage({ type: "error", text: `Failed to load stores: ${error.message}` });
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (token) {
-      fetchStoresAndCategories();
-    }
+    fetchStores();
   }, [token]);
 
-  // Handler for input changes (text fields)
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    const updatedData = { ...formData, [name]: value };
-
-    // Auto-calculate profit & margin when price or costPerItem changes
-    if (name === "price" || name === "costPerItem") {
-      const price = parseFloat(updatedData.price) || 0;
-      const costPerItem = parseFloat(updatedData.costPerItem) || 0;
-      const profit = price - costPerItem;
-      const margin = price > 0 ? (profit / price) * 100 : 0;
-      updatedData.profit = profit.toFixed(2);
-      updatedData.margin = margin.toFixed(2);
-    }
-
-    setFormData(updatedData);
-  };
-
-  // Handler for switch toggle
-  const handleSwitchChange = (checked: boolean) => {
-    setFormData({ ...formData, isPublished: checked });
-  };
-
-  // Handler for select changes
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData({ ...formData, [name]: value });
-  };
-
-  // Handlers for file inputs
-  const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setMainImageFile(file);
-      setMainImagePreview(URL.createObjectURL(file));
-    }
-  };
-
-  const handleAdditionalImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      setAdditionalImageFiles(files);
-      const previews = files.map(file => URL.createObjectURL(file));
-      setAdditionalImagePreviews(previews);
-    }
-  };
-
-  // Cleanup preview URLs when component unmounts or when files change
   useEffect(() => {
     return () => {
       if (mainImagePreview) URL.revokeObjectURL(mainImagePreview);
@@ -149,75 +125,97 @@ const CreateProductPage = () => {
     };
   }, [mainImagePreview, additionalImagePreviews]);
 
-  // Form submit handler to create a new product with file uploads using FormData
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage(null);
-    setIsSubmitting(true);
-
-    try {
-      const formPayload = new FormData();
-
-      // Append text fields
-      formPayload.append("storeId", formData.storeId);
-      formPayload.append("title", formData.title);
-      formPayload.append("description", formData.description);
-      formPayload.append("price", formData.price);
-      formPayload.append("sku", formData.sku);
-      formPayload.append("stock", formData.stock);
-      formPayload.append("weight", formData.weight);
-      formPayload.append("dimensions", formData.dimensions);
-      formPayload.append("tags", formData.tags);
-      formPayload.append("costPerItem", formData.costPerItem);
-      formPayload.append("categoryId", formData.categoryId);
-      formPayload.append("profit", formData.profit);
-      formPayload.append("margin", formData.margin);
-      formPayload.append("isPublished", formData.isPublished ? "true" : "false");
-      formPayload.append("resume", formData.resume);
-
-      // Append files if available
-      if (mainImageFile) {
-        formPayload.append("mainImage", mainImageFile);
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updatedData = { ...prev, [name]: value };
+      if (name === "price" || name === "costPerItem") {
+        const price = parseFloat(updatedData.price) || 0;
+        const costPerItem = parseFloat(updatedData.costPerItem) || 0;
+        const profit = price - costPerItem;
+        const margin = price > 0 ? (profit / price) * 100 : 0;
+        updatedData.profit = profit.toFixed(2);
+        updatedData.margin = margin.toFixed(2);
       }
-      if (additionalImageFiles.length > 0) {
-        additionalImageFiles.forEach((file) => {
-          formPayload.append("images", file);
-        });
-      }
+      return updatedData;
+    });
+  }, []);
 
-      const res = await fetch("http://localhost:8800/api/products", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // Do not set Content-Type; the browser will set the correct boundary.
-        },
-        body: formPayload,
-      });
+  const handleSwitchChange = useCallback((checked: boolean) => {
+    setFormData((prev) => ({ ...prev, isPublished: checked }));
+  }, []);
 
-      if (!res.ok) throw new Error("Failed to create product");
-
-      const data = await res.json();
-      setProductId(data.id);
-      setMessage({ type: "success", text: "Product created successfully!" });
-      setActiveTab("variants");
-      window.scrollTo(0, 0);
-    } catch (error: any) {
-      setMessage({ type: "error", text: error.message });
-      console.error("Error creating product:", error);
-    } finally {
-      setIsSubmitting(false);
+  const handleMainImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setMainImageFile(file);
+      setMainImagePreview(URL.createObjectURL(file));
     }
-  };
+  }, []);
 
-  // Check if form is valid
-  const isFormValid = () => {
+  const handleAdditionalImagesChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      setAdditionalImageFiles(files);
+      setAdditionalImagePreviews(files.map((file) => URL.createObjectURL(file)));
+    }
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setMessage(null);
+      setIsSubmitting(true);
+
+      try {
+        const formPayload = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+          formPayload.append(key, String(value));
+        });
+
+        if (mainImageFile) formPayload.append("mainImage", mainImageFile);
+        additionalImageFiles.forEach((file) => formPayload.append("images", file));
+
+        const res = await fetch("http://localhost:8800/api/products", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formPayload,
+        });
+
+        if (!res.ok) throw new Error("Failed to create product");
+
+        const data = await res.json();
+        setProductId(data.id);
+        setMessage({ type: "success", text: "Product created successfully!" });
+        setActiveTab("variants");
+        window.scrollTo(0, 0);
+      } catch (error: any) {
+        setMessage({ type: "error", text: error.message });
+        console.error("Error creating product:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [formData, mainImageFile, additionalImageFiles, token]
+  );
+
+  const isFormValid = useCallback(() => {
     return (
+      formData.storeId.trim() !== "" &&
       formData.title.trim() !== "" &&
       formData.price !== "" &&
       formData.stock !== "" &&
       formData.costPerItem !== ""
     );
-  };
+  }, [formData]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-10">
@@ -231,11 +229,7 @@ const CreateProductPage = () => {
 
         {message && (
           <Alert variant={message.type === "success" ? "default" : "destructive"} className="mb-6">
-            {message.type === "success" ? (
-              <CheckCircle2 className="h-4 w-4" />
-            ) : (
-              <AlertCircle className="h-4 w-4" />
-            )}
+            {message.type === "success" ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
             <AlertTitle>{message.type === "success" ? "Success" : "Error"}</AlertTitle>
             <AlertDescription>{message.text}</AlertDescription>
           </Alert>
@@ -320,40 +314,11 @@ const CreateProductPage = () => {
                           className="min-h-[120px]"
                         />
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <Label htmlFor="storeId" className="text-base">
-                            Store
-                          </Label>
-                          <Input
-                            id="storeId"
-                            name="storeId"
-                            value={formData.storeId}
-                            onChange={handleInputChange}
-                            placeholder="Enter store ID"
-                            className="h-11"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="categoryId" className="text-base">
-                            Category
-                          </Label>
-                          <Select
-                            value={formData.categoryId}
-                            onValueChange={(value) => handleSelectChange("categoryId", value)}
-                          >
-                            <SelectTrigger className="h-11">
-                              <SelectValue placeholder="Select a category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {categories.map((category) => (
-                                <SelectItem key={category.id} value={category.id}>
-                                  {category.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+                      <div className="space-y-2">
+                        <Label className="text-base">Store</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {stores.find((s) => s.id === formData.storeId)?.name || "No store assigned"}
+                        </p>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="tags" className="text-base">
@@ -522,27 +487,16 @@ const CreateProductPage = () => {
                         </p>
                       </div>
 
-                      {/* Updated file input for Main Image */}
                       <div className="space-y-2">
                         <Label htmlFor="mainImage" className="text-base">
                           Main Image
                         </Label>
-                        <Input
-                          id="mainImage"
-                          type="file"
-                          accept="image/*"
-                          onChange={handleMainImageChange}
-                        />
+                        <Input id="mainImage" type="file" accept="image/*" onChange={handleMainImageChange} />
                         {mainImagePreview && (
-                          <img
-                            src={mainImagePreview}
-                            alt="Main Image Preview"
-                            className="w-full h-48 object-cover mt-2 rounded"
-                          />
+                          <img src={mainImagePreview} alt="Main Image Preview" className="w-full h-48 object-cover mt-2 rounded" />
                         )}
                       </div>
 
-                      {/* File input for Additional Images */}
                       <div className="space-y-2">
                         <Label htmlFor="additionalImages" className="text-base">
                           Additional Images
@@ -617,15 +571,11 @@ const CreateProductPage = () => {
                     <div>
                       <h3 className="font-medium text-lg">{formData.title}</h3>
                       {formData.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                          {formData.description}
-                        </p>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{formData.description}</p>
                       )}
                     </div>
                     <div className="flex items-center justify-between">
-                      <div className="font-bold text-xl">
-                        ${parseFloat(formData.price || "0").toFixed(2)}
-                      </div>
+                      <div className="font-bold text-xl">${parseFloat(formData.price || "0").toFixed(2)}</div>
                       <Badge variant={formData.isPublished ? "default" : "secondary"}>
                         {formData.isPublished ? "Published" : "Draft"}
                       </Badge>
