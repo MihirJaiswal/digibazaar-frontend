@@ -4,6 +4,7 @@ import Dashboard from '@/components/inventory/Dashboard'
 import { useAuthStore } from '@/store/authStore'
 import Landing from '@/components/inventoryLanding/Landing'
 import Header from '@/components/global/Header'
+import { DashboardLayout } from './dashboard-layout'
 
 export default function HomeLand() {
   const { user, token } = useAuthStore()
@@ -61,7 +62,9 @@ export default function HomeLand() {
   return (
     <div>
       <Header/>
+      <DashboardLayout>
       <Dashboard />
+      </DashboardLayout>
     </div>
   )
 }

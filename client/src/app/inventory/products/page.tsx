@@ -334,7 +334,7 @@ function ProductsPageContent() {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
+      <>
         <div className="container mx-auto px-4 py-6">
           <Card className="border-0 shadow-sm">
             <CardHeader>
@@ -388,7 +388,7 @@ function ProductsPageContent() {
             </CardContent>
           </Card>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 

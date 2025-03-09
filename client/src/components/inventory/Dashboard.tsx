@@ -1,7 +1,6 @@
 "use client"
 
 import {  useState, useMemo } from "react"
-import { DashboardLayout } from "@/components/inventory/dashboard-layout"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency, formatNumber } from "@/app/inventory/lib/utils"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -29,7 +28,6 @@ import {
 } from "recharts"
 import { useQuery, useQueries, QueryClient, QueryClientProvider } from 'react-query'
 import { Suspense } from 'react'
-import { ErrorBoundary } from 'react-error-boundary'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -914,9 +912,7 @@ export default function DashboardPage() {
             </div>
           }
         >
-          <DashboardLayout>
             <DashboardContent />
-          </DashboardLayout>
         </Suspense>
     </QueryClientProvider>
   )

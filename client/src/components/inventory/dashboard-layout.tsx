@@ -64,12 +64,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 ))}
               </nav>
             </div>
-            <div className="flex-shrink-0 flex border-t border-primary-foreground/20 p-4">
+            <div className="flex-shrink-0 flex border-t bg-white dark:bg-zinc-900 border-primary-foreground/20 p-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="flex items-center w-full text-sm text-left text-primary-foreground"
+                    className="flex items-center w-full text-sm text-left d"
                   >
                     <Avatar className="h-8 w-8 mr-2">
                       <AvatarImage src="/placeholder-user.jpg" alt={user?.username || "User"} />
@@ -106,7 +106,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Mobile header */}
-        <div className="md:hidden bg-white border-b">
+        <div className="md:hidden  border-b">
           <div className="flex items-center justify-between px-4 py-2">
             <div className="flex items-center">
               <Truck className="h-8 w-8 text-primary" />
