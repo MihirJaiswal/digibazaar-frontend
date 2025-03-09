@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import Header from "@/components/global/Header"
-import { formatNumber } from "@/app/inventory/your-inventory/lib/utils"
+import { formatNumber } from "@/app/inventory/lib/utils"
 import {
   Database,
   Package,
