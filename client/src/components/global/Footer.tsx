@@ -14,9 +14,9 @@ const Footer = () => {
 
                 <AnimationContainer delay={0.1}>
                     <div className="flex flex-col items-start justify-start md:max-w-[200px]">
-                        <div className="flex items-start">
+                        <div className="flex items-center justify-center">
                             <Image src="/logo.png" alt="DigiBazar" width={40} height={40} />
-                            <h2 className="text-xl font-bold text-white ml-2">IGI-BAZAAR</h2>
+                            <h2 className="text-xl font-bold dark:text-white text-gray-700 ml-2">IGI-BAZAAR</h2>
                         </div>
                         <p className="text-muted-foreground mt-4 text-sm text-start">
                             Manage your warehouse and store with ease.
