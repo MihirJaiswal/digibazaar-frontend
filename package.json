@@ -1,0 +1,6 @@
+{
+	"dependencies": {
+		"react-error-boundary": "^5.0.0",
+		"react-query": "^3.39.3"
+	}
+}

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import Dashboard from '@/components/inventory/Dashboard'
 import { useAuthStore } from '@/store/authStore'
 import Landing from '@/components/inventoryLanding/Landing'
+import Header from '@/components/global/Header'
 
 export default function Page() {
   const { user, token } = useAuthStore()
@@ -59,6 +60,7 @@ export default function Page() {
 
   return (
     <div>
+      <Header/>
       <Dashboard />
     </div>
   )
