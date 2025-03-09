@@ -1,5 +1,3 @@
-"use client";
-
 import Header from "@/components/global/Header";
 import GigsSidebar from "@/components/gigs/GigsSidebar";
 import { Button } from "@/components/ui/button";

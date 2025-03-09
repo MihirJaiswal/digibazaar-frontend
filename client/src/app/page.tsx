@@ -5,6 +5,7 @@ import Process from '@/components/home/Process'
 import Footer from '@/components/global/Footer'
 import Cta from '@/components/home/Cta'
 import { LogoTicker } from '@/components/home/LogoTicker'
+import ServicesPage from '@/components/home/Process'
 
 export default function page() {
   return (
@@ -12,7 +13,7 @@ export default function page() {
       <Header/>
       <Hero/>
       <LogoTicker/>
-      <Process/>
+      <ServicesPage/>
       <About/>
       <Cta/>
       <Footer/>

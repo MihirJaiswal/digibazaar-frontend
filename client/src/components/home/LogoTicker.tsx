@@ -19,7 +19,7 @@ const logos = [
 
 export const LogoTicker = () => {
   return (
-    <section className="py-20 md:py-24 bg-gradient-to-b from-blue-500 via-purple-400 to-blue-100 dark:bg-gradient-to-b dark:from-black  dark:to-yellow-950 px-20">
+    <section className="py-20 md:py-24 bg-gradient-to-b from-blue-500 via-purple-400 to-purple-100 dark:bg-gradient-to-b dark:from-black  dark:to-yellow-950 px-20">
       <div className="container">
         <div className="flex items-center gap-5">
         

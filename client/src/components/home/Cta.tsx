@@ -5,7 +5,7 @@ import { Button } from '../ui/button'
 function Cta() {
   return (
     <>
-          <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-blue-200 dark:from-black dark:to-zinc-900">
+          <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-blue-200 dark:from-black dark:to-yellow-950">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">

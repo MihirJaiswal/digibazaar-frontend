@@ -3,8 +3,10 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   Menu,
+  X,
   MessageSquare,
   User,
   Settings,
@@ -23,20 +25,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { ModeToggle } from "./ModeToggle"
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
 
 export default function Header() {
   const { user, logout } = useAuthStore()
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
+  // Update state on scroll
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0)
-    }
+    const handleScroll = () => setIsScrolled(window.scrollY > 0)
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
@@ -44,6 +53,7 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await logout()
+      setIsOpen(false)
     } catch (error) {
       console.error("Logout error:", error)
     }
@@ -98,34 +108,90 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* Right Section: Cart, Messages, Dark Mode, Mobile Menu */}
+        {/* Right Section */}
         <div className="flex items-center gap-2 md:gap-4">
-          {/* Cart */}
+          {/* Cart (Always Visible) */}
           <Link href="/orders">
-            <Button variant="ghost" size="sm" className="rounded-full p-2 md:p-2">
+            <Button variant="ghost" size="sm" className="rounded-full p-2">
               <ShoppingCart className="h-5 w-5 text-foreground dark:text-gray-300" />
             </Button>
           </Link>
 
           {/* Messages (Only for logged-in users) */}
           {user && (
-            <Button variant="ghost" size="sm" className="rounded-full p-2 md:p-2">
+            <Button variant="ghost" size="sm" className="rounded-full p-2">
               <MessageSquare className="h-5 w-5 text-foreground dark:text-gray-300" />
             </Button>
+          )}
+
+          {/* Desktop User Dropdown (Only when logged in) */}
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden md:flex gap-2 font-normal text-foreground dark:text-gray-300"
+                >
+                  <Avatar className="h-7 w-7">
+                    <AvatarImage
+                      src={user.profilePic || "/placeholder.svg"}
+                      alt={user.username}
+                    />
+                    <AvatarFallback className="dark:bg-gray-700 dark:text-white">
+                      {user.username?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-56 dark:bg-gray-800 dark:border-gray-700"
+              >
+                <DropdownMenuLabel className="dark:text-gray-300">
+                  My Account
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="dark:bg-gray-600" />
+                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700">
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700">
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="dark:bg-gray-600" />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive dark:text-red-400 hover:dark:bg-gray-700"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           {/* Dark Mode Toggle */}
           <ModeToggle />
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu (Visible on smaller screens) */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="md:hidden rounded-full p-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden rounded-full p-2"
+              >
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              {/* Accessibility fix: Adding SheetHeader & SheetTitle */}
               <SheetHeader>
                 <SheetTitle>Menu</SheetTitle>
               </SheetHeader>
@@ -140,12 +206,12 @@ export default function Header() {
                   { name: "Inventory", path: "/inventory" },
                 ].map((route) => (
                   <Link key={route.path} href={route.path}>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className={cn(
                         "w-full justify-start",
-                        pathname === route.path 
-                          ? "text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20" 
+                        pathname === route.path
+                          ? "text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
                           : ""
                       )}
                     >
@@ -155,19 +221,26 @@ export default function Header() {
                 ))}
               </nav>
 
-              {/* User Menu */}
+              {/* Mobile User Menu (if logged in) */}
               {user && (
                 <div className="mt-6 pt-6 border-t dark:border-gray-700">
                   <div className="flex items-center gap-3 mb-4">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={user.profilePic || "/placeholder.svg"} alt={user.username} />
+                      <AvatarImage
+                        src={user.profilePic || "/placeholder.svg"}
+                        alt={user.username}
+                      />
                       <AvatarFallback className="dark:bg-gray-700 dark:text-white">
                         {user.username?.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium dark:text-gray-200">{user.username}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">User</p>
+                      <p className="font-medium dark:text-gray-200">
+                        {user.username}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        User
+                      </p>
                     </div>
                   </div>
 
@@ -184,8 +257,8 @@ export default function Header() {
                       <Settings className="mr-2 h-4 w-4" />
                       Settings
                     </Button>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                       onClick={handleLogout}
                     >
