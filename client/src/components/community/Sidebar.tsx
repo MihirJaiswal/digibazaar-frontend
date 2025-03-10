@@ -128,9 +128,9 @@ const Sidebar = () => {
 
       {/* Footer */}
       {!user && (
-        <div className="p-4 border-t border-neutral-200 bg-neutral-50">
+        <div className="p-4 border-t">
           <div className="text-center space-y-3">
-            <p className="text-sm text-neutral-600">Sign in to join communities</p>
+            <p className="text-sm">Sign in to join communities</p>
             <Link href="/login">
               <Button className="w-full" size="sm">
                 Sign In

@@ -14,10 +14,10 @@ const GigsSidebar = () => {
 
   const navItems = [
     { href: "/gigs", label: "Home", icon: Home },
-    { href: "/gigs/dashboard", label: "Dashboard", icon: PieChart },
     { href: "/gigs/gig", label: "All Gigs", icon: FileText },
     ...(user
       ? [
+        { href: "/gigs/dashboard", label: "Dashboard", icon: PieChart },
           { href: "/gigs/orders", label: "Your Orders", icon: ShoppingBag },
           { href: "/gigs/create-gig", label: "Create Gig", icon: PlusCircle, highlight: true },
         ]
@@ -126,9 +126,9 @@ const GigsSidebar = () => {
 
       {/* Footer */}
       {!user && (
-        <div className="p-4 border-t border-neutral-200 bg-neutral-50">
+        <div className="p-4 border-t">
           <div className="text-center space-y-3">
-            <p className="text-sm text-neutral-600">Sign in to access all features</p>
+            <p className="text-sm">Sign in to access all features</p>
             <Link href="/login">
               <Button className="w-full" size="sm">
                 Sign In
