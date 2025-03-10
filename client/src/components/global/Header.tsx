@@ -125,7 +125,7 @@ export default function Header() {
 
           {/* Messages (Only for logged-in users) */}
           {user && (
-            <Button variant="ghost" size="sm" className="rounded-full p-2">
+            <Button variant="ghost" size="sm" className="rounded-full p-2" onClick={() => router.push("/chats")} >
               <MessageSquare className="h-5 w-5 text-foreground dark:text-gray-300" />
             </Button>
           )}

@@ -188,7 +188,7 @@ export default function GigsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen">
       <Header />
       <div className="flex">
         <GigsSidebar />
@@ -196,17 +196,17 @@ export default function GigsPage() {
           {/* Page Title & Create Gig Button */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Explore Gigs</h1>
-              <p className="text-neutral-500 mt-1">Find the perfect services for your project</p>
+              <h1 className="text-2xl sm:text-3xl font-bold">Explore Gigs</h1>
+              <p className="text-neutral-500 dark:text-neutral-300 mt-1">Find the perfect services for your project</p>
             </div>
-            <Button className="bg-primary hover:bg-primary/90 text-white shadow-sm flex items-center gap-2">
+            <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-sm flex items-center gap-2">
               <Plus className="h-4 w-4" />
               <a href="/create-gig">Create a Gig</a>
             </Button>
           </div>
 
           {/* Search and Sorting */}
-          <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4 mb-6">
+          <div className=" rounded-xl shadow-sm border border-neutral-200 dark:border-gray-700 p-4 mb-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-grow">
                 <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
@@ -215,14 +215,14 @@ export default function GigsPage() {
                   placeholder="Search for services..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-neutral-300 focus-visible:ring-primary"
+                  className="pl-10 border-neutral-300 dark:border-gray-700 focus-visible:ring-primary"
                 />
               </div>
 
               <div className="flex gap-3">
                 <Sheet>
                   <SheetTrigger asChild>
-                    <Button variant="outline" className="flex items-center gap-2 border-neutral-300 text-neutral-700">
+                    <Button variant="outline" className="flex items-center gap-2 border-neutral-300 dark:border-gray-700 text-neutral-700">
                       <Filter className="h-4 w-4" />
                       Filters
                       {activeFilters > 0 && (
@@ -240,7 +240,7 @@ export default function GigsPage() {
                           variant="ghost" 
                           size="sm" 
                           onClick={resetFilters}
-                          className="text-neutral-500 hover:text-neutral-900 text-xs"
+                          className="text-neutral-500 dark:text-neutral-300 hover:text-neutral-900 text-xs"
                         >
                           Clear all
                         </Button>
@@ -250,9 +250,9 @@ export default function GigsPage() {
                     <div className="space-y-6">
                       {/* Category Filter */}
                       <div>
-                        <h4 className="text-sm font-medium text-neutral-900 mb-2">Category</h4>
+                        <h4 className="text-sm font-medium mb-2">Category</h4>
                         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                          <SelectTrigger className="w-full border-neutral-300">
+                          <SelectTrigger className="w-full border-neutral-300 dark:border-gray-700">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent>
@@ -269,7 +269,7 @@ export default function GigsPage() {
 
                       {/* Price Slider */}
                       <div>
-                        <h4 className="text-sm font-medium text-neutral-900 mb-2">Price Range</h4>
+                        <h4 className="text-sm font-medium  mb-2">Price Range</h4>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm text-neutral-500">${priceRange[0]}</span>
                           <span className="text-sm text-neutral-500">${priceRange[1]}</span>
@@ -288,7 +288,7 @@ export default function GigsPage() {
 
                       {/* Delivery Time Slider */}
                       <div>
-                        <h4 className="text-sm font-medium text-neutral-900 mb-2">Delivery Time</h4>
+                        <h4 className="text-sm font-medium  mb-2">Delivery Time</h4>
                         <p className="text-sm text-neutral-500 mb-2">Up to {deliveryTime[0]} days</p>
                         <Slider 
                           value={deliveryTime} 
@@ -313,7 +313,7 @@ export default function GigsPage() {
                 </Sheet>
 
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[180px] border-neutral-300">
+                  <SelectTrigger className="w-[180px] border-neutral-300 dark:border-gray-700">
                     <div className="flex items-center gap-2">
                       <span>Sort by</span>
                       <ChevronDown className="h-4 w-4 opacity-50" />
@@ -332,9 +332,9 @@ export default function GigsPage() {
             
             {/* Active filters */}
             {activeFilters > 0 && (
-              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-neutral-100">
+              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-neutral-100 dark:border-gray-700">
                 {selectedCategory !== "All" && (
-                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full bg-neutral-50">
+                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full">
                     Category: {categories.find(c => c.value === selectedCategory)?.label}
                     <Button 
                       variant="ghost" 
@@ -348,7 +348,7 @@ export default function GigsPage() {
                 )}
                 
                 {(priceRange[0] > 0 || priceRange[1] < 300) && (
-                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full bg-neutral-50">
+                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full">
                     Price: ${priceRange[0]} - ${priceRange[1]}
                     <Button 
                       variant="ghost" 
@@ -362,7 +362,7 @@ export default function GigsPage() {
                 )}
                 
                 {deliveryTime[0] !== 7 && (
-                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full bg-neutral-50">
+                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full ">
                     Delivery: Up to {deliveryTime[0]} days
                     <Button 
                       variant="ghost" 
@@ -380,7 +380,7 @@ export default function GigsPage() {
 
           {/* Results count */}
           <div className="flex items-center justify-between mb-6">
-            <p className="text-neutral-600">
+            <p className="text-neutral-600 dark:text-neutral-200">
               {filteredGigs.length} {filteredGigs.length === 1 ? 'service' : 'services'} available
             </p>
           </div>
@@ -470,10 +470,10 @@ export default function GigsPage() {
               )}
             </>
           ) : (
-            <div className="text-center py-16 bg-white rounded-xl border border-neutral-200">
-              <Briefcase className="h-12 w-12 mx-auto text-neutral-300 mb-4" />
-              <h3 className="text-lg font-medium text-neutral-900 mb-2">No gigs found</h3>
-              <p className="text-neutral-500 max-w-md mx-auto mb-6">
+            <div className="text-center py-16 rounded-xl border border-neutral-200 dark:border-gray-700 bg-neutral-50 dark:bg-zinc-900">
+              <Briefcase className="h-12 w-12 mx-auto text-neutral-300 dark:text-neutral-600 mb-4" />
+              <h3 className="text-lg font-medium mb-2">No gigs found</h3>
+              <p className="text-neutral-500 dark:text-neutral-200 max-w-md mx-auto mb-6">
                 We couldn&apos;t find any gigs matching your current filters. Try adjusting your search criteria.
               </p>
               <Button onClick={resetFilters} variant="outline" className="border-neutral-300">

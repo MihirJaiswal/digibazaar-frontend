@@ -10,6 +10,7 @@ import { ArrowLeft, Send, Loader2, User, Users } from 'lucide-react';
 import { format } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import Header from "@/components/global/Header";
 
 interface Message {
   id?: string;
@@ -199,6 +200,8 @@ export default function ChatConversationPage() {
   }
 
   return (
+    <>
+    <Header/>
     <div className="flex flex-col h-[calc(100vh-4rem)] bg-background">
       {/* Chat header */}
       <div className="border-b p-3 flex items-center gap-3">
@@ -339,5 +342,6 @@ export default function ChatConversationPage() {
         </form>
       </div>
     </div>
+    </>
   );
 }

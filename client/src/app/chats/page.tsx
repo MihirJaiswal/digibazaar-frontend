@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { useAuthStore } from "@/store/authStore";
 import { PlusCircle, MessageSquare, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from "date-fns";
+import Header from "@/components/global/Header";
 
 interface Conversation {
   id: string;
@@ -74,6 +75,8 @@ export default function ChatsPage() {
   }
 
   return (
+    <>
+    <Header/>
     <div className="flex h-[calc(100vh-4rem)] bg-background">
       {/* Sidebar */}
       <div className="w-full md:w-80 lg:w-96 border-r flex flex-col h-full">
@@ -149,5 +152,6 @@ export default function ChatsPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

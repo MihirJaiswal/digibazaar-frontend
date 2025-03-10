@@ -196,7 +196,7 @@ function ConfirmOrderContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <Card className="border-0 shadow-lg overflow-hidden bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
+          <Card className="border shadow-lg overflow-hidden bg-gradient-to-br from-white to-gray-50 dark:from-zinc-900 dark:to-zinc-950">
             <CardHeader className="bg-primary/5 border-b">
               <div className="flex items-center justify-between">
                 <div>
@@ -277,7 +277,7 @@ function ConfirmOrderContent() {
                   <CreditCard className="h-4 w-4 text-primary" />
                   Payment Method
                 </h4>
-                <div className="p-3 bg-white dark:bg-gray-800 rounded-md border shadow-sm">
+                <div className="p-3 bg-white dark:bg-zinc-800 rounded-md border shadow-sm">
                   <CardElement 
                     options={{
                       style: {

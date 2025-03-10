@@ -177,7 +177,7 @@ export default function OrdersDashboard() {
         );
       default:
         return (
-          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 dark:border-gray-600 ">
             {status.replace("_", " ")}
           </Badge>
         );
@@ -230,7 +230,7 @@ export default function OrdersDashboard() {
             <section className="mb-10">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Total Earnings Card */}
-                <Card className="overflow-hidden shadow-md border-gray-200 hover:shadow-lg transition-shadow duration-200">
+                <Card className="overflow-hidden shadow-md border-gray-200 dark:border-gray-600  hover:shadow-lg transition-shadow duration-200">
                   <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 dark:bg-gradient-to-r dark:from-green-600 dark:to-cyan-700 border-b pb-3">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
                       <DollarSign className="h-5 w-5 text-green-700 dark:text-green-950" />
@@ -257,7 +257,7 @@ export default function OrdersDashboard() {
                 </Card>
 
                 {/* Total Orders Card */}
-                <Card className="overflow-hidden shadow-md border-gray-200 hover:shadow-lg transition-shadow duration-200">
+                <Card className="overflow-hidden shadow-md border-gray-200 dark:border-gray-600 hover:shadow-lg transition-shadow duration-200">
                   <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 pb-3">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
                       <Package className="h-5 w-5 text-blue-600 dark:text-blue-900" />
@@ -282,7 +282,7 @@ export default function OrdersDashboard() {
                 </Card>
 
                 {/* Order Breakdown Card */}
-                <Card className="overflow-hidden shadow-md border-gray-200 hover:shadow-lg transition-shadow duration-200">
+                <Card className="overflow-hidden shadow-md border-gray-200 dark:border-gray-600  hover:shadow-lg transition-shadow duration-200">
                   <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100  dark:bg-gradient-to-r dark:from-pink-500 dark:to-purple-700 border-b pb-3">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
                       <BarChart3 className="h-5 w-5 text-purple-600 dark:text-purple-950" />
@@ -313,7 +313,7 @@ export default function OrdersDashboard() {
 
             {/* Search / Filter Section */}
             <section className="mb-8">
-              <Card className="border-gray-200 shadow-sm">
+              <Card className="border-gray-200 dark:border-gray-600  shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex flex-col md:flex-row gap-4">
                     <div className="relative flex-1">
@@ -350,10 +350,10 @@ export default function OrdersDashboard() {
             {/* Orders Tabs Section */}
             <section className="mb-10">
               {loading ? (
-                <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow-sm border">
+                <div className="flex items-center justify-center h-64  rounded-lg shadow-sm border">
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">Loading your orders...</p>
+                    <p className="text-sm ">Loading your orders...</p>
                   </div>
                 </div>
               ) : error ? (
@@ -363,7 +363,7 @@ export default function OrdersDashboard() {
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               ) : (
-                <Card className="border-gray-200 shadow-sm overflow-hidden">
+                <Card className="border-gray-200 dark:border-gray-600  shadow-sm overflow-hidden">
                   <Tabs defaultValue="PENDING" className="w-full">
                     <CardHeader className="pb-0 pt-4 px-4">
                       <TabsList className="w-full justify-start overflow-x-auto">
@@ -390,8 +390,8 @@ export default function OrdersDashboard() {
                         return (
                           <TabsContent key={status} value={status} className="mt-0 pt-4">
                             {filteredOrders.length === 0 ? (
-                              <div className="bg-gray-50 p-8 rounded-lg text-center">
-                                <p className="text-gray-600">
+                              <div className="p-8 rounded-lg text-center">
+                                <p className="text-gray-500">
                                   No {status.toLowerCase().replace("_", " ")} orders found.
                                 </p>
                               </div>
@@ -400,21 +400,21 @@ export default function OrdersDashboard() {
                                 {filteredOrders.map((order) => (
                                   <Card
                                     key={order.id}
-                                    className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 border-gray-200"
+                                    className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 border-gray-200 dark:border-gray-600 "
                                   >
                                     
                                     <div className="flex flex-col sm:flex-row sm:items-center p-4 gap-4">
                                       <div className="flex-1">
                                         <div className="flex items-center justify-between mb-1">
-                                          <h4 className="font-medium text-gray-900">
+                                          <h4 className="font-medium text-gray-900 dark:text-gray-300">
                                             Order #{order.id.slice(0, 8)}
                                           </h4>
                                           {getStatusBadge(order.status)}
                                         </div>
-                                        <p className="text-sm text-gray-700 line-clamp-1 mb-1">
+                                        <p className="text-sm text-gray-700 dark:text-gray-400 line-clamp-1 mb-1">
                                           {order.gig.title}
                                         </p>
-                                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                                        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-300">
                                           <span className="flex items-center">
                                             <Calendar className="h-3 w-3 mr-1" />
                                             {formatDate(order.createdAt)}
@@ -456,16 +456,16 @@ export default function OrdersDashboard() {
 
             {/* Additional Dashboard Widgets Section */}
             <section className="mt-10 mb-8">
-              <h2 className="text-2xl font-bold mb-6 text-gray-900">Additional Insights</h2>
+              <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-200">Additional Insights</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Recent Orders Widget */}
-                <Card className="shadow-md border-gray-200 overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b pb-3">
+                <Card className="shadow-md border-gray-200 dark:border-gray-600  overflow-hidden">
+                  <CardHeader className="border-b pb-3">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      <Clock className="h-5 w-5 text-primary" />
+                      <Clock className="h-5 w-5" />
                       Recent Orders
                     </CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardDescription className="text-gray-600 dark:text-gray-300">
                       Latest orders received
                     </CardDescription>
                   </CardHeader>
@@ -479,11 +479,11 @@ export default function OrdersDashboard() {
                             .map((order) => (
                               <li
                                 key={order.id}
-                                className="p-3 hover:bg-gray-50 transition-colors"
+                                className="p-3 transition-colors"
                               >
                                 <div className="flex justify-between items-center">
                                   <div>
-                                    <p className="font-medium text-gray-800">#{order.id.slice(0, 6)}</p>
+                                    <p className="font-medium text-gray-800 dark:text-gray-300">#{order.id.slice(0, 6)}</p>
                                     <p className="text-sm text-gray-600 line-clamp-1">{order.gig.title}</p>
                                   </div>
                                   <div className="text-right">
@@ -495,11 +495,11 @@ export default function OrdersDashboard() {
                             ))}
                         </ul>
                       ) : (
-                        <div className="p-6 text-center text-gray-500">No orders yet</div>
+                        <div className="p-6 text-center text-gray-500 dark:text-gray-300">No orders yet</div>
                       )}
                     </div>
                   </CardContent>
-                  <CardFooter className="bg-gray-50 border-t p-3 flex justify-center">
+                  <CardFooter className="border-t p-3 flex justify-center">
                     <Button variant="ghost" size="sm" className="text-xs" onClick={() => router.push('/seller/orders')}>
                       View All Orders
                       <ArrowRight className="ml-1 h-3 w-3" />
@@ -508,8 +508,8 @@ export default function OrdersDashboard() {
                 </Card>
 
                 {/* Order Statistics Chart Widget */}
-                <Card className="shadow-md border-gray-200 overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b pb-3">
+                <Card className="shadow-md border-gray-200 dark:border-gray-600  overflow-hidden">
+                  <CardHeader className=" border-b pb-3">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
                       <BarChart3 className="h-5 w-5 text-primary" />
                       Order Statistics
@@ -519,7 +519,7 @@ export default function OrdersDashboard() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-4">
-                    <div className="h-48 bg-gray-50 rounded-lg flex items-center justify-center text-gray-500 border border-dashed border-gray-300">
+                    <div className="h-48 rounded-lg flex items-center justify-center text-gray-500 border border-dashed border-gray-300 dark:border-gray-600 ">
                       <div className="text-center">
                         <BarChart3 className="h-10 w-10 mx-auto text-gray-300 mb-2" />
                         <p>Chart Visualization Coming Soon</p>
@@ -527,7 +527,7 @@ export default function OrdersDashboard() {
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="bg-gray-50 border-t p-3 flex justify-center">
+                  <CardFooter className=" border-t p-3 flex justify-center">
                     <Button variant="ghost" size="sm" className="text-xs" disabled>
                       View Detailed Analytics
                       <ArrowRight className="ml-1 h-3 w-3" />

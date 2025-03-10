@@ -103,7 +103,7 @@ export function GigCard({ gig, showDescription = false }: GigCardProps) {
   }
 
   return (
-    <Card className="overflow-hidden group h-full flex flex-col border-neutral-200 transition-all duration-300 hover:shadow-lg hover:border-primary/20">
+    <Card className="overflow-hidden group h-full flex flex-col border-neutral-200 dark:border-neutral-600 transition-all duration-300 hover:shadow-lg hover:border-primary/20">
       <Link href={`/gigs/gig/${gig.id}`} className="flex-grow flex flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
           {!imageLoaded && <Skeleton className="absolute inset-0 w-full h-full" />}
@@ -140,34 +140,34 @@ export function GigCard({ gig, showDescription = false }: GigCardProps) {
               />
             </div>
             <div>
-              <p className="text-sm font-medium text-neutral-900">{gig.seller?.username}</p>
-              <p className="text-xs text-neutral-500">{gig.seller?.level}</p>
+              <p className="text-sm font-medium text-neutral-900 dark:text-neutral-300">{gig.seller?.username}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-200">{gig.seller?.level}</p>
             </div>
           </div>
 
-          <h3 className="font-semibold text-neutral-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-neutral-900 dark:text-neutral-300 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
             {gig.title}
           </h3>
 
-          {showDescription && <p className="text-sm text-neutral-600 mb-3 line-clamp-2">{gig.description}</p>}
+          {showDescription && <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-3 line-clamp-2">{gig.description}</p>}
 
           <div className="flex items-center gap-4 mt-auto mb-3">
             <div className="flex items-center gap-1">
               <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
            {/*    <span className="text-sm font-medium text-neutral-900">{gig.rating.toFixed(1)}</span> */}
-              <span className="text-xs text-neutral-500">({gig.reviews})</span>
+              <span className="text-xs text-neutral-500 dark:text-neutral-300">({gig.reviews})</span>
             </div>
 
-            <div className="flex items-center gap-1 text-neutral-600">
+            <div className="flex items-center gap-1 text-neutral-600 dark:text-neutral-300">
               <Clock className="h-3.5 w-3.5" />
               <span className="text-xs">{gig.deliveryTime} days</span>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-neutral-100">
+          <div className="pt-3 border-t border-neutral-100 dark:border-neutral-600">
             <div className="flex justify-between items-center">
-              <p className="text-xs text-neutral-500 font-medium">Starting at</p>
-              <p className="font-bold text-lg text-neutral-900">${gig.price}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-200 font-medium">Starting at</p>
+              <p className="font-bold text-lg">${gig.price}</p>
             </div>
           </div>
         </CardContent>

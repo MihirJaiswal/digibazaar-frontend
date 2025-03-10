@@ -410,7 +410,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                 )
               : (
                 <Button 
-                  className="w-full bg-primary hover:bg-primary/90 text-white mb-3" 
+                  className="w-full bg-gradient-to-r from-purple-500 to-cyan-500 text-white mb-3" 
                   onClick={handleProceedToOrder}
                 >
                   Continue (${gig.price})
@@ -455,7 +455,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
 
         {/* Trust & Safety */}
         {!isOwner && (
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg">
             <h3 className="font-medium mb-3 flex items-center">
               <Shield className="h-5 w-5 mr-2 text-green-600" />
               Trust & Safety

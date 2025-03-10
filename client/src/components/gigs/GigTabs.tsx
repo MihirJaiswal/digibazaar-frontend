@@ -83,7 +83,7 @@ export default function GigTabs({ gig, isOwner }: GigTabsProps) {
                 </Button>
               )}
             </div>
-            <p className="text-gray-700 mb-6">{gig.shortDesc}</p>
+            <p className="text-neutral-700 dark:text-neutral-300 mb-6">{gig.shortDesc}</p>
 
             <div className="mb-6">
               <h3 className="font-semibold text-lg mb-3">What you&apos;ll get:</h3>
@@ -107,27 +107,27 @@ export default function GigTabs({ gig, isOwner }: GigTabsProps) {
               </ul>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg">
-              <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4  p-4 rounded-lg">
+              <div className="flex flex-col items-center justify-center p-3 bg-white dark:bg-zinc-900 rounded-lg shadow-sm">
                 <Clock className="h-6 w-6 text-blue-500 mb-2" />
                 <span className="text-sm text-gray-500">Delivery Time</span>
                 <span className="font-semibold">
                   {gig.deliveryTime} day{gig.deliveryTime !== 1 ? "s" : ""}
                 </span>
               </div>
-              <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+              <div className="flex flex-col items-center justify-center p-3 bg-white dark:bg-zinc-900 rounded-lg shadow-sm">
                 <RefreshCw className="h-6 w-6 text-purple-500 mb-2" />
                 <span className="text-sm text-gray-500">Revisions</span>
                 <span className="font-semibold">{gig.revisionNumber}</span>
               </div>
-              <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+              <div className="flex flex-col items-center justify-center p-3 bg-white dark:bg-zinc-900 rounded-lg shadow-sm">
                 <Briefcase className="h-6 w-6 text-amber-500 mb-2" />
                 <span className="text-sm text-gray-500">Experience</span>
                 <span className="font-semibold">
                   {gig.yearsOfExp} year{gig.yearsOfExp !== 1 ? "s" : ""}
                 </span>
               </div>
-              <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+              <div className="flex flex-col items-center justify-center p-3 bg-white dark:bg-zinc-900 rounded-lg shadow-sm">
                 <ThumbsUp className="h-6 w-6 text-green-500 mb-2" />
                 <span className="text-sm text-gray-500">Completed</span>
                 <span className="font-semibold">
