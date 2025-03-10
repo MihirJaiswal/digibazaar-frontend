@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useQuery, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import Header from "@/components/global/Header";
 import GigsSidebar from "@/components/gigs/GigsSidebar";
-import { Loader2, AlertCircle, DollarSign, User } from 'lucide-react';
+import { Loader2, AlertCircle, DollarSign, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -26,44 +32,32 @@ type Order = {
   };
 };
 
-export default function OrdersPage() {
+function OrdersPageContent() {
   const { token, user } = useAuthStore();
   const router = useRouter();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!token || !user?.id) return;
-
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        const endpoint = `http://localhost:8800/api/gig-orders/buyer/${user.id}`;
-
-        const res = await fetch(endpoint, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch orders");
-        }
-
-        const data = await res.json();
-        setOrders(data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        setError("Failed to load orders. Please try again.");
-      } finally {
-        setLoading(false);
+  const {
+    data: orders,
+    isLoading,
+    error,
+  } = useQuery<Order[], Error>({
+    queryKey: ["orders", user?.id],
+    queryFn: async () => {
+      const endpoint = `http://localhost:8800/api/gig-orders/buyer/${user?.id}`;
+      const res = await fetch(endpoint, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        throw new Error("Failed to fetch orders");
       }
-    };
-
-    fetchOrders();
-  }, [token, user?.id]);
+      return (await res.json()) as Order[];
+    },
+    enabled: !!user?.id && !!token,
+    staleTime: 5 * 60 * 1000, // Cache data for 5 minutes
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -75,8 +69,6 @@ export default function OrdersPage() {
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "COMPLETED":
         return "bg-green-100 text-green-800 border-green-200";
-      case "REJECTED":
-        return "bg-red-100 text-red-800 border-red-200";
       default:
         return "bg-blue-100 text-blue-800 border-blue-200";
     }
@@ -103,7 +95,7 @@ export default function OrdersPage() {
           <div className="max-w-4xl mx-auto">
             <h2 className="text-xl font-semibold mb-6">My Orders</h2>
 
-            {loading ? (
+            {isLoading ? (
               <div className="flex items-center justify-center h-64">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
@@ -111,18 +103,23 @@ export default function OrdersPage() {
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>{error.message}</AlertDescription>
               </Alert>
-            ) : orders.length === 0 ? (
+            ) : orders && orders.length === 0 ? (
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>No Orders Found</AlertTitle>
-                <AlertDescription>You haven&apos;t placed any orders yet.</AlertDescription>
+                <AlertDescription>
+                  You haven&apos;t placed any orders yet.
+                </AlertDescription>
               </Alert>
             ) : (
               <div className="space-y-6">
-                {orders.map((order) => (
-                  <Card key={order.id} className="overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+                {orders?.map((order) => (
+                  <Card
+                    key={order.id}
+                    className="overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                  >
                     <CardHeader className="bg-gray-50 border-b border-gray-200">
                       <div className="flex justify-between items-center">
                         <div>
@@ -133,7 +130,11 @@ export default function OrdersPage() {
                             {new Date(order.createdAt).toLocaleDateString()}
                           </CardDescription>
                         </div>
-                        <Badge className={`px-2 py-1 text-xs font-medium capitalize ${getStatusColor(order.status)}`}>
+                        <Badge
+                          className={`px-2 py-1 text-xs font-medium capitalize ${getStatusColor(
+                            order.status
+                          )}`}
+                        >
                           {order.status.replace("_", " ")}
                         </Badge>
                       </div>
@@ -141,7 +142,9 @@ export default function OrdersPage() {
                     <CardContent className="p-4">
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="space-y-1">
-                          <p className="text-sm font-medium text-gray-700">{order.gig.title}</p>
+                          <p className="text-sm font-medium text-gray-700">
+                            {order.gig.title}
+                          </p>
                           <p className="flex items-center text-sm text-gray-600">
                             <User className="h-4 w-4 mr-1" />
                             Buyer: {order.buyer?.username || "Unknown"}
@@ -170,5 +173,15 @@ export default function OrdersPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+// Wrap the page content with QueryClientProvider so that React Query hooks work
+export default function OrdersPage() {
+  const queryClient = new QueryClient();
+  return (
+    <QueryClientProvider client={queryClient}>
+      <OrdersPageContent />
+    </QueryClientProvider>
   );
 }

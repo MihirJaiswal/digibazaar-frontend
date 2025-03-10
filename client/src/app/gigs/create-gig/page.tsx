@@ -1,6 +1,6 @@
 "use client";
-
-import { useState, useRef, useEffect } from "react";
+import React from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,9 +42,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import Header from "@/components/global/Header";
-import GigsSidebar from "@/components/gigs/GigsSidebar";
+import dynamic from "next/dynamic";
 
+// Dynamically import components that aren't needed on initial load
+const Header = dynamic(() => import("@/components/global/Header"), { ssr: false });
+const GigsSidebar = dynamic(() => import("@/components/gigs/GigsSidebar"), { ssr: false });
+
+// Move static data outside the component to prevent recreation on each render
 const categories = [
   { value: "WEB_DEVELOPMENT", label: "Web Development", icon: "💻" },
   { value: "GRAPHIC_DESIGN", label: "Graphic Design", icon: "🎨" },
@@ -60,8 +64,8 @@ const categories = [
   { value: "VIRTUAL_ASSISTANTS", label: "Virtual Assistants", icon: "🤖" },
 ];
 
-// Feature card component
-function FeatureCard({
+// Define a memoized FeatureCard component to prevent unnecessary re-renders
+const FeatureCard = React.memo(function FeatureCard({
   value,
   onChange,
   onRemove,
@@ -100,10 +104,10 @@ function FeatureCard({
       </div>
     </motion.div>
   );
-}
+});
 
-// Progress indicator component
-function ProgressIndicator({
+// Memoize progress indicator to prevent re-renders
+const ProgressIndicator = React.memo(function ProgressIndicator({
   currentStep,
   totalSteps,
 }: {
@@ -126,10 +130,10 @@ function ProgressIndicator({
       </div>
     </div>
   );
-}
+});
 
-// Step indicator component
-function StepIndicator({
+// Memoize step indicator to prevent re-renders
+const StepIndicator = React.memo(function StepIndicator({
   steps,
   currentStep,
   onStepClick,
@@ -162,8 +166,9 @@ function StepIndicator({
       ))}
     </div>
   );
-}
+});
 
+// Main component with optimizations
 export default function CreateGigPage() {
   const router = useRouter();
   const { user, token } = useAuthStore();
@@ -172,7 +177,7 @@ export default function CreateGigPage() {
   const [previewMode, setPreviewMode] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
 
-  // Textual fields for the gig (excluding files)
+  // Reduce state updates by combining related fields
   const [formData, setFormData] = useState({
     title: "",
     shortDesc: "",
@@ -186,14 +191,16 @@ export default function CreateGigPage() {
     yearsOfExp: "",
   });
 
-  // File states for cover image and additional images
-  const [coverFile, setCoverFile] = useState<File | null>(null);
-  const [coverPreview, setCoverPreview] = useState<string>("");
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  // Separate media state for better performance
+  const [mediaState, setMediaState] = useState({
+    coverFile: null as File | null,
+    coverPreview: "",
+    imageFiles: [] as File[],
+    imagePreviews: [] as string[],
+  });
 
-  // Steps configuration
-  const steps = [
+  // Memoize steps configuration to prevent recreation on re-renders
+  const steps = useMemo(() => [
     {
       title: "Basic Info",
       icon: <Tag className="h-5 w-5" />,
@@ -209,118 +216,135 @@ export default function CreateGigPage() {
       icon: <FileImage className="h-5 w-5" />,
       fields: ["cover", "images", "resume", "yearsOfExp", "features"],
     },
-  ];
+  ], []);
 
-  // Scroll to top when step changes
+  // Optimize scrolling effect with debounce for performance
   useEffect(() => {
-    if (formRef.current) {
-      formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    const timer = setTimeout(() => {
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
   }, [step]);
 
-  // Handle input change for text fields
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Use useCallback for event handlers to prevent recreation on re-renders
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleSelectChange = (value: string) => {
+  const handleSelectChange = useCallback((value: string) => {
     setFormData((prev) => ({ ...prev, categoryId: value }));
-  };
+  }, []);
 
-  // Handle feature addition, update, removal
-  const addFeature = () => {
+  // Memoized feature handlers
+  const addFeature = useCallback(() => {
     setFormData((prev) => ({ ...prev, features: [...prev.features, ""] }));
-  };
-  const updateFeature = (index: number, value: string) => {
-    const updatedFeatures = [...formData.features];
-    updatedFeatures[index] = value;
-    setFormData((prev) => ({ ...prev, features: updatedFeatures }));
-  };
-  const removeFeature = (index: number) => {
+  }, []);
+
+  const updateFeature = useCallback((index: number, value: string) => {
+    setFormData((prev) => {
+      const updatedFeatures = [...prev.features];
+      updatedFeatures[index] = value;
+      return { ...prev, features: updatedFeatures };
+    });
+  }, []);
+
+  const removeFeature = useCallback((index: number) => {
     setFormData((prev) => ({
       ...prev,
       features: prev.features.filter((_, i) => i !== index),
     }));
-  };
+  }, []);
 
-  const handleNext = () => setStep(Math.min(step + 1, steps.length));
-  const handleBack = () => setStep(Math.max(step - 1, 1));
-  const handleStepClick = (newStep: number) => {
-    if (newStep <= step) {
-      setStep(newStep);
-    }
-  };
+  // Navigation handlers
+  const handleNext = useCallback(() => setStep((s) => Math.min(s + 1, steps.length)), [steps.length]);
+  const handleBack = useCallback(() => setStep((s) => Math.max(s - 1, 1)), []);
+  const handleStepClick = useCallback((newStep: number) => {
+    setStep((current) => (newStep <= current ? newStep : current));
+  }, []);
 
-  // Check if current step is valid (ensuring required fields are filled)
-  const isCurrentStepValid = () => {
+  // Optimize validation by memoizing it
+  const isCurrentStepValid = useCallback(() => {
     const currentStepFields = steps[step - 1].fields;
     return currentStepFields.every((field) => {
       if (field === "features") {
         return formData.features.length > 0 && formData.features[0].trim() !== "";
       }
-      // For cover/images, we check file existence on step 3
       if (field === "cover" || field === "images") {
-        return step !== 3 || coverFile !== null;
+        return step !== 3 || mediaState.coverFile !== null;
       }
-      // @ts-ignore-error - Dynamic access
+      // @ts-ignore - Dynamic access
       const value = formData[field];
       return value !== undefined && value !== "";
     });
-  };
+  }, [step, steps, formData, mediaState.coverFile]);
 
-  // File input handlers for cover and images
-  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // File handling with better memory management
+  const handleCoverChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setCoverFile(file);
-      setCoverPreview(URL.createObjectURL(file));
+      // Revoke previous object URL to prevent memory leaks
+      if (mediaState.coverPreview) {
+        URL.revokeObjectURL(mediaState.coverPreview);
+      }
+      const preview = URL.createObjectURL(file);
+      setMediaState((prev) => ({
+        ...prev,
+        coverFile: file,
+        coverPreview: preview,
+      }));
     }
-  };
+  }, [mediaState.coverPreview]);
 
-  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImagesChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      // Revoke previous object URLs to prevent memory leaks
+      mediaState.imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+      
       const files = Array.from(e.target.files);
-      setImageFiles(files);
       const previews = files.map((file) => URL.createObjectURL(file));
-      setImagePreviews(previews);
+      
+      setMediaState((prev) => ({
+        ...prev,
+        imageFiles: files,
+        imagePreviews: previews,
+      }));
     }
-  };
+  }, [mediaState.imagePreviews]);
 
-  // Cleanup preview URLs when component unmounts or when files change
+  // Properly clean up preview URLs to prevent memory leaks
   useEffect(() => {
     return () => {
-      if (coverPreview) URL.revokeObjectURL(coverPreview);
-      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+      if (mediaState.coverPreview) URL.revokeObjectURL(mediaState.coverPreview);
+      mediaState.imagePreviews.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [coverPreview, imagePreviews]);
+  }, []);
 
-  // Submit gig to API using FormData to include file uploads
-  const handleSubmitGig = async (e: React.FormEvent) => {
+  // Optimized form submission with better error handling
+  const handleSubmitGig = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
       const formPayload = new FormData();
 
       // Append text fields
-      formPayload.append("title", formData.title);
-      formPayload.append("shortDesc", formData.shortDesc);
-      formPayload.append("desc", formData.desc);
-      formPayload.append("categoryId", formData.categoryId);
-      formPayload.append("price", formData.price);
-      formPayload.append("deliveryTime", String(formData.deliveryTime));
-      formPayload.append("revisionNumber", String(formData.revisionNumber));
-      formPayload.append("resume", formData.resume);
-      formPayload.append("yearsOfExp", formData.yearsOfExp);
-      // Append features as a JSON string (or adjust per your backend expectations)
-      formPayload.append("features", JSON.stringify(formData.features));
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "features") {
+          formPayload.append(key, JSON.stringify(value));
+        } else {
+          formPayload.append(key, String(value));
+        }
+      });
+      
       // Append userId if needed
-      formPayload.append("userId", user?.id || "");
+      if (user?.id) formPayload.append("userId", user.id);
 
       // Append files if available
-      if (coverFile) formPayload.append("cover", coverFile);
-      if (imageFiles.length > 0) {
-        imageFiles.forEach((file) => {
+      if (mediaState.coverFile) formPayload.append("cover", mediaState.coverFile);
+      if (mediaState.imageFiles.length > 0) {
+        mediaState.imageFiles.forEach((file) => {
           formPayload.append("images", file);
         });
       }
@@ -329,12 +353,14 @@ export default function CreateGigPage() {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          // Let the browser set the Content-Type with proper boundary
         },
         body: formPayload,
       });
 
-      if (!response.ok) throw new Error("Failed to create gig");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || "Failed to create gig");
+      }
 
       toast.success("Gig created successfully!");
       router.push("/gigs/gig");
@@ -344,60 +370,64 @@ export default function CreateGigPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [formData, mediaState, user, token, router]);
 
-  // Preview card for the gig
-  const GigPreview = () => (
-    <div className="rounded-xl overflow-hidden border shadow-lg bg-card">
-      <div className="h-48 bg-muted relative">
-        {coverPreview ? (
-          <img
-            src={coverPreview}
-            alt={formData.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full bg-gradient-to-br from-primary/5 to-primary/20">
-            <FileImage className="h-12 w-12 text-muted-foreground/50" />
-          </div>
-        )}
-        {formData.categoryId && (
-          <Badge className="absolute top-3 left-3 bg-black/70 text-white hover:bg-black/70">
-            {categories.find((c) => c.value === formData.categoryId)?.icon || "🔍"}{" "}
-            {categories.find((c) => c.value === formData.categoryId)?.label || "Category"}
-          </Badge>
-        )}
-      </div>
-      <div className="p-5">
-        <h3 className="font-semibold text-lg line-clamp-2 mb-2">
-          {formData.title || "Your Gig Title"}
-        </h3>
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-          {formData.shortDesc || "Short description of your service goes here..."}
-        </p>
-
-        <div className="flex items-center gap-2 mb-4">
-          <Clock className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">
-            Delivers in {formData.deliveryTime || 1} day{String(formData.deliveryTime) !== "1" ? "s" : ""}
-          </span>
+  // Memoize the preview component to prevent re-renders
+  const GigPreview = useMemo(() => () => {
+    const categoryItem = categories.find((c) => c.value === formData.categoryId);
+    
+    return (
+      <div className="rounded-xl overflow-hidden border shadow-lg bg-card">
+        <div className="h-48 bg-muted relative">
+          {mediaState.coverPreview ? (
+            <img
+              src={mediaState.coverPreview}
+              alt={formData.title || "Gig preview"}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full bg-gradient-to-br from-primary/5 to-primary/20">
+              <FileImage className="h-12 w-12 text-muted-foreground/50" />
+            </div>
+          )}
+          {formData.categoryId && (
+            <Badge className="absolute top-3 left-3 bg-black/70 text-white hover:bg-black/70">
+              {categoryItem?.icon || "🔍"}{" "}
+              {categoryItem?.label || "Category"}
+            </Badge>
+          )}
         </div>
+        <div className="p-5">
+          <h3 className="font-semibold text-lg line-clamp-2 mb-2">
+            {formData.title || "Your Gig Title"}
+          </h3>
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+            {formData.shortDesc || "Short description of your service goes here..."}
+          </p>
 
-        <Separator className="my-4" />
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <Trophy className="h-4 w-4 text-amber-500" />
-            <span className="text-xs">{formData.yearsOfExp || "0"}+ years exp</span>
+          <div className="flex items-center gap-2 mb-4">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              Delivers in {formData.deliveryTime || 1} day{String(formData.deliveryTime) !== "1" ? "s" : ""}
+            </span>
           </div>
-          <div className="text-right">
-            <span className="text-xs text-muted-foreground">STARTING AT</span>
-            <p className="font-bold text-lg">${formData.price || "0"}</p>
+
+          <Separator className="my-4" />
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <Trophy className="h-4 w-4 text-amber-500" />
+              <span className="text-xs">{formData.yearsOfExp || "0"}+ years exp</span>
+            </div>
+            <div className="text-right">
+              <span className="text-xs text-muted-foreground">STARTING AT</span>
+              <p className="font-bold text-lg">${formData.price || "0"}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }, [formData, mediaState.coverPreview]);
 
   return (
     <>
@@ -451,205 +481,197 @@ export default function CreateGigPage() {
                           className="space-y-6"
                         >
                           {step === 1 && (
-                            <>
-                              <div className="space-y-4">
-                                <div className="space-y-2">
-                                  <Label htmlFor="title" className="text-base font-medium">
-                                    Title
-                                  </Label>
-                                  <Input
-                                    name="title"
-                                    value={formData.title}
-                                    onChange={handleChange}
-                                    placeholder="I will create a professional website for your business"
-                                    className="h-12"
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label htmlFor="shortDesc" className="text-base font-medium">
-                                    Short Description
-                                  </Label>
-                                  <Input
-                                    name="shortDesc"
-                                    value={formData.shortDesc}
-                                    onChange={handleChange}
-                                    placeholder="A brief summary of your service (100 characters max)"
-                                    className="h-12"
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label htmlFor="desc" className="text-base font-medium">
-                                    Full Description
-                                  </Label>
-                                  <Textarea
-                                    name="desc"
-                                    value={formData.desc}
-                                    onChange={handleChange}
-                                    placeholder="Describe your service in detail. What makes it unique? What will buyers receive?"
-                                    className="min-h-[200px] resize-y"
-                                  />
-                                </div>
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="title" className="text-base font-medium">
+                                  Title
+                                </Label>
+                                <Input
+                                  name="title"
+                                  value={formData.title}
+                                  onChange={handleChange}
+                                  placeholder="I will create a professional website for your business"
+                                  className="h-12"
+                                />
                               </div>
-                            </>
+                              <div className="space-y-2">
+                                <Label htmlFor="shortDesc" className="text-base font-medium">
+                                  Short Description
+                                </Label>
+                                <Input
+                                  name="shortDesc"
+                                  value={formData.shortDesc}
+                                  onChange={handleChange}
+                                  placeholder="A brief summary of your service (100 characters max)"
+                                  className="h-12"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="desc" className="text-base font-medium">
+                                  Full Description
+                                </Label>
+                                <Textarea
+                                  name="desc"
+                                  value={formData.desc}
+                                  onChange={handleChange}
+                                  placeholder="Describe your service in detail. What makes it unique? What will buyers receive?"
+                                  className="min-h-[200px] resize-y"
+                                />
+                              </div>
+                            </div>
                           )}
                           {step === 2 && (
-                            <>
-                              <div className="space-y-6">
-                                <div className="space-y-2">
-                                  <Label htmlFor="category" className="text-base font-medium">
-                                    Category
-                                  </Label>
-                                  <Select value={formData.categoryId} onValueChange={handleSelectChange}>
-                                    <SelectTrigger className="h-12">
-                                      <SelectValue placeholder="Select a category" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {categories.map((category, index) => (
-                                        <SelectItem key={index} value={category.value}>
-                                          <span className="flex items-center gap-2">
-                                            <span>{category.icon}</span>
-                                            <span>{category.label}</span>
-                                          </span>
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                  <div className="space-y-2">
-                                    <Label htmlFor="price" className="text-base font-medium">
-                                      Price ($)
-                                    </Label>
-                                    <Input
-                                      type="number"
-                                      name="price"
-                                      value={formData.price}
-                                      onChange={handleChange}
-                                      placeholder="50"
-                                      className="h-12"
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label htmlFor="deliveryTime" className="text-base font-medium">
-                                      Delivery (days)
-                                    </Label>
-                                    <Input
-                                      type="number"
-                                      name="deliveryTime"
-                                      value={String(formData.deliveryTime)}
-                                      onChange={handleChange}
-                                      placeholder="1"
-                                      className="h-12"
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label htmlFor="revisionNumber" className="text-base font-medium">
-                                      Revisions
-                                    </Label>
-                                    <Input
-                                      type="number"
-                                      name="revisionNumber"
-                                      value={String(formData.revisionNumber)}
-                                      onChange={handleChange}
-                                      placeholder="1"
-                                      className="h-12"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </>
-                          )}
-                          {step === 3 && (
-                            <>
-                              <div className="space-y-6">
-                                {/* Cover image file input */}
-                                <div className="space-y-2">
-                                  <Label htmlFor="cover" className="text-base font-medium">
-                                    Cover Image
-                                  </Label>
-                                  <Input
-                                    id="cover"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleCoverChange}
-                                  />
-                                  {coverPreview && (
-                                    <img
-                                      src={coverPreview}
-                                      alt="Cover Preview"
-                                      className="w-full h-48 object-cover mt-2 rounded"
-                                    />
-                                  )}
-                                  <p className="text-xs text-muted-foreground">
-                                    This will be the main image displayed for your gig
-                                  </p>
-                                </div>
-                                {/* Additional images file input */}
-                                <div className="space-y-2">
-                                  <Label htmlFor="images" className="text-base font-medium">
-                                    Additional Images
-                                  </Label>
-                                  <Input
-                                    id="images"
-                                    type="file"
-                                    accept="image/*"
-                                    multiple
-                                    onChange={handleImagesChange}
-                                  />
-                                  <div className="flex flex-wrap mt-2 gap-2">
-                                    {imagePreviews.map((preview, index) => (
-                                      <img
-                                        key={index}
-                                        src={preview}
-                                        alt={`Image preview ${index + 1}`}
-                                        className="w-24 h-24 object-cover rounded"
-                                      />
+                            <div className="space-y-6">
+                              <div className="space-y-2">
+                                <Label htmlFor="category" className="text-base font-medium">
+                                  Category
+                                </Label>
+                                <Select value={formData.categoryId} onValueChange={handleSelectChange}>
+                                  <SelectTrigger className="h-12">
+                                    <SelectValue placeholder="Select a category" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {categories.map((category, index) => (
+                                      <SelectItem key={index} value={category.value}>
+                                        <span className="flex items-center gap-2">
+                                          <span>{category.icon}</span>
+                                          <span>{category.label}</span>
+                                        </span>
+                                      </SelectItem>
                                     ))}
-                                  </div>
-                                </div>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="space-y-2">
-                                  <Label htmlFor="yearsOfExp" className="text-base font-medium">
-                                    Years of Experience
+                                  <Label htmlFor="price" className="text-base font-medium">
+                                    Price ($)
                                   </Label>
                                   <Input
                                     type="number"
-                                    name="yearsOfExp"
-                                    value={formData.yearsOfExp}
+                                    name="price"
+                                    value={formData.price}
                                     onChange={handleChange}
-                                    placeholder="3"
+                                    placeholder="50"
                                     className="h-12"
                                   />
                                 </div>
-                                <div className="space-y-3">
-                                  <div className="flex items-center justify-between">
-                                    <Label className="text-base font-medium">Features</Label>
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={addFeature}
-                                      className="h-8"
-                                    >
-                                      <Plus className="h-4 w-4 mr-1" />
-                                      Add Feature
-                                    </Button>
-                                  </div>
-                                  <div className="space-y-2">
-                                    <AnimatePresence>
-                                      {formData.features.map((feature, index) => (
-                                        <FeatureCard
-                                          key={`feature-${index}`}
-                                          value={feature}
-                                          onChange={(value) => updateFeature(index, value)}
-                                          onRemove={() => removeFeature(index)}
-                                          index={index}
-                                        />
-                                      ))}
-                                    </AnimatePresence>
-                                  </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="deliveryTime" className="text-base font-medium">
+                                    Delivery (days)
+                                  </Label>
+                                  <Input
+                                    type="number"
+                                    name="deliveryTime"
+                                    value={String(formData.deliveryTime)}
+                                    onChange={handleChange}
+                                    placeholder="1"
+                                    className="h-12"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="revisionNumber" className="text-base font-medium">
+                                    Revisions
+                                  </Label>
+                                  <Input
+                                    type="number"
+                                    name="revisionNumber"
+                                    value={String(formData.revisionNumber)}
+                                    onChange={handleChange}
+                                    placeholder="1"
+                                    className="h-12"
+                                  />
                                 </div>
                               </div>
-                            </>
+                            </div>
+                          )}
+                          {step === 3 && (
+                            <div className="space-y-6">
+                              <div className="space-y-2">
+                                <Label htmlFor="cover" className="text-base font-medium">
+                                  Cover Image
+                                </Label>
+                                <Input
+                                  id="cover"
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleCoverChange}
+                                />
+                                {mediaState.coverPreview && (
+                                  <img
+                                    src={mediaState.coverPreview}
+                                    alt="Cover Preview"
+                                    className="w-full h-48 object-cover mt-2 rounded"
+                                  />
+                                )}
+                                <p className="text-xs text-muted-foreground">
+                                  This will be the main image displayed for your gig
+                                </p>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="images" className="text-base font-medium">
+                                  Additional Images
+                                </Label>
+                                <Input
+                                  id="images"
+                                  type="file"
+                                  accept="image/*"
+                                  multiple
+                                  onChange={handleImagesChange}
+                                />
+                                <div className="flex flex-wrap mt-2 gap-2">
+                                  {mediaState.imagePreviews.map((preview, index) => (
+                                    <img
+                                      key={index}
+                                      src={preview}
+                                      alt={`Image preview ${index + 1}`}
+                                      className="w-24 h-24 object-cover rounded"
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="yearsOfExp" className="text-base font-medium">
+                                  Years of Experience
+                                </Label>
+                                <Input
+                                  type="number"
+                                  name="yearsOfExp"
+                                  value={formData.yearsOfExp}
+                                  onChange={handleChange}
+                                  placeholder="3"
+                                  className="h-12"
+                                />
+                              </div>
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <Label className="text-base font-medium">Features</Label>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={addFeature}
+                                    className="h-8"
+                                  >
+                                    <Plus className="h-4 w-4 mr-1" />
+                                    Add Feature
+                                  </Button>
+                                </div>
+                                <div className="space-y-2">
+                                  <AnimatePresence>
+                                    {formData.features.map((feature, index) => (
+                                      <FeatureCard
+                                        key={`feature-${index}`}
+                                        value={feature}
+                                        onChange={(value) => updateFeature(index, value)}
+                                        onRemove={() => removeFeature(index)}
+                                        index={index}
+                                      />
+                                    ))}
+                                  </AnimatePresence>
+                                </div>
+                              </div>
+                            </div>
                           )}
                         </motion.div>
                       </AnimatePresence>

@@ -1,14 +1,36 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { GigCard } from "@/components/gigs/gig-card";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { Search, Filter, X, Plus, Briefcase, ChevronDown } from 'lucide-react';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  Search,
+  Filter,
+  X,
+  Plus,
+  Briefcase,
+  ChevronDown,
+} from "lucide-react";
 import Header from "@/components/global/Header";
 import GigsSidebar from "@/components/gigs/GigsSidebar";
 import { Separator } from "@/components/ui/separator";
@@ -59,72 +81,71 @@ const defaultCategories: Category[] = [
   { value: "VIRTUAL_ASSISTANTS", label: "Virtual Assistants" },
 ];
 
-export default function GigsPage() {
+// Create a QueryClient instance outside the component to avoid re-creation
+const queryClient = new QueryClient();
+
+function GigsPageContent() {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  // Initialize categories state with the default categories plus an "All" option.
-  const [categories, setCategories] = useState<Category[]>([
-    { value: "All", label: "All Categories" },
-    ...defaultCategories,
-  ]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 300]);
   const [deliveryTime, setDeliveryTime] = useState<number[]>([30]);
   const [sortBy, setSortBy] = useState<string>("recommended");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [gigs, setGigs] = useState<Gig[]>([]);
-  const [filteredGigs, setFilteredGigs] = useState<Gig[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeFilters, setActiveFilters] = useState<number>(0);
 
   const itemsPerPage = 9;
 
-  // Fetch categories dynamically and merge with defaultCategories
-  useEffect(() => {
-    fetch("http://localhost:8800/api/categories")
-      .then((res) => res.json())
-      .then((data) => {
-        const fetchedCategories: Category[] = Array.isArray(data) ? data : data.categories ?? [];
-        // Merge "All" + defaultCategories with fetched ones (avoiding duplicates)
-        const mergedCategories = [
-          { value: "All", label: "All Categories" },
-          ...defaultCategories,
-          ...fetchedCategories.filter(
-            (fc) => !defaultCategories.some((dc) => dc.value === fc.value)
-          ),
-        ];
-        setCategories(mergedCategories);
-      })
-      .catch((err) => console.error("Failed to fetch categories:", err));
-  }, []);
+  // Fetch categories using React Query
+  const {
+    data: categoriesData,
+    isError: isCategoriesError,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const res = await fetch("http://localhost:8800/api/categories");
+      if (!res.ok) throw new Error
+      return res.json();
+    },
+  });
 
-  // Fetch gigs from API
-  useEffect(() => {
-    setIsLoading(true);
-    fetch("http://localhost:8800/api/gigs")
-      .then((res) => res.json())
-      .then((data) => {
-        const gigsArray: Gig[] = Array.isArray(data) ? data : data.gigs ?? [];
-        if (gigsArray.length === 0) {
-          console.warn("No gigs found, received:", data);
-        }
-        setGigs(gigsArray);
-        setFilteredGigs(gigsArray);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        toast.error("Failed to load gigs");
-        console.error(err);
-        setIsLoading(false);
-      });
-  }, []);
+  // Merge default categories with fetched ones
+  const categories = useMemo(() => {
+    const fetchedCategories: Category[] =
+      Array.isArray(categoriesData) ? categoriesData : categoriesData?.categories ?? [];
+    const mergedCategories = [
+      { value: "All", label: "All Categories" },
+      ...defaultCategories,
+      ...fetchedCategories.filter(
+        (fc) => !defaultCategories.some((dc) => dc.value === fc.value)
+      ),
+    ];
+    return mergedCategories;
+  }, [categoriesData]);
 
-  // Apply filters
-  useEffect(() => {
-    if (!gigs.length) return;
-    setIsLoading(true);
+  // Fetch gigs using React Query
+  const {
+    data: gigsData,
+    isLoading: gigsLoading,
+    isError: isGigsError,
+  } = useQuery({
+    queryKey: ["gigs"],
+    queryFn: async () => {
+      const res = await fetch("http://localhost:8800/api/gigs");
+      if (!res.ok) throw new Error("Failed to fetch gigs");
+      return res.json();
+    },
+  });
 
+  // Extract gigs array
+  const gigs: Gig[] = useMemo(() => {
+    const gigsArray: Gig[] =
+      Array.isArray(gigsData) ? gigsData : gigsData?.gigs ?? [];
+    return gigsArray;
+  }, [gigsData]);
+
+  // Filtering logic using useMemo for performance
+  const filteredGigs = useMemo(() => {
     let results = [...gigs];
-
     if (searchTerm) {
       results = results.filter((gig) => {
         const title = gig.title || "";
@@ -135,12 +156,12 @@ export default function GigsPage() {
         );
       });
     }
-
     if (selectedCategory !== "All") {
       results = results.filter((gig) => gig.category === selectedCategory);
     }
-
-    results = results.filter((gig) => gig.price >= priceRange[0] && gig.price <= priceRange[1]);
+    results = results.filter(
+      (gig) => gig.price >= priceRange[0] && gig.price <= priceRange[1]
+    );
     results = results.filter((gig) => gig.deliveryTime <= deliveryTime[0]);
 
     switch (sortBy) {
@@ -159,13 +180,10 @@ export default function GigsPage() {
       default:
         break;
     }
+    return results;
+  }, [gigs, searchTerm, selectedCategory, priceRange, deliveryTime, sortBy]);
 
-    setFilteredGigs(results);
-    setCurrentPage(1);
-    setIsLoading(false);
-  }, [searchTerm, selectedCategory, priceRange, deliveryTime, sortBy, gigs]);
-
-  // Calculate active filters
+  // Update active filters count
   useEffect(() => {
     let count = 0;
     if (selectedCategory !== "All") count++;
@@ -174,11 +192,12 @@ export default function GigsPage() {
     setActiveFilters(count);
   }, [selectedCategory, priceRange, deliveryTime]);
 
-  // Calculate pagination
+  // Pagination calculation
   const totalPages = Math.ceil(filteredGigs.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentGigs = filteredGigs.slice(startIndex, endIndex);
+  const currentGigs = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredGigs.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredGigs, currentPage]);
 
   // Reset filters function
   const resetFilters = () => {
@@ -186,6 +205,8 @@ export default function GigsPage() {
     setPriceRange([0, 300]);
     setDeliveryTime([30]);
   };
+
+
 
   return (
     <div className="min-h-screen">
@@ -197,16 +218,18 @@ export default function GigsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold">Explore Gigs</h1>
-              <p className="text-neutral-500 dark:text-neutral-300 mt-1">Find the perfect services for your project</p>
+              <p className="text-neutral-500 dark:text-neutral-300 mt-1">
+                Find the perfect services for your project
+              </p>
             </div>
             <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-sm flex items-center gap-2">
               <Plus className="h-4 w-4" />
-              <a href="/create-gig">Create a Gig</a>
+              <a href="/gigs/create-gig">Create a Gig</a>
             </Button>
           </div>
 
           {/* Search and Sorting */}
-          <div className=" rounded-xl shadow-sm border border-neutral-200 dark:border-gray-700 p-4 mb-6">
+          <div className="rounded-xl shadow-sm border border-neutral-200 dark:border-gray-700 p-4 mb-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-grow">
                 <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
@@ -222,11 +245,17 @@ export default function GigsPage() {
               <div className="flex gap-3">
                 <Sheet>
                   <SheetTrigger asChild>
-                    <Button variant="outline" className="flex items-center gap-2 border-neutral-300 dark:border-gray-700 text-neutral-700">
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2 border-neutral-300 dark:border-gray-700 text-neutral-700"
+                    >
                       <Filter className="h-4 w-4" />
                       Filters
                       {activeFilters > 0 && (
-                        <Badge variant="secondary" className="ml-1 bg-primary/10 text-primary text-xs">
+                        <Badge
+                          variant="secondary"
+                          className="ml-1 bg-primary/10 text-primary text-xs"
+                        >
                           {activeFilters}
                         </Badge>
                       )}
@@ -234,11 +263,13 @@ export default function GigsPage() {
                   </SheetTrigger>
                   <SheetContent className="w-full sm:max-w-md">
                     <div className="flex items-center justify-between mb-6">
-                    <DialogTitle className="text-lg font-semibold">Filters</DialogTitle>
+                      <DialogTitle className="text-lg font-semibold">
+                        Filters
+                      </DialogTitle>
                       {activeFilters > 0 && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={resetFilters}
                           className="text-neutral-500 dark:text-neutral-300 hover:text-neutral-900 text-xs"
                         >
@@ -246,18 +277,26 @@ export default function GigsPage() {
                         </Button>
                       )}
                     </div>
-                    
+
                     <div className="space-y-6">
                       {/* Category Filter */}
                       <div>
-                        <h4 className="text-sm font-medium mb-2">Category</h4>
-                        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                        <h4 className="text-sm font-medium mb-2">
+                          Category
+                        </h4>
+                        <Select
+                          value={selectedCategory}
+                          onValueChange={setSelectedCategory}
+                        >
                           <SelectTrigger className="w-full border-neutral-300 dark:border-gray-700">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent>
                             {categories.map((category) => (
-                              <SelectItem key={category.value} value={category.value}>
+                              <SelectItem
+                                key={category.value}
+                                value={category.value}
+                              >
                                 {category.label}
                               </SelectItem>
                             ))}
@@ -269,18 +308,26 @@ export default function GigsPage() {
 
                       {/* Price Slider */}
                       <div>
-                        <h4 className="text-sm font-medium  mb-2">Price Range</h4>
+                        <h4 className="text-sm font-medium mb-2">
+                          Price Range
+                        </h4>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-neutral-500">${priceRange[0]}</span>
-                          <span className="text-sm text-neutral-500">${priceRange[1]}</span>
+                          <span className="text-sm text-neutral-500">
+                            ${priceRange[0]}
+                          </span>
+                          <span className="text-sm text-neutral-500">
+                            ${priceRange[1]}
+                          </span>
                         </div>
-                        <Slider 
-                          value={priceRange} 
-                          min={0} 
-                          max={300} 
-                          step={5} 
+                        <Slider
+                          value={priceRange}
+                          min={0}
+                          max={300}
+                          step={5}
                           className="py-4"
-                          onValueChange={(value) => setPriceRange(value as [number, number])} 
+                          onValueChange={(value) =>
+                            setPriceRange(value as [number, number])
+                          }
                         />
                       </div>
 
@@ -288,21 +335,25 @@ export default function GigsPage() {
 
                       {/* Delivery Time Slider */}
                       <div>
-                        <h4 className="text-sm font-medium  mb-2">Delivery Time</h4>
-                        <p className="text-sm text-neutral-500 mb-2">Up to {deliveryTime[0]} days</p>
-                        <Slider 
-                          value={deliveryTime} 
-                          min={1} 
-                          max={30} 
+                        <h4 className="text-sm font-medium mb-2">
+                          Delivery Time
+                        </h4>
+                        <p className="text-sm text-neutral-500 mb-2">
+                          Up to {deliveryTime[0]} days
+                        </p>
+                        <Slider
+                          value={deliveryTime}
+                          min={1}
+                          max={30}
                           step={1}
                           className="py-4"
-                          onValueChange={setDeliveryTime} 
+                          onValueChange={setDeliveryTime}
                         />
                       </div>
                     </div>
-                    
+
                     <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <Button 
+                      <Button
                         onClick={resetFilters}
                         className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-900"
                       >
@@ -323,51 +374,65 @@ export default function GigsPage() {
                     <SelectItem value="recommended">Recommended</SelectItem>
                     <SelectItem value="newest">Newest</SelectItem>
                     <SelectItem value="rating">Best Rating</SelectItem>
-                    <SelectItem value="price-low">Price: Low to High</SelectItem>
-                    <SelectItem value="price-high">Price: High to Low</SelectItem>
+                    <SelectItem value="price-low">
+                      Price: Low to High
+                    </SelectItem>
+                    <SelectItem value="price-high">
+                      Price: High to Low
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-            
+
             {/* Active filters */}
             {activeFilters > 0 && (
               <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-neutral-100 dark:border-gray-700">
                 {selectedCategory !== "All" && (
-                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full">
-                    Category: {categories.find(c => c.value === selectedCategory)?.label}
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-4 w-4 ml-1 hover:bg-neutral-200" 
+                  <Badge
+                    variant="outline"
+                    className="flex items-center gap-1 px-3 py-1 rounded-full"
+                  >
+                    Category:{" "}
+                    {categories.find((c) => c.value === selectedCategory)?.label}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-4 w-4 ml-1 hover:bg-neutral-200"
                       onClick={() => setSelectedCategory("All")}
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </Badge>
                 )}
-                
+
                 {(priceRange[0] > 0 || priceRange[1] < 300) && (
-                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full">
+                  <Badge
+                    variant="outline"
+                    className="flex items-center gap-1 px-3 py-1 rounded-full"
+                  >
                     Price: ${priceRange[0]} - ${priceRange[1]}
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-4 w-4 ml-1 hover:bg-neutral-200" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-4 w-4 ml-1 hover:bg-neutral-200"
                       onClick={() => setPriceRange([0, 300])}
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </Badge>
                 )}
-                
+
                 {deliveryTime[0] !== 7 && (
-                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1 rounded-full ">
+                  <Badge
+                    variant="outline"
+                    className="flex items-center gap-1 px-3 py-1 rounded-full"
+                  >
                     Delivery: Up to {deliveryTime[0]} days
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-4 w-4 ml-1 hover:bg-neutral-200" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-4 w-4 ml-1 hover:bg-neutral-200"
                       onClick={() => setDeliveryTime([7])}
                     >
                       <X className="h-3 w-3" />
@@ -381,12 +446,13 @@ export default function GigsPage() {
           {/* Results count */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-neutral-600 dark:text-neutral-200">
-              {filteredGigs.length} {filteredGigs.length === 1 ? 'service' : 'services'} available
+              {filteredGigs.length}{" "}
+              {filteredGigs.length === 1 ? "service" : "services"} available
             </p>
           </div>
 
           {/* Gigs Grid */}
-          {isLoading ? (
+          {gigsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
                 <Card key={i} className="overflow-hidden h-full flex flex-col">
@@ -416,7 +482,7 @@ export default function GigsPage() {
                   <GigCard key={gig.id} gig={gig} showDescription={true} />
                 ))}
               </div>
-              
+
               {/* Pagination */}
               {totalPages > 1 && (
                 <>
@@ -432,12 +498,17 @@ export default function GigsPage() {
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          if (currentPage > 1) setCurrentPage(currentPage - 1);
+                          if (currentPage > 1)
+                            setCurrentPage(currentPage - 1);
                         }}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                        className={
+                          currentPage === 1
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
-                
+
                     {/* Page Numbers */}
                     {Array.from({ length: totalPages }).map((_, i) => (
                       <PaginationItem key={i}>
@@ -453,16 +524,21 @@ export default function GigsPage() {
                         </PaginationLink>
                       </PaginationItem>
                     ))}
-                
+
                     {/* Next Button */}
                     <PaginationItem>
                       <PaginationNext
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                          if (currentPage < totalPages)
+                            setCurrentPage(currentPage + 1);
                         }}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                        className={
+                          currentPage === totalPages
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
                   </PaginationContent>
@@ -474,7 +550,8 @@ export default function GigsPage() {
               <Briefcase className="h-12 w-12 mx-auto text-neutral-300 dark:text-neutral-600 mb-4" />
               <h3 className="text-lg font-medium mb-2">No gigs found</h3>
               <p className="text-neutral-500 dark:text-neutral-200 max-w-md mx-auto mb-6">
-                We couldn&apos;t find any gigs matching your current filters. Try adjusting your search criteria.
+                We couldn&apos;t find any gigs matching your current filters.
+                Try adjusting your search criteria.
               </p>
               <Button onClick={resetFilters} variant="outline" className="border-neutral-300">
                 Reset Filters
@@ -484,5 +561,13 @@ export default function GigsPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function GigsPage() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <GigsPageContent />
+    </QueryClientProvider>
   );
 }
