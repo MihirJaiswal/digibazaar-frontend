@@ -478,7 +478,7 @@ function MinimalTemplateInternal({
             <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Why Choose Us</h3>
             <Separator className="w-24 h-1 mx-auto mt-4 mb-6" style={{ backgroundColor: primaryColor }} />
             <p className="max-w-2xl mx-auto text-gray-600 dark:text-gray-300">
-              We're committed to providing you with the best shopping experience possible.
+              We&apos;re committed to providing you with the best shopping experience possible.
             </p>
           </motion.div>
 
@@ -653,7 +653,7 @@ function MinimalTemplateInternal({
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold">Complete Your Purchase</DialogTitle>
               <DialogDescription>
-                You're purchasing {selectedProduct.name} for ₹{selectedProduct.price.toLocaleString("en-IN")}
+                You&apos;re purchasing {selectedProduct.name} for ₹{selectedProduct.price.toLocaleString("en-IN")}
               </DialogDescription>
             </DialogHeader>
 

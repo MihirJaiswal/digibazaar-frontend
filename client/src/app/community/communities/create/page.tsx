@@ -26,6 +26,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { AlertCircle, ArrowLeft, ArrowRight, Check, CheckCircle2, Globe, Image as ImageIcon, Info, Loader2, Lock, Shield, Tag, Upload, Users, X } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import Image from "next/image"
 
 // Modified form schema to handle file uploads
 const formSchema = z.object({
@@ -228,9 +229,12 @@ for (const [key, value] of formData.entries()) {
     <div className="rounded-xl overflow-hidden border shadow-lg bg-card">
       <div className="h-32 bg-muted relative">
         {(watchedValues.coverImageUrl || coverImagePreview) ? (
-          <img 
+          <Image
             src={coverImagePreview || watchedValues.coverImageUrl || "/placeholder.svg"} 
             alt="Cover" 
+            width={300} height={150} 
+            loading="lazy"
+            quality={100}
             className="w-full h-full object-cover"
             onError={(e) => {
               (e.target as HTMLImageElement).src = "/placeholder.svg?height=128&width=400";
@@ -243,9 +247,12 @@ for (const [key, value] of formData.entries()) {
         <div className="absolute -bottom-10 left-4">
           <div className="h-20 w-20 rounded-full border-4 border-background bg-muted overflow-hidden">
             {(watchedValues.imageUrl || imagePreview) ? (
-              <img 
+              <Image
                 src={imagePreview || watchedValues.imageUrl || "/placeholder.svg"} 
                 alt="Community" 
+                width={80} height={80}
+                loading="lazy"
+                quality={100}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = "/placeholder.svg?height=80&width=80";
@@ -527,9 +534,13 @@ for (const [key, value] of formData.entries()) {
                                   <div className="flex items-center gap-4 mb-2">
                                     <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center overflow-hidden border">
                                       {imagePreview ? (
-                                        <img 
+                                        <Image 
                                           src={imagePreview} 
                                           alt="Preview" 
+                                          height={64}
+                                          width={64}
+                                          loading="lazy"
+                                          quality={100}
                                           className="h-full w-full object-cover"
                                         />
                                       ) : (
@@ -586,9 +597,13 @@ for (const [key, value] of formData.entries()) {
                                   <div className="mb-2">
                                     <div className="h-32 rounded-lg bg-muted flex items-center justify-center overflow-hidden mb-3 border">
                                       {coverImagePreview ? (
-                                        <img 
+                                        <Image 
                                           src={coverImagePreview} 
                                           alt="Cover Preview" 
+                                          height={128}
+                                          width={400}
+                                          loading="lazy"
+                                          quality={100}
                                           className="h-full w-full object-cover"
                                         />
                                       ) : (

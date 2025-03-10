@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PackageIcon } from "lucide-react";
+import Image from "next/image";
 
 interface Product {
   id: string;
@@ -54,9 +55,12 @@ const ProductTable: React.FC<ProductTableProps> = ({ items }) => {
                 <TableRow key={item.id} className="hover:bg-secondary/30 card-transition">
                   <TableCell className="p-2">
                     <div className="relative h-16 w-16 rounded-md overflow-hidden border">
-                      <img
+                      <Image
                         src={item.product?.mainImage || '/placeholder.svg'}
                         alt={item.product?.title || 'Product image'}
+                        width={80}
+                        height={80}
+                        quality={100}
                         className="h-full w-full object-cover object-center"
                         loading="lazy"
                         onError={(e) => {

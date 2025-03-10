@@ -8,10 +8,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogFooter,
+  DialogDescription
 } from "@/components/ui/dialog";
-import { Menu, X, ShoppingCart, CreditCard, Check, ChevronRight, Star, ArrowRight } from 'lucide-react';
+import { Menu, X, ShoppingCart, Check, ChevronRight, Star, ArrowRight } from 'lucide-react';
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useStripe, useElements, CardElement, Elements } from "@stripe/react-stripe-js";
@@ -67,8 +66,6 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 
 // This is the internal component that uses Stripe hooks
 function ModernTemplateInternal({
-  viewMode,
-  currentPage,
   storeName = "Modern Store",
   storeDescription = "Experience a sleek, contemporary design that sets your store apart.",
   products = [],

@@ -151,7 +151,7 @@ export default function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-56 dark:bg-gray-800 dark:border-gray-700"
+                className="w-56"
               >
                 <DropdownMenuLabel className="dark:text-gray-300">
                   My Account

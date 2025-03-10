@@ -26,7 +26,6 @@ export default function ManageProductVariants({ productId }: { productId: string
   const [loading, setLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingVariant, setEditingVariant] = useState<Variant | null>(null)
-  const [authChecked, setAuthChecked] = useState(false);
   const [newVariant, setNewVariant] = useState({
     name: "",
     value: "",

@@ -9,9 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Menu, X, ShoppingCart, CreditCard, Check, ChevronRight, Star } from 'lucide-react';
+import { Menu, X, ShoppingCart, Check, ChevronRight, Star } from 'lucide-react';
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useStripe, useElements, CardElement, Elements } from "@stripe/react-stripe-js";

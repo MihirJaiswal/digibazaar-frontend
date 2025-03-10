@@ -29,10 +29,6 @@ interface Like {
   userId: string;
 }
 
-interface Comment {
-  // Define properties as needed. For count purposes, an empty interface is sufficient.
-}
-
 interface User {
   id: string;
   // Add other properties if required

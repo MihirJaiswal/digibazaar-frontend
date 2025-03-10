@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/authStore";
+import Image from "next/image";
 
 export default function SetupWizardPage() {
   const router = useRouter();
@@ -211,9 +212,13 @@ export default function SetupWizardPage() {
                     onChange={handleLogoChange}
                   />
                   {logoPreview && (
-                    <img
-                      src={logoPreview}
+                    <Image
+                      src={logoPreview || './placeholder.svg' }
                       alt="Logo Preview"
+                      width={96}
+                      height={96}
+                      loading="lazy"
+                      quality={100}
                       className="w-24 h-24 object-cover rounded mt-2"
                     />
                   )}
@@ -422,7 +427,14 @@ export default function SetupWizardPage() {
                     {logoPreview && (
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Logo:</span>
-                        <img src={logoPreview} alt="Logo" className="h-8 w-8 object-cover rounded" />
+                        <Image
+                          src={logoPreview} 
+                          alt="Logo"
+                          width={32}
+                          height={32}
+                          loading="lazy"
+                          quality={100}
+                         className="h-8 w-8 object-cover rounded" />
                       </div>
                     )}
                   </div>

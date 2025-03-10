@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Package, Search, AlertTriangle, ArrowUpDown, Tag, DollarSign, Percent, Clock, ShoppingCart, Filter, RefreshCw } from 'lucide-react';
 import dynamic from "next/dynamic";
 import { useAuthStore } from "@/store/authStore";
+import Image from "next/image";
 
 // Dynamically import chart components to avoid SSR issues
 const StockDistributionChart = dynamic(() => import("@/components/inventory/stock-distribution-chart"), { ssr: false });
@@ -352,9 +353,13 @@ export default function WarehouseStock({ warehouseId }: Props) {
                         <TableRow key={item.id}>
                           <TableCell>
                             {item.product.mainImage ? (
-                              <img 
+                              <Image
                                 src={item.product.mainImage || "/placeholder.svg"} 
                                 alt={item.product.title} 
+                                width={40}
+                                height={40}
+                                loading="lazy"
+                                quality={100}
                                 className="w-10 h-10 object-cover rounded-md"
                               />
                             ) : (
@@ -448,9 +453,12 @@ export default function WarehouseStock({ warehouseId }: Props) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="p-4 flex items-center justify-center bg-muted/20">
                     {item.product.mainImage ? (
-                      <img 
+                      <Image
                         src={item.product.mainImage || "/placeholder.svg"} 
                         alt={item.product.title} 
+                        width={100} height={100}
+                        loading="lazy"
+                        quality={100}
                         className="max-h-[150px] object-contain"
                       />
                     ) : (

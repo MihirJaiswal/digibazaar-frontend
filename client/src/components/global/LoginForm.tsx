@@ -57,21 +57,21 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-background relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/2 w-[1000px] h-[1000px] bg-primary/5 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2" />
+        <div className="absolute top-0 left-1/2 w-[1000px] h-[1000px] bg-purple-500/5 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 right-1/2 w-[800px] h-[800px] bg-cyan-500/10 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2" />
       </div>
 
-      <div className="container relative flex items-center justify-center min-h-screen py-20 px-4">
+      <div className="container relative flex items-center justify-center pt-28 pb-20">
         <MotionDiv
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          <Card className="border-0 shadow-2xl backdrop-blur-xl">
+          <Card className="border shadow-2xl backdrop-blur-xl">
             <CardHeader className="space-y-1 pb-8">
               <MotionDiv
                 initial={{ scale: 0.95 }}
@@ -139,7 +139,7 @@ export default function Login() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-12 text-base font-medium"
+                  className="w-full h-12 bg-gradient-to-r from-purple-500 to-cyan-600 text-white font-medium rounded-md shadow-md hover:from-purple-600 hover:to-cyan-700 transition-colors"
                 >
                   {loading ? (
                     <div className="flex items-center gap-2">

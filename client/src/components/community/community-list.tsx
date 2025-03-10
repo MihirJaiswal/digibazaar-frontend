@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, Search } from "lucide-react";
 import Link from "next/link";
-import { useAuthStore } from "@/store/authStore";
 import Image from "next/image";
 import { debounce } from "lodash";
 import { Input } from "@/components/ui/input";

@@ -42,35 +42,6 @@ const queryClient = new QueryClient({
 })
 
 // Types for our data
-interface Warehouse {
-  id: string
-  name: string
-  location: string
-  capacity: number
-  contactInfo: {
-    phone: string
-    email?: string
-  }
-  coordinates: {
-    latitude: number
-    longitude: number
-  }
-  availableCapacity: number
-  usedCapacity: number
-  totalStock: number
-}
-
-interface Product {
-  id: string
-  title: string
-  description: string
-  price: number
-  stock: number
-  categoryId: string | null
-  costPerItem: number | null
-  profit: number | null
-  margin: number | null
-}
 
 interface OrderItem {
   id: string
@@ -80,50 +51,6 @@ interface OrderItem {
   totalPrice: number
 }
 
-interface Order {
-  id: string
-  totalPrice: number
-  status: string
-  paymentStatus: string
-  shippingAddress: {
-    phone: string
-    address: string
-  }
-  createdAt: string
-  items: OrderItem[]
-}
-
-interface SalesReport {
-  totalRevenue: number
-  totalOrders: number
-  topSellingProducts: {
-    product: {
-      title: string
-    }
-    quantitySold: number
-  }[]
-  revenueTrend: {
-    month: string
-    revenue: number
-  }[]
-}
-
-interface StockReport {
-  warehouse: string
-  product: string
-  stock: number
-  stockValue: number
-}
-
-interface StockAlert {
-  warehouse: string
-  product: string
-  currentStock: number
-  reorderLevel: number
-  supplier: string
-  supplierContact: string
-
-}
 
 // Main dashboard component
 function DashboardContent() {

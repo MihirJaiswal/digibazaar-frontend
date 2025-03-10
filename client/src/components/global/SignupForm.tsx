@@ -59,7 +59,7 @@ export default function SignUp() {
       formPayload.append("country", data.country);
       formPayload.append("phone", data.phone);
       formPayload.append("bio", data.desc);
-      formPayload.append("isSeller", data.isSeller === "on" ? "true" : "false");
+      formPayload.append("isSeller", data.isSeller === "on" ? "true" : "true");
 
       if (profileImageFile) {
         formPayload.append("profilePic", profileImageFile);
@@ -97,21 +97,21 @@ export default function SignUp() {
   const prevStep = () => setStep(1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-background relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
       {/* Lightweight background decoration */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl transform rotate-12 animate-pulse" />
-        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-primary/10 to-transparent rounded-full blur-3xl transform -rotate-12 animate-pulse" />
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl transform rotate-12 animate-pulse" />
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-cyan/10 to-transparent rounded-full blur-3xl transform -rotate-12 animate-pulse" />
       </div>
 
-      <div className="container relative flex items-center justify-center min-h-screen py-20 px-4">
+      <div className="container relative flex items-center justify-center pt-24 pb-20 px-4">
         <MotionDiv
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="w-full max-w-4xl"
         >
-          <Card className="border-0 shadow-2xl bg-background/80 backdrop-blur-xl">
+          <Card className="border shadow-2xl bg-background/80 backdrop-blur-xl ">
             <div className="md:grid md:grid-cols-5 divide-x divide-border">
               {/* Left side – Progress & Navigation */}
               <div className="col-span-2 p-6 bg-muted/30">
@@ -129,7 +129,7 @@ export default function SignUp() {
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
                         <MotionDiv
-                          className="h-full bg-primary"
+                          className="h-full bg-purple-600"
                           initial={{ width: "0%" }}
                           animate={{ width: `${(step / 2) * 100}%` }}
                           transition={{ duration: 0.3 }}
@@ -141,7 +141,7 @@ export default function SignUp() {
                       <button
                         onClick={() => setStep(1)}
                         className={`w-full p-4 rounded-lg text-left transition-all ${
-                          step === 1 ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                          step === 1 ? "bg-purple-600 text-primary-foreground" : "hover:bg-muted"
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -162,7 +162,7 @@ export default function SignUp() {
                           watchedFields.username && watchedFields.email && watchedFields.password && setStep(2)
                         }
                         className={`w-full p-4 rounded-lg text-left transition-all ${
-                          step === 2 ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                          step === 2 ? "bg-purple-600 text-primary-foreground" : "hover:bg-muted"
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -251,8 +251,8 @@ export default function SignUp() {
                           <Label htmlFor="profilePic">Profile Image</Label>
                           <div className="relative">
                             <Image
-                              src="/icons/profile-upload.svg"
-                              alt="Upload"
+                              src='./placeholder.svg'
+                              alt="."
                               width={16}
                               height={16}
                               className="absolute left-3 top-3"
@@ -267,7 +267,7 @@ export default function SignUp() {
                           </div>
                           {profileImagePreview && (
                             <Image
-                              src={profileImagePreview}
+                              src={profileImagePreview || "/placeholder.svg"}
                               alt="Profile Preview"
                               width={100}
                               height={100}
@@ -282,7 +282,7 @@ export default function SignUp() {
                           type="button"
                           onClick={() => setStep(2)}
                           disabled={!watchedFields.username || !watchedFields.email || !watchedFields.password}
-                          className="w-full"
+                          className="w-full bg-gradient-to-r from-purple-500 to-cyan-500"
                         >
                           Continue
                           <ArrowRight className="ml-2 h-4 w-4" />
@@ -342,7 +342,7 @@ export default function SignUp() {
                           </div>
                         </div>
 
-                        <div className="flex items-center space-x-2 bg-muted/50 p-4 rounded-lg">
+                        <div className="items-center space-x-2 bg-muted/50 p-4 rounded-lg hidden">
                           <Checkbox id="isSeller" {...registerField("isSeller")} />
                           <Label htmlFor="isSeller" className="text-sm">
                             Register as a Seller
@@ -360,7 +360,7 @@ export default function SignUp() {
                           <Button type="button" variant="outline" onClick={prevStep} className="flex-1">
                             Back
                           </Button>
-                          <Button type="submit" disabled={loading} className="flex-1">
+                          <Button type="submit" disabled={loading} className="flex-1 bg-gradient-to-r from-purple-500 to-cyan-500 ">
                             {loading ? (
                               <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
