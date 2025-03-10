@@ -110,7 +110,7 @@ export function GigCard({ gig, showDescription = false }: GigCardProps) {
           {!imageLoaded && <Skeleton className="absolute inset-0 w-full h-full" />}
           <Image
             src={gig.cover || "/placeholder.svg"}
-            alt={gig.title}
+            alt={gig.title || 'image'}
             width={400}
             height={300}
             quality={100}
@@ -140,7 +140,7 @@ export function GigCard({ gig, showDescription = false }: GigCardProps) {
             <div className="relative w-8 h-8 rounded-full overflow-hidden border border-neutral-200 bg-neutral-50">
               <Image
                 src={gig.seller?.profilePicture || "/placeholder.svg"}
-                alt={gig.seller?.username}
+                alt={gig.seller?.username || 'image'}
                 width={32}
                 height={32}
                 loading="lazy"
