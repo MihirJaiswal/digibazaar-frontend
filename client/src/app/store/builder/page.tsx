@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
   ArrowRight,
@@ -37,7 +36,7 @@ export default function BuilderPage() {
   const [viewMode, setViewMode] = useState<"desktop" | "tablet" | "mobile">("desktop")
   const [currentPage, setCurrentPage] = useState("home")
   const [isPublishing, setIsPublishing] = useState(false)
-  const { token, _hasRehydrated, user } = useAuthStore()
+  const { token, _hasRehydrated } = useAuthStore()
   const [themeCustomization, setThemeCustomization] = useState<ThemeCustomization>({})
   const [isCustomizationLoading, setIsCustomizationLoading] = useState(true)
 

@@ -4,7 +4,6 @@ import { useState, useMemo, useCallback, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardLayout } from "@/components/inventory/dashboard-layout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -29,7 +28,6 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import {
-  Search,
   Warehouse,
   BarChart3,
   Package,
@@ -38,21 +36,11 @@ import {
   MapPin,
   Phone,
   ArrowUpDown,
-  Filter,
   RefreshCw,
   Building2,
-  LayoutGrid,
-  ListFilter,
 } from "lucide-react";
 import { formatCurrency, formatNumber } from "@/app/inventory/lib/utils";
 import Header from "@/components/global/Header";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import dynamic from "next/dynamic";
 import { useAuthStore } from "@/store/authStore";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
@@ -191,7 +179,6 @@ const DashboardStats = ({ warehouses }: { warehouses: WarehouseType[] }) => {
 const WarehouseTable = ({
   warehouses,
   handleSort,
-  sortConfig,
   onViewDetails,
 }: {
   warehouses: WarehouseType[];
