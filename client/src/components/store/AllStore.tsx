@@ -168,15 +168,12 @@ export default function StoresPage() {
                     onChange={(e) => setRawSearchQuery(e.target.value)}
                   />
                 </div>
-                {/* Conditionally render the Create Your Store button only if the user is logged out */}
-                {!token && (
                   <Button asChild variant="default" className="w-full sm:w-auto">
                     <Link href="/create-store">
                       <StoreIcon className="mr-2 h-4 w-4" />
                       Create Your Store
                     </Link>
                   </Button>
-                )}
               </div>
             </div>
           </div>

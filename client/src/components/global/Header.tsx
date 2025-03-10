@@ -48,7 +48,6 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
-
   const handleLogout = async () => {
     try {
       await logout()
@@ -80,6 +79,8 @@ export default function Header() {
               alt="logo"
               width={32}
               height={32}
+              loading="lazy"
+              quality={100}
               />
             </div>
             <span className="text-xl hidden md:inline uppercase">igiBazaar</span>
@@ -141,6 +142,7 @@ export default function Header() {
                     <AvatarImage
                       src={user.profilePic || "/placeholder.svg"}
                       alt={user.username}
+                      className="object-cover"
                     />
                     <AvatarFallback className="dark:bg-gray-700 dark:text-white">
                       {user.username?.charAt(0).toUpperCase()}
