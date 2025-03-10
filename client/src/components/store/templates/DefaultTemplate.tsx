@@ -25,9 +25,7 @@ interface DefaultTemplateProps {
   themeCustomization?: ThemeCustomization;
 }
 
-export function DefaultTemplate({ 
-  viewMode, 
-  currentPage, 
+export function DefaultTemplate({  
   storeName = "Default Store",
   storeDescription = "Discover our great products and enjoy an exceptional shopping experience.",
   themeCustomization = {} 

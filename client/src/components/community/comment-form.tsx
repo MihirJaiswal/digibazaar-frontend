@@ -48,7 +48,7 @@ export function CommentForm({ postId, onCommentAdded }: CommentFormProps) {
       if (onCommentAdded) {
         onCommentAdded(comment);
       }
-    } catch (error) {
+    } catch {
       toast.error( !user ? "Failed to add comment" : "Please login to add a comment");
     } finally {
       setIsSubmitting(false);

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import {
   Menu,
-  X,
   MessageSquare,
   User,
   Settings,
@@ -35,12 +34,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import Image from "next/image"
-import router from "next/navigation"
 
 export default function Header() {
   const { user, logout } = useAuthStore()
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
+  const [_isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
 

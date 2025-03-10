@@ -86,7 +86,7 @@ function StockManagementComponent() {
   const [productId, setProductId] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("stock-movement");
-  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [recentTransactions, _setRecentTransactions] = useState([]);
 
   // Fetch warehouses
   const { data: warehouses, isLoading: loadingWarehouses } = useQuery(
@@ -109,7 +109,7 @@ function StockManagementComponent() {
   );
 
   // Fetch warehouse stock when a warehouse is selected
-  const { data: warehouseStock, isLoading: loadingWarehouseStock } = useQuery(
+  const { data: warehouseStock } = useQuery(
     ["warehouseStock", warehouseId],
     () =>
       fetch(`http://localhost:8800/api/warehouses/${warehouseId}/stock`, {

@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
 import { GigCard } from "@/components/gigs/gig-card";
 import {
   Pagination,
@@ -96,10 +95,7 @@ function GigsPageContent() {
   const itemsPerPage = 9;
 
   // Fetch categories using React Query
-  const {
-    data: categoriesData,
-    isError: isCategoriesError,
-  } = useQuery({
+  const {data: categoriesData} = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const res = await fetch("http://localhost:8800/api/categories");
@@ -126,7 +122,6 @@ function GigsPageContent() {
   const {
     data: gigsData,
     isLoading: gigsLoading,
-    isError: isGigsError,
   } = useQuery({
     queryKey: ["gigs"],
     queryFn: async () => {

@@ -84,7 +84,6 @@ export function ProductDetailPageComponent() {
   const {
     data: stockData,
     isLoading: stockLoading,
-    error: stockError,
   } = useQuery(
     ["stock", id],
     async () => {

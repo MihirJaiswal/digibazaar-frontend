@@ -34,15 +34,6 @@ export default function ManageProductVariants({ productId }: { productId: string
     stock: 0,
     })
 
-  useEffect(() => {
-    // Set a flag to indicate we've checked auth status
-    // This prevents premature fetch attempts
-    const checkAuth = () => {
-      setAuthChecked(true);
-    };
-    
-    fetchVariants()
-  }, [authChecked])
 
   const fetchVariants = async () => {
     setLoading(true)

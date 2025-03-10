@@ -4,7 +4,7 @@ import {  useState, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency, formatNumber } from "@/app/inventory/lib/utils"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, ArrowDown, ArrowUp, BarChart3, DollarSign, MapPin, PackageCheck, PackageX, ShoppingBag, TrendingUp, WarehouseIcon } from 'lucide-react'
+import { AlertCircle, ArrowDown, ArrowUp, BarChart3, DollarSign, MapPin, PackageCheck, PackageX, ShoppingBag, WarehouseIcon } from 'lucide-react'
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
@@ -26,7 +26,7 @@ import {
   Pie, 
   Cell 
 } from "recharts"
-import { useQuery, useQueries, QueryClient, QueryClientProvider } from 'react-query'
+import { useQuery, QueryClient, QueryClientProvider } from 'react-query'
 import { Suspense } from 'react'
 
 // Create a client
@@ -123,31 +123,6 @@ interface StockAlert {
   supplier: string
   supplierContact: string
 
-}
-
-interface DashboardData {
-  warehouses: Warehouse[]
-  products: Product[]
-  orders: Order[]
-  salesReport: SalesReport
-  stockReport: StockReport[]
-  stockAlerts: StockAlert[]
-}
-
-// API Fetcher Functions
-const fetchWithAuth = async (url, token) => {
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  }
-  
-  const response = await fetch(url, { headers })
-  
-  if (!response.ok) {
-    throw new Error(`API call failed: ${url} → Status: ${response.status}`)
-  }
-  
-  return response.json()
 }
 
 // Main dashboard component
@@ -814,7 +789,7 @@ function DashboardContent() {
                             cx="50%"
                             cy="50%"
                             labelLine={false}
-                            label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                            label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                             outerRadius={80}
                             fill="#8884d8"
                             dataKey="value"

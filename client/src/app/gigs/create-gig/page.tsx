@@ -373,7 +373,8 @@ export default function CreateGigPage() {
     }
   }, [formData, mediaState, user, token, router]);
 
-  // Memoize the preview component to prevent re-renders
+
+  
   const GigPreview = useMemo(() => () => {
     const categoryItem = categories.find((c) => c.value === formData.categoryId);
     

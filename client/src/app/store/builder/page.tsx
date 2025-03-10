@@ -38,7 +38,7 @@ export default function BuilderPage() {
   const [isPublishing, setIsPublishing] = useState(false)
   const { token, _hasRehydrated } = useAuthStore()
   const [themeCustomization, setThemeCustomization] = useState<ThemeCustomization>({})
-  const [isCustomizationLoading, setIsCustomizationLoading] = useState(true)
+  const [_isCustomizationLoading, setIsCustomizationLoading] = useState(true)
 
   // In a real app, storeSlug would come from the logged in user's data or route params.
 

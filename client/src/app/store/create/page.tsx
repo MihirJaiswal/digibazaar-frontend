@@ -1,7 +1,6 @@
 "use client";
 
-import { Checkbox } from "@/components/ui/checkbox";
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import { useRouter } from "next/navigation";
 import { Check, ChevronRight, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ import { useAuthStore } from "@/store/authStore";
 
 export default function SetupWizardPage() {
   const router = useRouter();
-  const { user, token } = useAuthStore();
+  const { token } = useAuthStore();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -114,7 +113,6 @@ export default function SetupWizardPage() {
         throw new Error(errorData.message || "Failed to create store");
       }
 
-      const newStore = await response.json();
       toast.success("Store created successfully!", {
         description: "Your store is now ready to be customized."
       });

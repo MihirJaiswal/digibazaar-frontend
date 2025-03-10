@@ -67,8 +67,6 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 
 // This is the internal component that uses Stripe hooks
 function ClassicTemplateInternal({
-  viewMode,
-  currentPage,
   storeName = "Classic Store",
   storeDescription = "Enjoy a timeless design that focuses on tradition and quality.",
   products = [],
@@ -243,7 +241,6 @@ function ClassicTemplateInternal({
       if (!orderRes.ok) {
         throw new Error("Failed to create order");
       }
-      const orderData = await orderRes.json();
       toast.success("Order placed successfully!");
       closePaymentDialog();
     } catch (error: any) {

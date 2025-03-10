@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useAuthStore } from "@/store/authStore"
-import { Home, FileText, PlusCircle, Settings, Info, ShoppingBag, Heart, ChevronRight, PieChart } from "lucide-react"
+import { Home, FileText, PlusCircle, Settings, Info, ShoppingBag, ChevronRight, PieChart } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"

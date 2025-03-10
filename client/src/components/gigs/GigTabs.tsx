@@ -16,7 +16,6 @@ import {
   CheckCircle,
   MessageSquare,
   Calendar,
-  Award,
   ThumbsUp,
   MapPin,
   Edit,
@@ -32,7 +31,7 @@ interface GigTabsProps {
 
 export default function GigTabs({ gig, isOwner }: GigTabsProps) {
   const [reviews, setReviews] = useState<Review[]>(gig.reviews || [])
-  const [showReviewForm, setShowReviewForm] = useState(false)
+  const [_showReviewForm, setShowReviewForm] = useState(false)
   const { user } = useAuthStore()
 
   // Format date
@@ -56,9 +55,6 @@ export default function GigTabs({ gig, isOwner }: GigTabsProps) {
     gig.totalStars = newTotalStars
     gig.starNumber = newStarNumber
   }
-
-  const canReview = user && !isOwner && !reviews.some((review) => review.userId === user.id)
-
   // Ensure features is an array
   const features = Array.isArray(gig.features) ? gig.features : [];
 

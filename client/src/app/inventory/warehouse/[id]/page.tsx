@@ -76,7 +76,7 @@ const WarehouseDetailsPage = () => {
   const router = useRouter()
   const { id } = useParams()
   const { token } = useAuthStore()
-  const [authChecked, setAuthChecked] = useState(false);
+  const [authChecked, _setAuthChecked] = useState(false);
 
   console.log(token)
 

@@ -134,7 +134,7 @@ export default function CreateCommunityPost() {
     try {
       new URL(url);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };

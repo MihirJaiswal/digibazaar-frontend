@@ -405,13 +405,13 @@ const WarehouseGrid = ({
 };
 
 const WarehousesPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterCapacity, setFilterCapacity] = useState("all");
+  const [searchTerm, _setSearchTerm] = useState("");
+  const [filterCapacity, _setFilterCapacity] = useState("all");
   const [sortConfig, setSortConfig] = useState<{
     key: keyof WarehouseType | null;
     direction: "ascending" | "descending";
   }>({ key: null, direction: "ascending" });
-  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [viewMode, _setViewMode] = useState<"table" | "grid">("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState("overview");
   const router = useRouter();

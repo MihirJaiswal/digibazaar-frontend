@@ -3,9 +3,8 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useAuthStore } from "@/store/authStore"
-import { Home, FileText, User, Users, Settings, Info, PlusCircle, Bell, Bookmark, ChevronRight } from "lucide-react"
+import { Home, FileText, User, Users, Settings, Info, PlusCircle, ChevronRight } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
 const Sidebar = () => {

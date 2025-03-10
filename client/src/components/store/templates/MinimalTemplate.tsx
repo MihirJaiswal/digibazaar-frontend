@@ -62,8 +62,6 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 
 // This is the internal component that uses Stripe hooks
 function MinimalTemplateInternal({
-  viewMode,
-  currentPage,
   storeName,
   storeDescription,
   products,
@@ -203,7 +201,6 @@ function MinimalTemplateInternal({
       if (!orderRes.ok) {
         throw new Error("Failed to create order")
       }
-      const orderData = await orderRes.json()
       toast.success("Order placed successfully!")
       closePaymentDialog()
     } catch (error: any) {

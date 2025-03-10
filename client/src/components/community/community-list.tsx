@@ -76,7 +76,6 @@ const CommunityCard: React.FC<CommunityCardProps> = React.memo(({ community, mem
 export function CommunityList() {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuthStore();
   const [memberCounts, setMemberCounts] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredCommunities, setFilteredCommunities] = useState<Community[]>([]);

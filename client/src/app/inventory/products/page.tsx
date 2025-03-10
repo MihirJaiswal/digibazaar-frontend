@@ -226,7 +226,7 @@ function ProductsPageContent() {
     try {
       await refetch();
       toast.success("Products refreshed successfully");
-    } catch (err) {
+    } catch {
       toast.error("Failed to refresh products");
     }
   }, [refetch]);

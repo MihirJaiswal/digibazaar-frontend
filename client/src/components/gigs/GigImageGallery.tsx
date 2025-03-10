@@ -23,7 +23,6 @@ export default function GigImageGallery({
   gig,
   isLiked,
   isBookmarked,
-  onLike,
   onBookmark,
   isOwner,
 }: GigImageGalleryProps) {

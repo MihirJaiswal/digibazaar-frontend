@@ -15,18 +15,6 @@ interface GigReviewFormProps {
   onCancel: () => void
 }
 
-interface GigStar {
-  id: string
-  gigId: string
-  userId: string
-  star: number
-  createdAt: string
-  user?: {
-    username: string
-    profilePic?: string
-  }
-}
-
 export default function GigReviewForm({ gigId, onSubmit, onCancel }: GigReviewFormProps) {
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
@@ -219,8 +207,6 @@ export default function GigReviewForm({ gigId, onSubmit, onCancel }: GigReviewFo
       if (!reviewResponse.ok) {
         throw new Error("Failed to update review");
       }
-  
-      const updatedReview = await reviewResponse.json();
       
       // 2. Update the local state
       setExistingReviews(prev => 
