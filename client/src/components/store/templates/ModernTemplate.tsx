@@ -544,7 +544,7 @@ function ModernTemplateInternal({
             </h2>
             <Separator className="w-24 h-1 mx-auto my-6 bg-indigo-500" />
             <p className="max-w-2xl mx-auto text-gray-400 text-lg">
-              We're committed to providing you with the best shopping experience possible.
+              We&apos;re committed to providing you with the best shopping experience possible.
             </p>
           </motion.div>
           
@@ -717,7 +717,7 @@ function ModernTemplateInternal({
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-white">Complete Your Purchase</DialogTitle>
               <DialogDescription className="text-gray-300">
-                You're purchasing {selectedProduct.name} for ₹{selectedProduct.price.toLocaleString('en-IN')}
+                You&apos;re purchasing {selectedProduct.name} for ₹{selectedProduct.price.toLocaleString('en-IN')}
               </DialogDescription>
             </DialogHeader>
             

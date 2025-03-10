@@ -521,7 +521,7 @@ function ClassicTemplateInternal({
             </h2>
             <div className="w-24 h-1 bg-amber-700 mx-auto my-6" style={{ backgroundColor: primaryColor }}></div>
             <p className="max-w-2xl mx-auto text-gray-700 text-lg">
-              We're committed to providing you with the best shopping experience possible.
+              We&apos;re committed to providing you with the best shopping experience possible.
             </p>
           </motion.div>
           
@@ -694,7 +694,7 @@ function ClassicTemplateInternal({
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-gray-900">Complete Your Purchase</DialogTitle>
               <DialogDescription className="text-gray-700">
-                You're purchasing {selectedProduct.name} for ₹{selectedProduct.price.toLocaleString('en-IN')}
+                You&apos;re purchasing {selectedProduct.name} for ₹{selectedProduct.price.toLocaleString('en-IN')}
               </DialogDescription>
             </DialogHeader>
             

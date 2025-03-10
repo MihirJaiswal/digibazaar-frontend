@@ -303,7 +303,7 @@ export default function SetupWizardPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Store Settings</CardTitle>
-                <CardDescription>Configure your store's basic settings</CardDescription>
+                <CardDescription>Configure your store&apos;s basic settings</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">

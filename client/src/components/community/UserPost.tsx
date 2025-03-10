@@ -235,7 +235,7 @@ export default function UserPosts() {
     return (
       <div className="text-center py-10">
         <h3 className="text-lg font-medium">No posts yet</h3>
-        <p className="text-muted-foreground mt-2">You haven't posted anything yet.</p>
+        <p className="text-muted-foreground mt-2">You haven&apos;t posted anything yet.</p>
       </div>
     );
   }

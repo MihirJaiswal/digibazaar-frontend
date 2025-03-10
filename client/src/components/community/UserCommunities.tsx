@@ -122,7 +122,7 @@ export default function UserCommunities() {
           </Card>
         ))
       ) : (
-        <p className="text-gray-600 text-center col-span-3">You haven't joined any communities yet.</p>
+        <p className="text-gray-600 text-center col-span-3">You haven&apos;t joined any communities yet.</p>
       )}
     </div>
   );
