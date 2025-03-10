@@ -1,15 +1,15 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { useFrame, useThree } from "@react-three/fiber"
+import { useFrame } from "@react-three/fiber"
 import { Box, Torus, RoundedBox, Sphere } from "@react-three/drei"
 import type { Group, Mesh } from "three"
 import { useMobile } from "./use-mobile"
 
 const LetterD = ({ position, isDarkMode }: { position: [number, number, number]; isDarkMode: boolean }) => {
   const ref = useRef<Group>(null)
-  const primaryColor = isDarkMode ? "#6366f1" : "#4f46e5"
-  const accentColor = isDarkMode ? "#8b5cf6" : "#7c3aed"
+  const primaryColor = isDarkMode ? "#A29BFE" : "#4f46e5"
+  const accentColor = isDarkMode ? "#B2B0FF" : "#7c3aed"
 
   useFrame((state) => {
     if (ref.current) {
@@ -35,10 +35,16 @@ const LetterD = ({ position, isDarkMode }: { position: [number, number, number];
       {/* Holographic storefront */}
       <group position={[0.5, 0, 0.5]} scale={0.4}>
         <Sphere args={[0.5, 16, 16]}>
-          <meshStandardMaterial color={accentColor} transparent opacity={0.6} emissive={accentColor} emissiveIntensity={0.5} />
+          <meshStandardMaterial
+            color={accentColor}
+            transparent
+            opacity={0.6}
+            emissive={accentColor}
+            emissiveIntensity={0.5}
+          />
         </Sphere>
         <Box args={[0.6, 0.6, 0.6]} position={[0, 0, 0]}>
-          <meshStandardMaterial color={isDarkMode ? "#a78bfa" : "#8b5cf6"} transparent opacity={0.4} wireframe />
+          <meshStandardMaterial color={isDarkMode ? "#B2B0FF" : "#8b5cf6"} transparent opacity={0.4} wireframe />
         </Box>
       </group>
     </group>
@@ -47,9 +53,9 @@ const LetterD = ({ position, isDarkMode }: { position: [number, number, number];
 
 const LetterI = ({ position, isDarkMode }: { position: [number, number, number]; isDarkMode: boolean }) => {
   const robotArmRef = useRef<Group>(null)
-  const primaryColor = isDarkMode ? "#8b5cf6" : "#7c3aed"
-  const metalColor = isDarkMode ? "#94a3b8" : "#64748b"
-  const accentColor = isDarkMode ? "#a855f7" : "#9333ea"
+  const primaryColor = isDarkMode ? "#74b9ff" : "#7c3aed"
+  const metalColor = isDarkMode ? "#B2B0FF" : "#64748b"
+  const accentColor = isDarkMode ? "#B2B0FF" : "#9333ea"
 
   useFrame((state) => {
     if (robotArmRef.current) {
@@ -82,8 +88,8 @@ const LetterI = ({ position, isDarkMode }: { position: [number, number, number];
 
 const LetterG = ({ position, isDarkMode }: { position: [number, number, number]; isDarkMode: boolean }) => {
   const gearRef = useRef<Mesh>(null)
-  const primaryColor = isDarkMode ? "#6366f1" : "#4f46e5"
-  const metalColor = isDarkMode ? "#94a3b8" : "#64748b"
+  const primaryColor = isDarkMode ? "#A29BFE" : "#4f46e5"
+  const metalColor = isDarkMode ? "#B2B0FF" : "#64748b"
 
   useFrame(() => {
     if (gearRef.current) {
@@ -116,8 +122,8 @@ const LetterG = ({ position, isDarkMode }: { position: [number, number, number];
 
 const LetterB = ({ position, isDarkMode }: { position: [number, number, number]; isDarkMode: boolean }) => {
   const bubbleRefs = useRef<Group[]>([])
-  const primaryColor = isDarkMode ? "#8b5cf6" : "#7c3aed"
-  const accentColor = isDarkMode ? "#a78bfa" : "#8b5cf6"
+  const primaryColor = isDarkMode ? "#74b9ff" : "#7c3aed"
+  const accentColor = isDarkMode ? "#B2B0FF" : "#8b5cf6"
 
   useFrame((state) => {
     bubbleRefs.current.forEach((bubble, i) => {
@@ -167,7 +173,12 @@ const FloatingBox = ({
   color,
   delay = 0,
   isDarkMode,
-}: { position: [number, number, number]; color: string; delay?: number; isDarkMode: boolean }) => {
+}: {
+  position: [number, number, number]
+  color: string
+  delay?: number
+  isDarkMode: boolean
+}) => {
   const ref = useRef<Mesh>(null)
   const [startTime] = useState(delay)
   const boxColor = isDarkMode ? color : color.replace("f", "e").replace("b", "a")
@@ -190,10 +201,10 @@ const FloatingBox = ({
 const ConveyorBelt = ({ position, length, isDarkMode }: { position: [number, number, number]; length: number; isDarkMode: boolean }) => {
   const ref = useRef<Group>(null)
   const boxRefs = useRef<Mesh[]>([])
-  const beltColor = isDarkMode ? "#475569" : "#334155"
-  const rollerColor = isDarkMode ? "#94a3b8" : "#64748b"
-  const primaryColor = isDarkMode ? "#8b5cf6" : "#7c3aed"
-  const secondaryColor = isDarkMode ? "#6366f1" : "#4f46e5"
+  const beltColor = isDarkMode ? "#e8ecff" : "#334155"
+  const rollerColor = isDarkMode ? "#d0d5ff" : "#64748b"
+  const primaryColor = isDarkMode ? "#74b9ff" : "#7c3aed"
+  const secondaryColor = isDarkMode ? "#A29BFE" : "#4f46e5"
 
   useFrame(() => {
     boxRefs.current.forEach((box) => {
@@ -241,14 +252,18 @@ const HolographicPanel = ({
   size,
   color,
   isDarkMode,
-}: { position: [number, number, number]; size: [number, number]; color: string; isDarkMode: boolean }) => {
+}: {
+  position: [number, number, number]
+  size: [number, number]
+  color: string
+  isDarkMode: boolean
+}) => {
   const ref = useRef<Mesh>(null)
   const panelColor = isDarkMode ? color : color.replace("f", "e").replace("b", "a")
 
   useFrame((state) => {
     if (ref.current) {
       const t = state.clock.getElapsedTime()
-      // Check if material is a single material or cast it appropriately
       if (ref.current.material && !Array.isArray(ref.current.material)) {
         ref.current.material.opacity = 0.5 + Math.sin(t * 2) * 0.2
       }
@@ -271,7 +286,7 @@ const HolographicPanel = ({
 
 // Additional letter components
 const LetterA = ({ position, isDarkMode }: { position: [number, number, number]; isDarkMode: boolean }) => {
-  const primaryColor = isDarkMode ? "#6366f1" : "#4f46e5"
+  const primaryColor = isDarkMode ? "#A29BFE" : "#4f46e5"
   
   return (
     <group position={position}>
@@ -289,7 +304,7 @@ const LetterA = ({ position, isDarkMode }: { position: [number, number, number];
 }
 
 const LetterZ = ({ position, isDarkMode }: { position: [number, number, number]; isDarkMode: boolean }) => {
-  const primaryColor = isDarkMode ? "#8b5cf6" : "#7c3aed"
+  const primaryColor = isDarkMode ? "#B2B0FF" : "#7c3aed"
   
   return (
     <group position={position}>
@@ -307,7 +322,7 @@ const LetterZ = ({ position, isDarkMode }: { position: [number, number, number];
 }
 
 const LetterR = ({ position, isDarkMode }: { position: [number, number, number]; isDarkMode: boolean }) => {
-  const primaryColor = isDarkMode ? "#6366f1" : "#4f46e5"
+  const primaryColor = isDarkMode ? "#A29BFE" : "#4f46e5"
   
   return (
     <group position={position}>
@@ -334,21 +349,30 @@ export default function DigiBazaarScene({ isDarkMode = true }) {
   const isMobile = useMobile()
   const scale = isMobile ? 0.6 : 1
   
-  // Floor color based on theme
-  const floorColor = isDarkMode ? "#1e293b" : "#f1f5f9"
+  const floorColor = isDarkMode ? "#c5cbe3" : "#f1f5f9"
 
   return (
     <>
-      <ambientLight intensity={isDarkMode ? 0.5 : 0.7} />
-      <pointLight position={[10, 10, 10]} intensity={isDarkMode ? 1 : 0.8} color={isDarkMode ? "#a78bfa" : "#8b5cf6"} />
-      <pointLight position={[-10, -10, -10]} intensity={isDarkMode ? 0.5 : 0.4} color={isDarkMode ? "#6366f1" : "#4f46e5"} />
-      <spotLight position={[0, 10, 0]} intensity={isDarkMode ? 1 : 0.8} angle={0.6} penumbra={0.5} color={isDarkMode ? "#8b5cf6" : "#7c3aed"} />
+      <ambientLight intensity={isDarkMode ? 0.7 : 0.7} />
+      <pointLight position={[10, 10, 10]} intensity={isDarkMode ? 1 : 0.8} color={isDarkMode ? "#A29BFE" : "#8b5cf6"} />
+      <pointLight position={[-10, -10, -10]} intensity={isDarkMode ? 0.7 : 0.4} color={isDarkMode ? "#74b9ff" : "#4f46e5"} />
+      <spotLight position={[0, 10, 0]} intensity={isDarkMode ? 1 : 0.8} angle={0.6} penumbra={0.5} color={isDarkMode ? "#B2B0FF" : "#7c3aed"} />
 
       <group position={[0, -1, 0]} scale={scale}>
         {/* Main warehouse floor */}
         <Box args={[20, 0.2, 20]} position={[0, -1, 0]}>
           <meshStandardMaterial color={floorColor} metalness={0.8} roughness={0.2} />
         </Box>
+
+         {/* Control panel with holographic displays */}
+         <group position={[0, 0, -5]}>
+          <Box args={[6, 2, 0.5]} position={[0, 0, 0]}>
+            <meshStandardMaterial color={isDarkMode ? "#e0e6ff" : "#cbd5e1"} metalness={0.7} roughness={0.2} />
+          </Box>
+          <HolographicPanel position={[-1.5, 0.5, 0.3]} size={[1.5, 1]} color={isDarkMode ? "#A29BFE" : "#6366f1"} isDarkMode={isDarkMode} />
+          <HolographicPanel position={[0, 0.5, 0.3]} size={[1.5, 1]} color={isDarkMode ? "#74b9ff" : "#8b5cf6"} isDarkMode={isDarkMode} />
+          <HolographicPanel position={[1.5, 0.5, 0.3]} size={[1.5, 1]} color={isDarkMode ? "#B2B0FF" : "#a78bfa"} isDarkMode={isDarkMode} />
+        </group>
 
         {/* DigiBazaar Letters */}
         <group position={[-6, 0, 0]}>
@@ -371,20 +395,12 @@ export default function DigiBazaarScene({ isDarkMode = true }) {
         <ConveyorBelt position={[3, -0.5, -3]} length={8} isDarkMode={isDarkMode} />
 
         {/* Floating product boxes */}
-        <FloatingBox position={[-3, 1, 2]} color="#6366f1" isDarkMode={isDarkMode} />
-        <FloatingBox position={[2, 1.5, -2]} color="#8b5cf6" delay={1} isDarkMode={isDarkMode} />
-        <FloatingBox position={[4, 2, 1]} color="#a78bfa" delay={0.5} isDarkMode={isDarkMode} />
-        <FloatingBox position={[-2, 2.5, -1]} color="#6366f1" delay={1.5} isDarkMode={isDarkMode} />
+        <FloatingBox position={[-3, 1, 2]} color={isDarkMode ? "#A29BFE" : "#6366f1"} isDarkMode={isDarkMode} />
+        <FloatingBox position={[2, 1.5, -2]} color={isDarkMode ? "#74b9ff" : "#8b5cf6"} delay={1} isDarkMode={isDarkMode} />
+        <FloatingBox position={[4, 2, 1]} color={isDarkMode ? "#B2B0FF" : "#a78bfa"} delay={0.5} isDarkMode={isDarkMode} />
+        <FloatingBox position={[-2, 2.5, -1]} color={isDarkMode ? "#A29BFE" : "#6366f1"} delay={1.5} isDarkMode={isDarkMode} />
 
-        {/* Control panel with holographic displays */}
-        <group position={[0, 0, -5]}>
-          <Box args={[6, 2, 0.5]} position={[0, 0, 0]}>
-            <meshStandardMaterial color={isDarkMode ? "#334155" : "#cbd5e1"} metalness={0.7} roughness={0.2} />
-          </Box>
-          <HolographicPanel position={[-1.5, 0.5, 0.3]} size={[1.5, 1]} color="#6366f1" isDarkMode={isDarkMode} />
-          <HolographicPanel position={[0, 0.5, 0.3]} size={[1.5, 1]} color="#8b5cf6" isDarkMode={isDarkMode} />
-          <HolographicPanel position={[1.5, 0.5, 0.3]} size={[1.5, 1]} color="#a78bfa" isDarkMode={isDarkMode} />
-        </group>
+       
       </group>
     </>
   )
