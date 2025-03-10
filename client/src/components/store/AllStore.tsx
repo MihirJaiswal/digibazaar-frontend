@@ -169,7 +169,7 @@ export default function StoresPage() {
                   />
                 </div>
                   <Button asChild variant="default" className="w-full sm:w-auto">
-                    <Link href="/create-store">
+                    <Link href="/store/create">
                       <StoreIcon className="mr-2 h-4 w-4" />
                       Create Your Store
                     </Link>
