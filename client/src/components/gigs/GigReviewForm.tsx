@@ -8,6 +8,7 @@ import { Star, Edit2, Trash2 } from "lucide-react"
 import { useAuthStore } from "@/store/authStore"
 import type { Review } from "@/app/gigs/types/gig"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 interface GigReviewFormProps {
   gigId: string
   onSubmit: (review: Review) => void
@@ -430,9 +431,13 @@ export default function GigReviewForm({ gigId, onSubmit, onCancel }: GigReviewFo
                     <div className="flex items-center">
                       <div className="h-10 w-10 rounded-full bg-gray-200 mr-3 overflow-hidden">
                         {review.user?.profilePic && (
-                          <img 
+                          <Image 
                             src={review.user.profilePic} 
                             alt={review.user?.username} 
+                            width={40}
+                            height={40}
+                            loading="lazy"
+                            quality={100}
                             className="h-full w-full object-cover"
                           />
                         )}

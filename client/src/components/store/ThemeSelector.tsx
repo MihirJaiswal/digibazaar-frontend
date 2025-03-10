@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface ThemeOption {
   id: string;
@@ -63,9 +64,13 @@ export function ThemeSelector({ initialTheme, storeId, token, onThemeUpdate }: T
             }`}
             onClick={() => handleThemeChange(option.id)}
           >
-            <img
+            <Image
               src={option.thumbnail}
               alt={option.name}
+              width={200}
+              height={100}
+              loading="lazy"
+              quality={100}
               className="w-full h-32 object-cover rounded-md mb-2"
             />
             <div className="text-center font-medium">{option.name}</div>

@@ -46,6 +46,7 @@ import {
 import { useAuthStore } from "@/store/authStore";
 import { DashboardLayout } from "@/components/inventory/dashboard-layout";
 import Header from "@/components/global/Header";
+import Image from "next/image";
 
 interface Warehouse {
   id: string;
@@ -505,9 +506,13 @@ function StockManagementComponent() {
                               <div className="flex items-center">
                                 <div className="w-8 h-8 bg-gray-200 rounded-md mr-2 overflow-hidden">
                                   {product.image ? (
-                                    <img
+                                    <Image
                                       src={product.image || "/placeholder.svg"}
                                       alt={product.title}
+                                      width={32}
+                                      height={32}
+                                      loading="lazy"
+                                      quality={100}
                                       className="w-full h-full object-cover"
                                     />
                                   ) : (

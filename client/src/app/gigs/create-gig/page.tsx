@@ -43,6 +43,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 // Dynamically import components that aren't needed on initial load
 const Header = dynamic(() => import("@/components/global/Header"), { ssr: false });
@@ -380,9 +381,13 @@ export default function CreateGigPage() {
       <div className="rounded-xl overflow-hidden border shadow-lg bg-card">
         <div className="h-48 bg-muted relative">
           {mediaState.coverPreview ? (
-            <img
-              src={mediaState.coverPreview}
+            <Image
+              src={mediaState.coverPreview || "./placeholder.svg" }
               alt={formData.title || "Gig preview"}
+              quality={100}
+              height={1920}
+              width={1080}
+              loading="lazy"
               className="w-full h-full object-cover"
             />
           ) : (
@@ -598,9 +603,13 @@ export default function CreateGigPage() {
                                   onChange={handleCoverChange}
                                 />
                                 {mediaState.coverPreview && (
-                                  <img
-                                    src={mediaState.coverPreview}
-                                    alt="Cover Preview"
+                                  <Image
+                                    src={mediaState.coverPreview || "./placeholder.svg" }
+                                    alt="Cover Image"
+                                    width={400}
+                                    height={200}
+                                    loading="lazy"
+                                    quality={100}
                                     className="w-full h-48 object-cover mt-2 rounded"
                                   />
                                 )}
@@ -621,10 +630,14 @@ export default function CreateGigPage() {
                                 />
                                 <div className="flex flex-wrap mt-2 gap-2">
                                   {mediaState.imagePreviews.map((preview, index) => (
-                                    <img
+                                    <Image
                                       key={index}
                                       src={preview}
                                       alt={`Image preview ${index + 1}`}
+                                      width={100}
+                                      height={100}
+                                      loading="lazy"
+                                      quality={100}
                                       className="w-24 h-24 object-cover rounded"
                                     />
                                   ))}

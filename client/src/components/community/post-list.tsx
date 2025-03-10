@@ -10,6 +10,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 interface PostListProps {
   posts: any[];
 }
@@ -192,9 +193,13 @@ export function PostList({ posts }: PostListProps) {
               {/* 🖼️ Show Image if Available */}
               {post.image && post.image.trim() !== "" && (
                 <div className="mb-4">
-                  <img
+                  <Image
                     src={post.image}  // ✅ Correctly uses `post.image`
                     alt={post.title}
+                    width={400}
+                    height={200}
+                    loading="lazy"
+                    quality={100}
                     className="max-h-80 w-full object-cover rounded-md"
                   />
                 </div>

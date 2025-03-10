@@ -74,6 +74,7 @@ import {
   QueryClient, 
   QueryClientProvider 
 } from "@tanstack/react-query";
+import Image from "next/image";
 
 // Define types
 interface Product {
@@ -712,9 +713,13 @@ function ProductsPageContent() {
                         >
                           <TableCell>
                             <div className="w-10 h-10 rounded-md overflow-hidden bg-gray-100 border">
-                              <img
+                              <Image
                                 src={product.mainImage || "/placeholder.svg?height=40&width=40"}
                                 alt={product.title}
+                                width={40}
+                                height={40}
+                                loading="lazy"
+                                quality={100}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                   (e.target as HTMLImageElement).src =

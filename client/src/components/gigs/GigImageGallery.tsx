@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "sonner";
 import type { Gig } from "@/app/gigs/types/gig";
+import Image from "next/image";
 
 interface GigImageGalleryProps {
   gig: Gig;
@@ -100,9 +101,13 @@ export default function GigImageGallery({
     <Card className="overflow-hidden border-none shadow-sm">
       <CardContent className="p-0">
         <div className="relative">
-          <img
+          <Image
             src={activeImage || gig.cover || "/placeholder.svg?height=500&width=800"}
             alt={gig.title}
+            width={800}
+            height={500}
+            loading="lazy"
+            quality={100}
             className="w-full h-[400px] object-cover"
           />
           <div className="absolute top-4 right-4 flex gap-2">
@@ -156,7 +161,14 @@ export default function GigImageGallery({
               }`}
               onClick={() => setActiveImage(gig.cover)}
             >
-              <img src={gig.cover || "/placeholder.svg"} alt="thumbnail" className="h-full w-full object-cover" />
+              <Image 
+              src={gig.cover || "/placeholder.svg"} 
+              alt="thumbnail" 
+              width={64}
+              height={64}
+              loading="lazy"
+              quality={100}
+              className="h-full w-full object-cover" />
             </div>
             {gig.images.map(
               (img, index) =>
@@ -168,7 +180,14 @@ export default function GigImageGallery({
                     }`}
                     onClick={() => setActiveImage(img)}
                   >
-                    <img src={img || "/placeholder.svg"} alt={`thumbnail ${index}`} className="h-full w-full object-cover" />
+                    <Image 
+                    src={img || "/placeholder.svg"} 
+                    alt={`thumbnail ${index}`} 
+                    width={64}
+                    height={64}
+                    loading="lazy"
+                    quality={100}
+                    className="h-full w-full object-cover" />
                   </div>
                 )
             )}

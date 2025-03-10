@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface Customization {
   fontFamily?: string;
@@ -149,9 +150,13 @@ export function SettingsPanel({
               />
               {/* Display preview if available */}
               {bannerImagePreview && (
-                <img
+                <Image
                   src={bannerImagePreview}
                   alt="Banner Preview"
+                  width={200}
+                  height={100}
+                  loading="lazy"
+                  quality={100}
                   className="mt-2 w-full rounded-md object-cover"
                 />
               )}

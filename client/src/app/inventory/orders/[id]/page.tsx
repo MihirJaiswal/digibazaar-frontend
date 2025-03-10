@@ -32,6 +32,7 @@ import { useAuthStore } from "@/store/authStore"
 
 // Utilities
 import { formatCurrency, formatDate } from "@/app/inventory/lib/utils"
+import Image from "next/image"
 
 // Fix for default marker icon issues in React Leaflet
 
@@ -637,9 +638,13 @@ export default function AssignInventoryPage() {
                 <TableRow key={item.productId} className="hover:bg-slate-50">
                   <TableCell>
                     <div className="h-12 w-12 rounded-md overflow-hidden border border-slate-200">
-                      <img
+                      <Image
                         src={item.product?.mainImage || "/placeholder.svg?height=48&width=48"}
                         alt={item.product?.title || "Product image"}
+                        width={48}
+                        height={48}
+                        loading="lazy"
+                        quality={100}
                         className="h-full w-full object-cover"
                       />
                     </div>

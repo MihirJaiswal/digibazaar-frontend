@@ -266,9 +266,13 @@ export default function SignUp() {
                             />
                           </div>
                           {profileImagePreview && (
-                            <img
+                            <Image
                               src={profileImagePreview}
                               alt="Profile Preview"
+                              width={100}
+                              height={100}
+                              loading="lazy"
+                              quality={100}
                               className="mt-2 h-24 w-24 rounded-full object-cover"
                             />
                           )}

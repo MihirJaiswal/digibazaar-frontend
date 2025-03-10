@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle2, Clock, CreditCard, FileText, type LucideIcon, Package, ShieldCheck } from 'lucide-react';
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 // Feature item component with animation
 function FeatureItem({ icon: Icon, title, description }: { icon: LucideIcon; title: string; description: string }) {
@@ -213,9 +214,13 @@ function ConfirmOrderContent() {
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   <div className="h-16 w-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
-                    <img 
+                    <Image
                       src={gig.cover || "/placeholder.svg?height=64&width=64"} 
                       alt={gig.title}
+                      width={64}
+                      height={64}
+                      loading="lazy"
+                      quality={100}
                       className="h-full w-full object-cover"
                     />
                   </div>

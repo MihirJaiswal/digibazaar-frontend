@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { AlertCircle, FileImage, LinkIcon, Loader2, MessageSquare, Music, Send, Video } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import Image from "next/image";
 
 const schema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
@@ -149,9 +150,13 @@ export default function CreateCommunityPost() {
       >
         {type === "image" && (
           <div className="aspect-video bg-muted flex items-center justify-center overflow-hidden">
-            <img
-              src={previewUrl}
+            <Image
+              src={previewUrl || "/placeholder.svg?height=200&width=400"}
               alt="Preview"
+              width={400}
+              height={200}
+              loading="lazy"
+              quality={100}
               className="w-full h-full object-cover"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=400";
@@ -190,7 +195,14 @@ export default function CreateCommunityPost() {
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
                     {user.profilePic ? (
-                      <img src={user.profilePic || "/placeholder.svg"} alt={user.username} className="h-full w-full object-cover" />
+                      <Image 
+                      src={user.profilePic || "/placeholder.svg"} 
+                      alt={user.username} 
+                      width={32}
+                      height={32}
+                      loading="lazy"
+                      quality={100}
+                      className="h-full w-full object-cover" />
                     ) : (
                       <span className="text-xs font-medium">{user.username?.charAt(0).toUpperCase()}</span>
                     )}

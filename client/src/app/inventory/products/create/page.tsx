@@ -35,6 +35,7 @@ import {
   Store,
 } from "lucide-react";
 import CreateProductVariant from "@/components/inventory/CreateProductVariant";
+import Image from "next/image";
 
 const CreateProductPage = () => {
   const { token } = useAuthStore();
@@ -493,7 +494,14 @@ const CreateProductPage = () => {
                         </Label>
                         <Input id="mainImage" type="file" accept="image/*" onChange={handleMainImageChange} />
                         {mainImagePreview && (
-                          <img src={mainImagePreview} alt="Main Image Preview" className="w-full h-48 object-cover mt-2 rounded" />
+                          <Image
+                           src={mainImagePreview} 
+                           alt="Main Image Preview"
+                           width={200}
+                           height={200}
+                           loading="lazy"
+                           quality={100}
+                          className="w-full h-48 object-cover mt-2 rounded" />
                         )}
                       </div>
 
@@ -510,10 +518,14 @@ const CreateProductPage = () => {
                         />
                         <div className="flex flex-wrap mt-2 gap-2">
                           {additionalImagePreviews.map((preview, index) => (
-                            <img
+                            <Image
                               key={index}
                               src={preview}
                               alt={`Additional Image ${index + 1} Preview`}
+                              width={100}
+                              height={100}
+                              loading="lazy"
+                              quality={100}
                               className="w-24 h-24 object-cover rounded"
                             />
                           ))}
@@ -556,9 +568,13 @@ const CreateProductPage = () => {
                   <>
                     <div className="aspect-square bg-muted rounded-md flex items-center justify-center">
                       {mainImagePreview ? (
-                        <img
+                        <Image
                           src={mainImagePreview}
                           alt={formData.title}
+                          width={200}
+                          height={200}
+                          loading="lazy"
+                          quality={100}
                           className="max-h-full max-w-full object-contain"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=200";

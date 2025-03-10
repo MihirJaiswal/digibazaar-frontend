@@ -15,6 +15,7 @@ import { CommentList } from "@/components/community/comment-list";
 import { CommentForm } from "@/components/community/comment-form";
 import Header from "@/components/global/Header";
 import Sidebar from "@/components/community/Sidebar";
+import Image from "next/image";
 export default function PostPage() {
   const { id: communityId, postId } = useParams();
   const router = useRouter();
@@ -190,9 +191,13 @@ export default function PostPage() {
             </CardHeader>
             {post.image && (
               <CardContent>
-                <img
-                  src={post.image}
+                <Image
+                  src={post.image || "./placeholder.svg" }
                   alt={post.title}
+                  width={400}
+                  height={200}
+                  loading="lazy"
+                  quality={100}
                   className="max-h-80 w-full object-cover rounded-md"
                 />
               </CardContent>

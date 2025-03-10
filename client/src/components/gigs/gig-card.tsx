@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/authStore"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import Image from "next/image"
 
 interface Seller {
   id: string
@@ -107,9 +108,13 @@ export function GigCard({ gig, showDescription = false }: GigCardProps) {
       <Link href={`/gigs/gig/${gig.id}`} className="flex-grow flex flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
           {!imageLoaded && <Skeleton className="absolute inset-0 w-full h-full" />}
-          <img
+          <Image
             src={gig.cover || "/placeholder.svg"}
             alt={gig.title}
+            width={400}
+            height={300}
+            quality={100}
+            loading="lazy"
             className={`object-cover w-full h-full transition-transform duration-500 group-hover:scale-105 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
             onLoad={() => setImageLoaded(true)}
           />
@@ -133,9 +138,13 @@ export function GigCard({ gig, showDescription = false }: GigCardProps) {
         <CardContent className="p-5 flex-grow flex flex-col">
           <div className="flex items-center gap-2 mb-3">
             <div className="relative w-8 h-8 rounded-full overflow-hidden border border-neutral-200 bg-neutral-50">
-              <img
+              <Image
                 src={gig.seller?.profilePicture || "/placeholder.svg"}
                 alt={gig.seller?.username}
+                width={32}
+                height={32}
+                loading="lazy"
+                quality={100}
                 className="w-full h-full object-cover"
               />
             </div>
