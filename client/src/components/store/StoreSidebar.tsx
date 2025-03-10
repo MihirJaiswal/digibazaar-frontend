@@ -65,7 +65,7 @@ export function StoreLayout({ children }: StoreLayoutProps) {
               </nav>
             </div>
           </div>
-          <div className="flex-shrink-0 flex border-t bg-white dark:bg-zinc-900 border-primary-foreground/20 p-4">
+          <div className="flex-shrink-0 flex border-t border-primary-foreground/20 p-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center w-full text-sm text-left">

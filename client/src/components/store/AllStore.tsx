@@ -321,7 +321,7 @@ const StoreCard = React.memo(function StoreCard({
         </div>
       </CardContent>
       <CardFooter className="flex gap-2">
-        <Button asChild className="w-full group-hover:bg-primary/90">
+        <Button asChild className="w-full bg-gradient-to-r from-purple-500 to-cyan-500">
           <Link href={`/store/stores/${store.name}`}>
             Visit Store
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
