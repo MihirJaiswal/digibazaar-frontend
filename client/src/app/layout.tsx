@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
 import { Toaster } from "sonner";
+import ChatButton from "@/components/global/ChatButton";
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -35,6 +36,7 @@ export default function RootLayout({
           <Toaster />
           {children}
         </ThemeProvider>
+        <ChatButton/>
       </body>
     </html>
   );
