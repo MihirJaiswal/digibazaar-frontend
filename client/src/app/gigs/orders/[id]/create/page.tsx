@@ -52,7 +52,7 @@ export default function SellerDeliveryUpload() {
       }
       await res.json()
       alert("Delivery uploaded successfully!")
-      router.push("/seller/orders")
+      router.push("/gigs/orders")
     } catch (err: any) {
       console.error("Error uploading delivery:", err)
       setError(err.message || "Something went wrong")
@@ -63,7 +63,7 @@ export default function SellerDeliveryUpload() {
 
   return (
     <div className="container max-w-2xl mx-auto py-10 px-4">
-      <Card className="shadow-lg border-gray-200">
+      <Card className="shadow-lg ">
         <CardHeader className="space-y-1 bg-muted/30">
           <CardTitle className="text-2xl font-bold text-center">
             <div className="flex items-center justify-center gap-2">

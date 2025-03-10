@@ -114,7 +114,7 @@ export default function BuyerDeliveryReview() {
       const updatedDelivery = await res.json();
       alert("✅ Delivery accepted! Order is now completed.");
       setDelivery(updatedDelivery);
-      router.push("/buyer/orders");
+      router.push("/gigs/orders");
     } catch (err: any) {
       console.error("❌ Error Accepting Delivery:", err);
       alert(err.message || "Failed to accept delivery.");
@@ -146,9 +146,9 @@ export default function BuyerDeliveryReview() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white shadow rounded-lg mt-8">
+    <div className="max-w-4xl mx-auto p-8 shadow rounded-lg mt-8">
       <Card className="shadow-lg">
-        <CardHeader className="bg-gray-50 p-4 flex items-center justify-between">
+        <CardHeader className="bg-gray-50 dark:bg-zinc-900 p-4 flex items-center justify-between">
           <CardTitle className="text-2xl font-bold">📦 Delivery Details</CardTitle>
         </CardHeader>
         <CardContent className="p-6">

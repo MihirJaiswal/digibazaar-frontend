@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, AlertCircle, ArrowLeft, Clock, CheckCircle2, Package, Star, Calendar, MessageSquare, RefreshCw } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
+import Header from "@/components/global/Header";
 
 type Order = {
   id: string;
@@ -200,25 +201,27 @@ export default function OrderTrackingPage() {
   const statusInfo = getStatusInfo(order.status);
 
   return (
-    <div className="p-6 lg:p-8 bg-gray-50 min-h-screen">
+   <>
+   <Header/>
+   <div className="p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <Button 
           variant="ghost" 
           onClick={() => router.back()} 
-          className="mb-6 group hover:bg-gray-100"
+          className="mb-6 group hover:bg-gray-100 dark:hover:bg-zinc-800"
         >
           <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
           Back to Orders
         </Button>
         
-        <Card className="overflow-hidden bg-white shadow-md rounded-lg border-gray-200 mb-8">
-          <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 p-6">
+        <Card className="overflow-hidden bg-white dark:bg-zinc-950 shadow-md rounded-lg border-gray-200 dark:border-gray-700 mb-8">
+          <CardHeader className="order-b border-gray-200 p-6">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
               <div>
-                <CardTitle className="text-2xl font-bold text-gray-900">
+                <CardTitle className="text-2xl font-bold ">
                   Order #{order.id.slice(0, 8)}
                 </CardTitle>
-                <CardDescription className="text-sm text-gray-500 mt-1">
+                <CardDescription className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                   Placed on {formatDate(order.createdAt)}
                 </CardDescription>
               </div>
@@ -240,7 +243,7 @@ export default function OrderTrackingPage() {
               </h3>
               
               <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <div className="p-4 rounded-lg border border-gray-100 dark:border-gray-700 ">
                   <div className="flex justify-between mb-2 text-sm font-medium">
                     <span>Order Placed</span>
                     <span>In Progress</span>
@@ -250,9 +253,9 @@ export default function OrderTrackingPage() {
                   <Progress value={statusInfo.progress} className={statusInfo.progressColor} />
                 </div>
                 
-                <div className="bg-white p-5 rounded-lg border border-gray-200">
+                <div className="p-5 rounded-lg border border-gray-200 dark:border-gray-700 ">
                   <h4 className="text-lg font-medium mb-2">Current Status</h4>
-                  <p className="text-gray-700">{order.status.replace("_", " ")}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{order.status.replace("_", " ")}</p>
                   
                   {order.status === "DELIVERED" && (
                     <div className="mt-6">
@@ -262,7 +265,7 @@ export default function OrderTrackingPage() {
                         className="gap-2"
                       >
                         <Star className="h-4 w-4" />
-                        Review Product
+                        Collect Product
                       </Button>
                     </div>
                   )}
@@ -279,7 +282,7 @@ export default function OrderTrackingPage() {
               </h3>
               
               {loadingUpdates ? (
-                <div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-center h-32 rounded-lg">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                   <span className="ml-2 text-gray-500">Loading updates...</span>
                 </div>
@@ -287,10 +290,10 @@ export default function OrderTrackingPage() {
                 <div className="space-y-4">
                   {updates.map((update) => (
                     <Card key={update.id} className="overflow-hidden">
-                      <div className="bg-gray-50 px-4 py-3 border-b">
+                      <div className="px-4 py-3 border-b">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <h4 className="font-semibold text-gray-800">{update.title}</h4>
-                          <div className="text-xs text-gray-500 flex items-center gap-1">
+                          <h4 className="font-semibold ">{update.title}</h4>
+                          <div className="text-xs text-gray-500 dark:text-gray-300 flex items-center gap-1">
                             <Calendar className="h-3.5 w-3.5" />
                             {formatDate(update.createdAt)}
                           </div>
@@ -300,7 +303,7 @@ export default function OrderTrackingPage() {
                         <p className="text-gray-700 whitespace-pre-line">{update.content}</p>
                         {update.expectedDeliveryDate && (
                           <div className="mt-3 flex items-center">
-                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:border-gray-700 ">
                               <Calendar className="h-3 w-3 mr-1" />
                               Expected: {formatDate(update.expectedDeliveryDate)}
                             </Badge>
@@ -311,7 +314,7 @@ export default function OrderTrackingPage() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
+                <div className=" p-6 rounded-lg border border-gray-200 text-center">
                   <p className="text-gray-500">No updates available yet.</p>
                   <p className="text-sm text-gray-400 mt-1">
                     The seller will post updates about your order here.
@@ -321,10 +324,10 @@ export default function OrderTrackingPage() {
             </div>
           </CardContent>
           
-          <CardFooter className="bg-gray-50 border-t p-6">
+          <CardFooter className=" border-t p-6">
             <div className="w-full flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div>
-                <h4 className="font-medium text-gray-700">Order Total</h4>
+                <h4 className="font-medium text-gray-700 dark:text-gray-300">Order Total</h4>
                 <p className="text-2xl font-bold">₹{order.price.toLocaleString()}</p>
               </div>
               <Button 
@@ -339,5 +342,6 @@ export default function OrderTrackingPage() {
         </Card>
       </div>
     </div>
+   </>
   );
 }

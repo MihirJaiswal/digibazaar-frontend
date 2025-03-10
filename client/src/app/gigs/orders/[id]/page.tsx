@@ -179,19 +179,19 @@ export default function OrderDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <Header />
       <div className="flex">
         <GigsSidebar />
         <main className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="max-w-5xl mx-auto">
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
-              <p className="text-gray-500">View and manage your order information</p>
+              <h1 className="text-2xl font-bold">Order Details</h1>
+              <p className="text-gray-500 dark:text-zinc-300">View and manage your order information</p>
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow-sm border">
+              <div className="flex items-center justify-center h-64 rounded-lg shadow-sm border">
                 <div className="flex flex-col items-center gap-2">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   <p className="text-sm text-muted-foreground">Loading order details...</p>
@@ -210,17 +210,17 @@ export default function OrderDetailsPage() {
                 <AlertDescription>Order not found.</AlertDescription>
               </Alert>
             ) : (
-              <Card className="overflow-hidden bg-white shadow-md rounded-lg border-gray-200 mb-8">
-                <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 p-6">
+              <Card className="overflow-hidden shadow-md rounded-lg border-gray-200 dark:border-gray-700 mb-8">
+                <CardHeader className="border-b border-gray-200 dark:border-gray-700 p-6">
                   <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <CardTitle className="text-2xl font-bold text-gray-900">
+                        <CardTitle className="text-2xl font-bold">
                           Order #{order.id.slice(0, 8)}
                         </CardTitle>
                         {getStatusBadge(order.status)}
                       </div>
-                      <CardDescription className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                      <CardDescription className="text-sm text-gray-500 dark:text-gray-300 mt-1 flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
                         {formatDate(order.createdAt)}
                       </CardDescription>
@@ -252,57 +252,57 @@ export default function OrderDetailsPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="p-6 space-y-8">
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <div className="p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                       <FileText className="h-5 w-5 text-primary" />
                       Gig Details
                     </h3>
-                    <p className="text-gray-800 font-medium text-lg">{order.gig?.title}</p>
-                    <p className="text-gray-600 mt-2">{order.gig?.desc}</p>
+                    <p className="text-gray-800  dark:text-gray-300 font-medium text-lg">{order.gig?.title}</p>
+                    <p className="text-gray-600 dark:text-gray-300 mt-2">{order.gig?.desc}</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                      <h3 className="text-sm font-medium text-gray-500 uppercase mb-3">Order Information</h3>
+                    <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-300 uppercase mb-3">Order Information</h3>
                       <div className="space-y-3">
-                        <div className="flex items-center text-gray-700">
-                          <Clock className="h-4 w-4 mr-3 text-gray-400" />
-                          <span className="text-gray-500 w-24">Status:</span>
+                        <div className="flex items-center text-gray-700 dark:text-gray-300">
+                          <Clock className="h-4 w-4 mr-3 text-gray-400  dark:text-gray-300" />
+                          <span className="text-gray-500 dark:text-gray-300 w-24">Status:</span>
                           <span className="font-medium">{order.status.replace("_", " ")}</span>
                         </div>
-                        <div className="flex items-center text-gray-700">
-                          <DollarSign className="h-4 w-4 mr-3 text-gray-400" />
-                          <span className="text-gray-500 w-24">Price:</span>
+                        <div className="flex items-center text-gray-700 dark:text-gray-300">
+                          <DollarSign className="h-4 w-4 mr-3 text-gray-400 dark:text-gray-300" />
+                          <span className="text-gray-500 dark:text-gray-300 w-24">Price:</span>
                           <span className="font-medium">₹{order.price.toLocaleString()}</span>
                         </div>
-                        <div className="flex items-start text-gray-700">
-                          <FileText className="h-4 w-4 mr-3 text-gray-400 mt-0.5" />
-                          <span className="text-gray-500 w-24">Payment ID:</span>
+                        <div className="flex items-start text-gray-700 dark:text-gray-300">
+                          <FileText className="h-4 w-4 mr-3 text-gray-400 dark:text-gray-300 mt-0.5" />
+                          <span className="text-gray-500 dark:text-gray-300 w-24">Payment ID:</span>
                           <span className="font-medium break-all">{order.paymentIntent}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                      <h3 className="text-sm font-medium text-gray-500 uppercase mb-3">Buyer & Seller</h3>
+                    <div className="p-4 rounded-lg border border-gray-200  dark:border-gray-700">
+                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-300 uppercase mb-3">Buyer & Seller</h3>
                       <div className="space-y-3">
-                        <div className="flex items-center text-gray-700">
+                        <div className="flex items-center text-gray-700 dark:text-gray-300">
                           <User className="h-4 w-4 mr-3 text-gray-400" />
-                          <span className="text-gray-500 w-24">Buyer:</span>
+                          <span className="text-gray-500 dark:text-gray-300 w-24">Buyer:</span>
                           <span className="font-medium">{order.buyer?.username || "Unknown"}</span>
                         </div>
-                        <div className="flex items-center text-gray-700">
-                          <User className="h-4 w-4 mr-3 text-gray-400" />
-                          <span className="text-gray-500 w-24">Seller:</span>
+                        <div className="flex items-center text-gray-700 dark:text-gray-300">
+                          <User className="h-4 w-4 mr-3 text-gray-400 dark:text-gray-300" />
+                          <span className="text-gray-500 dark:text-gray-300 w-24">Seller:</span>
                           <span className="font-medium">{order.seller?.username || "Unknown"}</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white p-5 rounded-lg border border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h3>
-                    <div className="bg-gray-50 p-4 rounded border border-gray-100">
-                      <p className="text-gray-700 whitespace-pre-line">{order.requirement}</p>
+                  <div className="p-5 rounded-lg border border-gray-200  dark:border-gray-700 ">
+                    <h3 className="text-lg font-semibold mb-3">Requirements</h3>
+                    <div className="p-4 rounded border border-gray-100 dark:border-gray-700">
+                      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{order.requirement}</p>
                     </div>
                   </div>
                 </CardContent>

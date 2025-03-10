@@ -179,8 +179,8 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
   }
 
   return (
-    <Card className="shadow-md border-gray-200 mb-8">
-      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b">
+    <Card className="shadow-md border-gray-200 dark:border-zinc-700 mb-8 rounded-lg">
+      <CardHeader className="border-b">
         <CardTitle className="text-xl font-bold flex items-center gap-2">
           <RefreshCw className="h-5 w-5 text-primary" />
           Order Updates & Management
@@ -252,7 +252,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
             <PlusCircle className="h-5 w-5 text-primary" />
             Add Progress Update
           </h3>
-          <div className="space-y-4 bg-gray-50 p-4 rounded-lg border border-gray-100">
+          <div className="space-y-4  p-4 rounded-lg border border-gray-100 dark:border-gray-700">
             <div className="space-y-2">
               <Label htmlFor="updateTitle">Update Title</Label>
               <Input
@@ -261,7 +261,6 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
                 placeholder="E.g., First draft completed"
                 value={updateTitle}
                 onChange={(e) => setUpdateTitle(e.target.value)}
-                className="bg-white"
               />
             </div>
             <div className="space-y-2">
@@ -272,7 +271,6 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
                 value={updateContent}
                 onChange={(e) => setUpdateContent(e.target.value)}
                 rows={4}
-                className="bg-white"
               />
             </div>
             <div className="space-y-2">
@@ -285,7 +283,6 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
                 type="date"
                 value={expectedDeliveryDate}
                 onChange={(e) => setExpectedDeliveryDate(e.target.value)}
-                className="bg-white"
               />
             </div>
             <div className="flex justify-end">
@@ -315,22 +312,22 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
           </h3>
 
           {loadingUpdates ? (
-            <div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-center h-32 rounded-lg">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
-              <span className="ml-2 text-gray-500">Loading updates...</span>
+              <span className="ml-2 text-gray-500 dark:text-gray-300">Loading updates...</span>
             </div>
           ) : existingUpdates.length > 0 ? (
             <div className="space-y-4">
               {existingUpdates.map((update: OrderUpdate) => (
                 <Card key={update.id} className="overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-3 border-b">
+                  <div className="px-4 py-3 border-b">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <h4 className="font-semibold text-gray-800">{update.title}</h4>
-                      <div className="text-xs text-gray-500">{formatDate(update.createdAt)}</div>
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-300">{update.title}</h4>
+                      <div className="text-xs text-gray-500 dark:text-gray-300">{formatDate(update.createdAt)}</div>
                     </div>
                   </div>
                   <CardContent className="p-4">
-                    <p className="text-gray-700 whitespace-pre-line">{update.content}</p>
+                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{update.content}</p>
                     {update.expectedDeliveryDate && (
                       <div className="mt-3 flex items-center">
                         <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">

@@ -76,7 +76,7 @@ function OrdersPageContent() {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
+      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-zinc-900">
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Authentication Required</AlertTitle>
@@ -118,12 +118,12 @@ function OrdersPageContent() {
                 {orders?.map((order) => (
                   <Card
                     key={order.id}
-                    className="overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                    className="overflow-hidden bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md transition-shadow duration-200"
                   >
-                    <CardHeader className="bg-gray-50 border-b border-gray-200">
+                    <CardHeader className="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700 p-4">
                       <div className="flex justify-between items-center">
                         <div>
-                          <CardTitle className="text-lg font-semibold text-gray-900">
+                          <CardTitle className="text-lg font-semibold ">
                             Order #{order.id.slice(0, 8)}
                           </CardTitle>
                           <CardDescription className="text-sm text-gray-500">
@@ -142,7 +142,7 @@ function OrdersPageContent() {
                     <CardContent className="p-4">
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="space-y-1">
-                          <p className="text-sm font-medium text-gray-700">
+                          <p className="text-sm font-medium text-gray-700 dark:text-zinc-300">
                             {order.gig.title}
                           </p>
                           <p className="flex items-center text-sm text-gray-600">
@@ -151,7 +151,7 @@ function OrdersPageContent() {
                           </p>
                         </div>
                         <div className="flex items-center gap-4">
-                          <p className="flex items-center text-sm font-medium text-gray-900">
+                          <p className="flex items-center text-sm font-medium">
                             <DollarSign className="h-4 w-4 mr-1 text-gray-400" />
                             ₹{order.price}
                           </p>
