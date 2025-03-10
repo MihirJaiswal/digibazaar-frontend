@@ -18,9 +18,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface Product {
   id: string
-  name: string
+  title: string
   price: number
-  image: string
+  mainImage: string
   variants?: string[]
   description?: string
 }
@@ -424,8 +424,8 @@ function MinimalTemplateInternal({
               >
                 <div className="relative w-full aspect-[4/3] overflow-hidden">
                   <Image
-                    src={product.image || "/placeholder.svg?height=300&width=400"}
-                    alt={product.name || "Product Image"}
+                    src={product.mainImage || "/placeholder.svg?height=300&width=400"}
+                    alt={product.mainImage || "Product Image"}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
@@ -433,7 +433,7 @@ function MinimalTemplateInternal({
                 </div>
                 <div className="p-5">
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white">{product.name}</h4>
+                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white">{product.title}</h4>
                     <div className="flex items-center">
                       <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                       <span className="text-sm ml-1 text-gray-600 dark:text-gray-300">4.9</span>
@@ -560,8 +560,8 @@ function MinimalTemplateInternal({
               <div className="md:w-1/2 relative">
                 <div className="relative h-[300px] md:h-full w-full">
                   <Image
-                    src={selectedProduct.image || "/placeholder.svg?height=600&width=600"}
-                    alt={selectedProduct.name || "Product Image"}
+                    src={selectedProduct.mainImage || "/placeholder.svg?height=600&width=600"}
+                    alt={selectedProduct.mainImage || "Product Image"}
                     fill
                     className="object-cover"
                   />
@@ -573,7 +573,7 @@ function MinimalTemplateInternal({
                 <DialogHeader className="mb-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <DialogTitle className="text-2xl font-bold">{selectedProduct.name}</DialogTitle>
+                      <DialogTitle className="text-2xl font-bold">{selectedProduct.title}</DialogTitle>
                       <div className="flex items-center mt-2">
                         <div className="flex">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -653,7 +653,7 @@ function MinimalTemplateInternal({
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold">Complete Your Purchase</DialogTitle>
               <DialogDescription>
-                You&apos;re purchasing {selectedProduct.name} for ₹{selectedProduct.price.toLocaleString("en-IN")}
+                You&apos;re purchasing {selectedProduct.title} for ₹{selectedProduct.price.toLocaleString("en-IN")}
               </DialogDescription>
             </DialogHeader>
 
@@ -708,14 +708,14 @@ function MinimalTemplateInternal({
                     <div className="flex items-start gap-4">
                       <div className="relative h-16 w-16 flex-shrink-0">
                         <Image
-                          src={selectedProduct.image || "/placeholder.svg?height=64&width=64"}
-                          alt={selectedProduct.name || "Product Image"}
+                          src={selectedProduct.mainImage || "/placeholder.svg?height=64&width=64"}
+                          alt={selectedProduct.mainImage || "Product Image"}
                           fill
                           className="object-cover rounded-md"
                         />
                       </div>
                       <div>
-                        <h4 className="font-medium">{selectedProduct.name}</h4>
+                        <h4 className="font-medium">{selectedProduct.title}</h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Quantity: 1</p>
                         <p className="font-bold mt-1">₹{selectedProduct.price.toLocaleString("en-IN")}</p>
                       </div>

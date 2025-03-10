@@ -6,9 +6,9 @@ import { StorePreview } from "@/components/store/store-preview";
 
 interface Product {
   id: string;
-  name: string;
+  title: string;
   price: number;
-  image: string;
+  mainImage: string;
   variants?: string[];
   description?: string;
 }

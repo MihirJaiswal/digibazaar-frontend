@@ -22,9 +22,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Product {
   id: string;
-  name: string;
+  title: string;
   price: number;
-  image: string;
+  mainImage: string;
   variants?: string[];
   description?: string;
 }
@@ -594,8 +594,8 @@ function ClassicTemplateInternal({
               <div className="md:w-1/2 relative">
                 <div className="relative h-[300px] md:h-full w-full">
                   <Image
-                    src={selectedProduct.image || "/placeholder.svg?height=600&width=600"}
-                    alt={selectedProduct.name || "Product Image"}
+                    src={selectedProduct.mainImage || "/placeholder.svg?height=600&width=600"}
+                    alt={selectedProduct.title || "Product Image"}
                     fill
                     className="object-cover"
                   />
@@ -607,7 +607,7 @@ function ClassicTemplateInternal({
                 <DialogHeader className="mb-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <DialogTitle className="text-2xl font-bold text-gray-900">{selectedProduct.name}</DialogTitle>
+                      <DialogTitle className="text-2xl font-bold text-gray-900">{selectedProduct.title}</DialogTitle>
                       <div className="flex items-center mt-2">
                         <div className="flex">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -690,7 +690,7 @@ function ClassicTemplateInternal({
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-gray-900">Complete Your Purchase</DialogTitle>
               <DialogDescription className="text-gray-700">
-                You&apos;re purchasing {selectedProduct.name} for ₹{selectedProduct.price.toLocaleString('en-IN')}
+                You&apos;re purchasing {selectedProduct.title} for ₹{selectedProduct.price.toLocaleString('en-IN')}
               </DialogDescription>
             </DialogHeader>
             
@@ -750,14 +750,14 @@ function ClassicTemplateInternal({
                     <div className="flex items-start gap-4">
                       <div className="relative h-16 w-16 flex-shrink-0">
                         <Image
-                          src={selectedProduct.image || "/placeholder.svg?height=64&width=64"}
-                          alt={selectedProduct.name}
+                          src={selectedProduct.mainImage || "/placeholder.svg?height=64&width=64"}
+                          alt={selectedProduct.title || "Product Image"}
                           fill
                           className="object-cover rounded-md"
                         />
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900">{selectedProduct.name}</h4>
+                        <h4 className="font-medium text-gray-900">{selectedProduct.mainImage}</h4>
                         <p className="text-sm text-gray-600">Quantity: 1</p>
                         <p className="font-bold mt-1 text-gray-900">₹{selectedProduct.price.toLocaleString('en-IN')}</p>
                       </div>

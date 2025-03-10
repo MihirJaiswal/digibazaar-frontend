@@ -8,9 +8,9 @@ import { ThemeCustomization } from "@/components/store/templates/MinimalTemplate
 
 interface Product {
   id: string;
-  name: string;
+  title: string;
   price: number;
-  image: string;
+  mainImage: string;
   variants?: string[];
   description?: string;
 } 
