@@ -92,7 +92,7 @@ export default function StoresPage() {
           </div>
           <div className="container relative z-10">
             <div className="mx-auto max-w-3xl text-center">
-              <h1 className="mb-4 bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-6xl">
+              <h1 className="mb-4 bg-gradient-to-r from-purple-500 to-cyan-500 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-6xl">
                 Discover Our Marketplace
               </h1>
               <p className="mx-auto max-w-[800px] text-lg text-muted-foreground md:text-xl">
