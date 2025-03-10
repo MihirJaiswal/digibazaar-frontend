@@ -349,7 +349,7 @@ export default function DigiBazaarScene({ isDarkMode = true }) {
   const isMobile = useMobile()
   const scale = isMobile ? 0.6 : 1
   
-  const floorColor = isDarkMode ? "#c5cbe3" : "#f1f5f9"
+  const floorColor = isDarkMode ? "#1e293b" : "#f1f5f9"
 
   return (
     <>
