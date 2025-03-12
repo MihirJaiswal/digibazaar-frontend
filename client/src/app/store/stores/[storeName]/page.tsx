@@ -31,10 +31,6 @@ export default function StorePage({ params }: StorePageProps) {
 
   useEffect(() => {
     async function fetchData() {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
       try {
         // Fetch store details by storeName.
         const resStore = await fetch(`http://localhost:8800/api/stores/${storeName}`, {
