@@ -12,6 +12,7 @@ import {
   ChevronDown,
   ShoppingCart,
   LayoutDashboard,
+  Store,
 } from "lucide-react"
 import { useAuthStore } from "@/store/authStore"
 import { usePathname, useRouter } from "next/navigation"
@@ -159,17 +160,17 @@ export default function Header() {
                   My Account
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="dark:bg-gray-600" />
-                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700">
+                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700" onClick={() => router.push("/profile")}>
                   <User className="mr-2 h-4 w-4" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700">
+                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700" onClick={() => router.push("/inventory")} >
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
                 </DropdownMenuItem>
-                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700" onClick={() => router.push("/store")} >
+                  <Store className="mr-2 h-4 w-4" />
+                  Store
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="dark:bg-gray-600" />
                 <DropdownMenuItem
@@ -257,17 +258,17 @@ export default function Header() {
                   </div>
 
                   <div className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button variant="ghost" className="w-full justify-start"  onClick={() => router.push("/profile")} >
                       <User className="mr-2 h-4 w-4" />
                       Profile
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
+                    <Button variant="ghost" className="w-full justify-start"  onClick={() => router.push("/inventory")} >
                       <LayoutDashboard className="mr-2 h-4 w-4" />
                       Dashboard
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
+                    <Button variant="ghost" className="w-full justify-start" onClick={() => router.push("/store")} >
+                      <Store className="mr-2 h-4 w-4" />
+                      Store
                     </Button>
                     <Button
                       variant="ghost"
