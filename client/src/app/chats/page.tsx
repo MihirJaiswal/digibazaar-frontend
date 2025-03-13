@@ -1,13 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, FormEvent, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore";
-import { PlusCircle, MessageSquare, Loader2 } from 'lucide-react';
-import { formatDistanceToNow } from "date-fns";
+import { io, Socket } from "socket.io-client";
+import {
+  ArrowLeft,
+  Send,
+  Loader2,
+  PlusCircle,
+  MessageSquare,
+  Users,
+  User,
+} from "lucide-react";
+import { format, formatDistanceToNow } from "date-fns";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 import Header from "@/components/global/Header";
+import Image from "next/image";
+
+interface Message {
+  id?: string;
+  userId: string;
+  receiverId?: string;
+  content: string;
+  createdAt: string;
+  status?: "sending" | "sent" | "delivered" | "read";
+}
 
 interface Conversation {
   id: string;
@@ -15,14 +36,35 @@ interface Conversation {
   lastMessageTime?: string;
   participants?: { id: string; name: string }[];
   title?: string;
+  // Fallback fields if participants is missing:
+  user1Id?: string;
+  user2Id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  readByUser1?: boolean;
+  readByUser2?: boolean;
 }
 
-export default function ChatsPage() {
-  const { token } = useAuthStore();
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
+interface OtherUser {
+  id: string;
+  username: string;
+  profilePic: string;
+}
+
+export default function MergedChatsPage() {
+  const { token, user } = useAuthStore();
   const router = useRouter();
   const baseApiUrl = "http://localhost:8800/api";
+
+  // ---------------------------
+  // Left Sidebar: Conversation List
+  // ---------------------------
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [loadingConversations, setLoadingConversations] = useState(true);
+  // We'll store user details for each conversation's other user
+  const [conversationUserDetails, setConversationUserDetails] = useState<
+    Record<string, OtherUser>
+  >({});
 
   useEffect(() => {
     if (!token) return;
@@ -37,34 +79,223 @@ export default function ChatsPage() {
         });
         if (res.ok) {
           const data = await res.json();
+          console.log("Fetched conversations:", data);
           setConversations(data);
         } else {
-          console.error("Failed to fetch conversations");
+          console.error("Failed to fetch conversations. Status:", res.status);
         }
       } catch (err) {
         console.error("Error fetching conversations:", err);
       } finally {
-        setLoading(false);
+        setLoadingConversations(false);
       }
     };
 
     fetchConversations();
   }, [token]);
 
-  const handleNewChat = () => {
-    // This would typically create a new conversation and redirect
-    // For now, we'll just log it
-    console.log("Creating new chat");
+  // Helper function to compute the receiver's ID for a conversation
+  const getReceiverId = (conv: Conversation) => {
+    const fromParticipants = conv.participants?.find((p) => p.id !== user?.id)?.id;
+    if (fromParticipants) return fromParticipants;
+    if (conv.user1Id && conv.user2Id) {
+      return conv.user1Id === user?.id ? conv.user2Id : conv.user1Id;
+    }
+    return undefined;
   };
+
+  // For each conversation, prefetch the other user's details if not already fetched
+  useEffect(() => {
+    if (!conversations.length || !token || !user?.id) return;
+    conversations.forEach((conv) => {
+      const receiverId = getReceiverId(conv);
+      if (receiverId && !conversationUserDetails[receiverId]) {
+        fetch(`${baseApiUrl}/users/${receiverId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
+        })
+          .then((res) => {
+            if (res.ok) return res.json();
+            throw new Error("Failed to fetch user details");
+          })
+          .then((data: OtherUser) => {
+            console.log("Fetched user details for", receiverId, ":", data);
+            setConversationUserDetails((prev) => ({ ...prev, [receiverId]: data }));
+          })
+          .catch((err) => {
+            console.error("Error fetching user details for conversation list:", err);
+          });
+      }
+    });
+  }, [conversations, token, user?.id, baseApiUrl, conversationUserDetails]);
+
+  // ---------------------------
+  // Right Side: Conversation Detail
+  // ---------------------------
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [newMessage, setNewMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  // Other user for the selected conversation (fetched separately)
+  const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<Socket | null>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Fetch conversation detail when a conversation is selected
+  useEffect(() => {
+    if (!selectedConversationId || !token) return;
+    const fetchConversation = async () => {
+      try {
+        const res = await fetch(`${baseApiUrl}/conversations/${selectedConversationId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          console.log("Fetched conversation detail:", data);
+          setConversation(data);
+        } else {
+          console.error("Failed to fetch conversation. Status:", res.status);
+        }
+      } catch (err) {
+        console.error("Error fetching conversation:", err);
+      }
+    };
+    fetchConversation();
+  }, [selectedConversationId, token]);
+
+  // Fetch messages for the selected conversation
+  useEffect(() => {
+    if (!selectedConversationId || !token) {
+      setLoadingMessages(false);
+      return;
+    }
+    const fetchMessages = async () => {
+      try {
+        const res = await fetch(`${baseApiUrl}/messages/${selectedConversationId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        });
+        if (res.ok) {
+          const msgs = await res.json();
+          console.log("Fetched messages:", msgs);
+          setMessages(msgs);
+        } else {
+          console.error("Failed to fetch messages. Status:", res.status);
+        }
+      } catch (err) {
+        console.error("Error fetching messages:", err);
+      } finally {
+        setLoadingMessages(false);
+      }
+    };
+    fetchMessages();
+  }, [selectedConversationId, token]);
+
+  // Compute the receiver's ID for the selected conversation
+  const receiverIdForDetail = conversation
+    ? conversation.user1Id === user?.id
+      ? conversation.user2Id
+      : conversation.user1Id
+    : undefined;
+
+  // Fetch the other user's details for the selected conversation
+  useEffect(() => {
+    if (!receiverIdForDetail || !token) return;
+    const fetchOtherUser = async () => {
+      try {
+        const res = await fetch(`${baseApiUrl}/users/${receiverIdForDetail}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
+        });
+        if (res.ok) {
+          const userData = await res.json();
+          console.log("Fetched other user details for chat detail:", userData);
+          setOtherUser(userData);
+        } else {
+          console.error("Failed to fetch other user details. Status:", res.status);
+        }
+      } catch (err) {
+        console.error("Error fetching other user details:", err);
+      }
+    };
+    fetchOtherUser();
+  }, [receiverIdForDetail, token]);
+
+  // Setup socket connection for the selected conversation
+  useEffect(() => {
+    if (!selectedConversationId) return;
+    if (!socketRef.current) {
+      socketRef.current = io("http://localhost:8800", { transports: ["websocket"] });
+    }
+    socketRef.current.emit("joinRoom", selectedConversationId);
+    socketRef.current.on("messageReceived", (message) => {
+      console.log("New message received:", message);
+      setMessages((prev) => [...prev, message]);
+    });
+    return () => {
+      socketRef.current?.off("messageReceived");
+    };
+  }, [selectedConversationId]);
+
+  const sendMessage = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !socketRef.current) return;
+    setSending(true);
+    const tempId = Date.now().toString();
+    const messageData = {
+      conversationId: selectedConversationId,
+      message: {
+        id: tempId,
+        userId: user?.id,
+        receiverId: receiverIdForDetail,
+        content: newMessage,
+        createdAt: new Date().toISOString(),
+        status: "sending",
+      } as Message,
+    };
+    setMessages((prev) => [...prev, messageData.message]);
+    setNewMessage("");
+    socketRef.current.emit("newMessage", messageData);
+    console.log("Sent message:", messageData);
+    setTimeout(() => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === tempId ? { ...msg, status: "sent" } : msg
+        )
+      );
+      setSending(false);
+    }, 500);
+  };
+
+  const formatMessageDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    return date.toDateString() === today.toDateString()
+      ? format(date, "h:mm a")
+      : format(date, "MMM d, h:mm a");
+  };
+
+  const getInitials = (text: string = "User") => text.charAt(0).toUpperCase();
 
   if (!token) {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh] p-6">
-        <div className="text-center space-y-4 max-w-md">
-          <MessageSquare className="h-16 w-16 text-primary mx-auto mb-4" />
+        <div className="text-center space-y-4">
+          <User className="h-16 w-16 text-primary mx-auto mb-4" />
           <h2 className="text-2xl font-bold">Sign in to access your chats</h2>
           <p className="text-muted-foreground">
-            Please log in to view and manage your conversations.
+            Please log in to view and participate in your conversations.
           </p>
           <Button onClick={() => router.push("/login")} className="mt-4">
             Sign In
@@ -76,20 +307,18 @@ export default function ChatsPage() {
 
   return (
     <>
-    <Header/>
-    <div className="flex h-[calc(100vh-4rem)] bg-background">
-      {/* Sidebar */}
-      <div className="w-full md:w-80 lg:w-96 border-r flex flex-col h-full">
-        <div className="p-4 border-b flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Conversations</h1>
-          <Button onClick={handleNewChat} size="sm" className="gap-1">
-            <PlusCircle className="h-4 w-4" />
-            <span className="hidden sm:inline">New Chat</span>
-          </Button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-2">
-          {loading ? (
+      <Header />
+      <div className="flex h-[calc(100vh-4rem)] bg-background border">
+        {/* Left Sidebar: Conversation List */}
+        <div className="w-full md:w-80 border-r p-4 overflow-y-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-xl font-semibold">Conversations</h1>
+            <Button onClick={() => console.log("New chat")} size="sm" className="gap-1">
+              <PlusCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">New Chat</span>
+            </Button>
+          </div>
+          {loadingConversations ? (
             <div className="flex flex-col items-center justify-center h-full">
               <Loader2 className="h-8 w-8 text-primary animate-spin mb-2" />
               <p className="text-sm text-muted-foreground">Loading conversations...</p>
@@ -101,57 +330,204 @@ export default function ChatsPage() {
               <p className="text-sm text-muted-foreground mt-1 mb-4">
                 Start a new conversation to begin chatting
               </p>
-              <Button onClick={handleNewChat} variant="outline" className="gap-1">
+              <Button onClick={() => console.log("New chat")} variant="outline" className="gap-1">
                 <PlusCircle className="h-4 w-4" />
                 Start a new chat
               </Button>
             </div>
           ) : (
             <div className="space-y-2">
-              {conversations.map((conv) => (
-                <Card
-                  key={conv.id}
-                  className="cursor-pointer hover:bg-accent transition-colors p-3"
-                  onClick={() => router.push(`/chats/${conv.id}`)}
-                >
-                  <div className="flex items-center gap-3">
+              {conversations.map((conv) => {
+                const receiverIdForConv = getReceiverId(conv);
+                const otherUserData = receiverIdForConv ? conversationUserDetails[receiverIdForConv] : null;
+                return (
+                  <div
+                    key={conv.id}
+                    onClick={() => setSelectedConversationId(conv.id)}
+                    className={cn(
+                      "cursor-pointer hover:bg-accent transition-colors p-3 flex items-center gap-3 rounded-md border-b",
+                      selectedConversationId === conv.id && "bg-accent"
+                    )}
+                  >
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      {(conv.title?.[0] || "C").toUpperCase()}
+                      {otherUserData?.profilePic ? (
+                        <Image
+                          src={otherUserData.profilePic}
+                          alt={otherUserData.username}
+                          width={40}
+                          height={40}
+                          loading="lazy"
+                          quality={100}
+                          className="h-full w-full object-cover rounded-full"
+                        />
+                      ) : otherUserData?.username ? (
+                        getInitials(otherUserData.username)
+                      ) : (
+                        (conv.title?.[0] || "C").toUpperCase()
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-baseline">
-                        <h3 className="font-medium truncate">
-                          {conv.title || `Chat ${conv.id.slice(0, 8)}`}
-                        </h3>
-                        {conv.lastMessageTime && (
-                          <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
-                            {formatDistanceToNow(new Date(conv.lastMessageTime), { addSuffix: true })}
-                          </span>
-                        )}
-                      </div>
+                      <h3 className="font-medium truncate">
+                        {otherUserData?.username || conv.title || `Chat ${conv.id.slice(0, 8)}`}
+                      </h3>
                       <p className="text-sm text-muted-foreground truncate">
                         {conv.lastMessage || "No messages yet"}
                       </p>
                     </div>
                   </div>
-                </Card>
-              ))}
+                );
+              })}
+            </div>
+          )}
+        </div>
+        {/* Right Side: Conversation Detail */}
+        <div className="flex-1 p-4 flex flex-col">
+          {selectedConversationId ? (
+            <>
+              {/* Chat header */}
+              <div className="border-b p-3 flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
+                  onClick={() => setSelectedConversationId(null)}
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  {otherUser?.profilePic ? (
+                    <Image
+                      src={otherUser.profilePic}
+                      alt={otherUser.username}
+                      width={40}
+                      height={40}
+                      loading="lazy"
+                      quality={100}
+                      className="h-full w-full object-cover rounded-full"
+                    />
+                  ) : otherUser?.username ? (
+                    getInitials(otherUser.username)
+                  ) : (
+                    "C"
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h2 className="font-medium">
+                    {otherUser?.username || "Chat"}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    {conversation ? `Conversation ID: ${conversation.id}` : "Loading conversation details..."}
+                  </p>
+                </div>
+              </div>
+              {/* Messages area */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-accent/5">
+                {loadingMessages ? (
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <Loader2 className="h-8 w-8 text-primary animate-spin mb-2" />
+                    <p className="text-sm text-muted-foreground">Loading messages...</p>
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+                    <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+                      <Users className="h-8 w-8" />
+                    </div>
+                    <h3 className="font-medium text-lg">No messages yet</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Send a message to start the conversation
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {messages.map((msg, index) => {
+                      const isCurrentUser = String(msg.userId) === String(user?.id);
+                      return (
+                        <div key={msg.id || index} className="w-full">
+                          <div className={cn("flex gap-2 w-full", isCurrentUser ? "justify-end" : "justify-start")}>
+                            {isCurrentUser ? (
+                              <>
+                                <div className="max-w-[75%] flex flex-col ml-auto items-end">
+                                  <div className="px-3 py-2 rounded-lg bg-primary text-primary-foreground rounded-br-none">
+                                    <p className="text-sm">{msg.content}</p>
+                                  </div>
+                                  <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                                    <span>{formatMessageDate(msg.createdAt)}</span>
+                                    {msg.status && (
+                                      <span className="ml-1">
+                                        {msg.status === "sending" && "Sending..."}
+                                        {msg.status === "sent" && "Sent"}
+                                        {msg.status === "delivered" && "Delivered"}
+                                        {msg.status === "read" && "Read"}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                                    {getInitials(user?.username)}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </>
+                            ) : (
+                              <>
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                                    {getInitials(otherUser?.username || "U")}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="max-w-[75%] flex flex-col items-start">
+                                  <div className="px-3 py-2 rounded-lg bg-accent rounded-bl-none">
+                                    <p className="text-sm">{msg.content}</p>
+                                  </div>
+                                  <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                                    <span>{formatMessageDate(msg.createdAt)}</span>
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div ref={messagesEndRef} />
+                  </>
+                )}
+              </div>
+              {/* Message input */}
+              <div className="border-t p-3">
+                <form onSubmit={sendMessage} className="flex items-center gap-2 max-w-5xl">
+                  <Input
+                    type="text"
+                    placeholder="Type your message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    className="flex-1"
+                    disabled={sending}
+                  />
+                  <Button
+                    type="submit"
+                    size="icon"
+                    disabled={!newMessage.trim() || sending}
+                    className={cn("transition-all", !newMessage.trim() && "opacity-50")}
+                  >
+                    {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  </Button>
+                </form>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center flex-1 p-6 bg-accent/5">
+              <div className="text-center space-y-4 max-w-md">
+                <MessageSquare className="h-16 w-16 text-primary/40 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold">Select a conversation</h2>
+                <p className="text-muted-foreground">
+                  Choose a conversation from the sidebar or start a new chat to begin messaging.
+                </p>
+              </div>
             </div>
           )}
         </div>
       </div>
-
-      {/* Main content area - only visible on larger screens */}
-      <div className="hidden md:flex flex-col items-center justify-center flex-1 p-6 bg-accent/5">
-        <div className="text-center space-y-4 max-w-md">
-          <MessageSquare className="h-16 w-16 text-primary/40 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold">Select a conversation</h2>
-          <p className="text-muted-foreground">
-            Choose a conversation from the sidebar or start a new chat to begin messaging.
-          </p>
-        </div>
-      </div>
-    </div>
     </>
   );
 }
