@@ -6,18 +6,18 @@ import { Button } from "@/components/ui/button"
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen bg-background ">
+    <div className="min-h-screen bg-background mb-20">
       <main>
-        <section className="py-20 dark:bg-gradient-to-b dark:from-black" id="services">
+        <section className="py-20 dark:bg-gradient-to-b dark:from-black pb-20" id="services">
           <div className="container max-w-7xl mx-auto">
-            <div className="mb-16 text-center">
+            <div className="mb-16 text-center px-8">
               <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">Our Services</h2>
               <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
                 Everything you need to build, grow, and scale your online business in one powerful platform.
               </p>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 px-8">
               <ServiceCard
                 icon={<Layers className="h-10 w-10" />}
                 title="Customizable Templates"
@@ -42,8 +42,8 @@ export default function ServicesPage() {
               />
               <ServiceCard
                 icon={<MessageSquare className="h-10 w-10" />}
-                title="Marketing Tools"
-                description="Grow your audience with built-in SEO tools, email marketing, and social media integration."
+                title="Connect with more Audience"
+                description="Join our communities for support, feedback, and inspiration from fellow entrepreneurs and experts."
                 gradientFrom="from-yellow-500"
                 gradientTo="to-amber-500"
                 className="lg:translate-y-12"
@@ -57,8 +57,8 @@ export default function ServicesPage() {
               />
               <ServiceCard
                 icon={<MessageSquare className="h-10 w-10" />}
-                title="24/7 Support"
-                description="Get help whenever you need it with our dedicated support team and extensive knowledge base."
+                title="Hire Experts"
+                description="Hire Experts for managaing your stores, Connect with top eCommerce professionals to optimize and grow your store effortlessly."
                 gradientFrom="from-red-500"
                 gradientTo="to-pink-500"
                 className="lg:translate-y-12"
@@ -67,7 +67,7 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        <section className="p-28 dark:bg-gradient-to-t from-black">
+        <section className="md:p-28 px-8  dark:bg-gradient-to-t from-black ">
           <div className="container">
             <div className="grid gap-12 lg:grid-cols-2 items-center">
               <div className="space-y-6">

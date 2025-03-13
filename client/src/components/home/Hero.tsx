@@ -37,7 +37,7 @@ export default function Hero() {
   const environmentPreset = isDarkMode ? "night" : "park"
 
   // Background color based on theme
-  const bgColor = isDarkMode ? "bg-gradient-to-b from-black via-cyan-950 to-cyan-950" : "bg-gradient-to-b from-white to-purple-200"
+  const bgColor = isDarkMode ? "bg-gradient-to-b from-black via-[#320546] md:to-pink-900 to-purple-950" : "bg-gradient-to-b from-white to-purple-200"
 
   // Heading text colors based on theme
   const headingClass = isDarkMode 
@@ -61,7 +61,7 @@ export default function Hero() {
     <main className={`relative w-full h-screen overflow-hidden ${bgColor} transition-colors duration-300`}>
       {!loaded && <LoadingScreen />}
       
-      <div className="absolute z-10 max-w-xl p-8 top-12 md:top-14 md:left-16">
+      <div className="absolute z-10 max-w-xl p-8 top-12 bg-gradient-to-b from-white via-white to-transparent dark:from-black dark:via-black dark:to-transparent md:bg-gradient-to-b md:from-transparent md:to-transparent  md:dark:bg-gradient-to-b md:dark:from-transparent md:dark:to-transparent">
         <h1 className={`pb-4 text-4xl font-bold md:text-6xl text-center md:text-left ${headingClass}`}>
           DIGI-BAZAAR
         </h1>
