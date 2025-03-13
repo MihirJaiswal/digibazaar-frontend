@@ -5,9 +5,9 @@ import { Canvas } from "@react-three/fiber"
 import { OrbitControls, Environment } from "@react-three/drei"
 import { Button } from "@/components/ui/button"
 import { useMobile } from "./use-mobile"
-import DigiBazaarScene from "./digibazaar-scene"
 import LoadingScreen from "./loading-screen"
 import { useTheme } from "next-themes"
+import DigiBazaarScene from "./digibazaar-scene"
 
 export default function Hero() {
   const [loaded, setLoaded] = useState(false)
@@ -37,7 +37,7 @@ export default function Hero() {
   const environmentPreset = isDarkMode ? "night" : "park"
 
   // Background color based on theme
-  const bgColor = isDarkMode ? "bg-gradient-to-b from-black to-purple-600" : "bg-gradient-to-b from-white to-purple-200"
+  const bgColor = isDarkMode ? "bg-gradient-to-b from-black via-cyan-950 to-cyan-950" : "bg-gradient-to-b from-white to-purple-200"
 
   // Heading text colors based on theme
   const headingClass = isDarkMode 
@@ -78,15 +78,13 @@ export default function Hero() {
         </div>
       </div>
       
-      <Canvas className="w-full h-screen" shadows camera={{ position: isMobile ? [0, 2, 8] : [-5, 2, 10], fov: 60 }}>
+      <Canvas className="w-full h-screen" shadows camera={{ position: isMobile ? [0, 2, 8] : [2, 0.1, 10], fov: 60 }}>
         <Suspense fallback={null}>
-          <DigiBazaarScene isDarkMode={isDarkMode} />
+          <DigiBazaarScene isDarkMode={true}  />
           <Environment preset={environmentPreset} />
           <OrbitControls
             enableZoom={false}
             enablePan={false}
-            autoRotate
-            autoRotateSpeed={0.5}
             maxPolarAngle={Math.PI / 2}
             minPolarAngle={Math.PI / 3}
           />
