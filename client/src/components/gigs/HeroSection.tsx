@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { ArrowRight, Briefcase, Search, Users } from "lucide-react"
+import { ArrowRight, Briefcase, Search, Star, Users } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -13,7 +13,7 @@ export default function HeroSection() {
   const [activeTab, setActiveTab] = useState("hire")
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-background to-background/80 pb-16 pt-24 md:pb-24  px-8">
+    <section className="relative overflow-hidden bg-gradient-to-b from-background to-background/80 pb-16 md:pt-24 pt-12 md:pb-24  px-8">
       {/* Background decorative elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[-10%] top-[-5%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-3xl" />
@@ -31,7 +31,7 @@ export default function HeroSection() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                Connect with top freelance talent <span className="text-primary">instantly</span>
+                Transform Your Business with   <span className="text-primary">Expert</span>
               </motion.h1>
               <motion.p
                 className="max-w-[600px] text-muted-foreground md:text-xl/relaxed"
@@ -39,7 +39,7 @@ export default function HeroSection() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
-                The easiest way to hire experts or find work in design, development, marketing, and more.
+                Whether you're setting up a store, managing inventory, or scaling your eCommerce business, we’ve got the right experts for you!
               </motion.p>
             </div>
 
@@ -51,18 +51,18 @@ export default function HeroSection() {
             >
               <Tabs defaultValue="hire" value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="hire">Hire Talent</TabsTrigger>
-                  <TabsTrigger value="work">Find Work</TabsTrigger>
+                  <TabsTrigger value="hire">Hire Professionals</TabsTrigger>
+                  <TabsTrigger value="work">Expand Your Store</TabsTrigger>
                 </TabsList>
                 <TabsContent value="hire" className="mt-4 space-y-4">
                   <Card>
                     <CardContent className="p-4">
                       <div className="flex flex-col space-y-3">
-                        <p className="text-sm text-muted-foreground">Find the perfect freelancer for your project</p>
+                        <p className="text-sm text-muted-foreground">Find top-tier specialists for store setup, marketing, SEO, product photography, inventory management, and more.</p>
                         <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
                           
                           <Button variant="outline" className="flex-1 gap-1" size="lg">
-                            Browse Freelancers <Search className="h-4 w-4" />
+                            Browse Experts <Search className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
@@ -73,10 +73,10 @@ export default function HeroSection() {
                   <Card>
                     <CardContent className="p-4">
                       <div className="flex flex-col space-y-3">
-                        <p className="text-sm text-muted-foreground">Create your profile and start finding clients</p>
+                        <p className="text-sm text-muted-foreground"> Get personalized solutions to boost sales, streamline operations, and optimize logistics.</p>
                         <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
                           <Button className="flex-1 gap-1" size="lg">
-                            Register as Freelancer <ArrowRight className="h-4 w-4" />
+                            wanna create a service? <ArrowRight className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
@@ -88,30 +88,21 @@ export default function HeroSection() {
 
             {/* Stats */}
             <motion.div
-              className="flex flex-wrap gap-4 md:gap-8"
+              className="flex items-center justify-start flex-wrap gap-4 md:gap-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">20k+ Freelancers</span>
+                <span className="text-sm font-medium">20k+ Verified Experts</span>
               </div>
               <div className="flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">10k+ Projects Completed</span>
+                <span className="text-sm font-medium">10k+ Successful Projects</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-muted"
-                    >
-                      <span className="text-[10px]">★</span>
-                    </div>
-                  ))}
-                </div>
+                <Star className="h-5 w-5 text-primary" />
                 <span className="text-sm font-medium">4.9/5 Average Rating</span>
               </div>
             </motion.div>
@@ -139,7 +130,7 @@ export default function HeroSection() {
                 <div className="flex items-center justify-between gap-2">
                   <div className="space-y-1">
                     <p className="text-xs font-medium">Sarah J.</p>
-                    <p className="text-[10px] text-muted-foreground">UI/UX Designer</p>
+                    <p className="text-[10px] text-muted-foreground">Digital marketing expert</p>
                   </div>
                   <div className="h-8 w-8 rounded-full bg-primary/20" />
                 </div>

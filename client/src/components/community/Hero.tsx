@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/5 pt-16">
+    <section className="relative overflow-hidden pt-12">
       {/* Background decorative elements */}
       <div className="absolute inset-0 z-0 opacity-30">
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />

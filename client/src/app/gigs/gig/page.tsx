@@ -212,9 +212,9 @@ function GigsPageContent() {
           {/* Page Title & Create Gig Button */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">Explore Gigs</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold">Explore Experts</h1>
               <p className="text-neutral-500 dark:text-neutral-300 mt-1">
-                Find the perfect services for your project
+                Find the perfect Experts to manage your shop.
               </p>
             </div>
             <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-sm flex items-center gap-2">

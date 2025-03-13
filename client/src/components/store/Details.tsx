@@ -242,7 +242,7 @@ export default function StoreDashboardPage() {
 
         {/* Store Details Section */}
         <Card>
-          <div className="flex items-center justify-between p-6">
+          <div className="flex flex-wrap items-center justify-between p-6">
             <div className="flex items-center gap-4">
               <Store className="h-8 w-8" />
               <div>
@@ -250,7 +250,7 @@ export default function StoreDashboardPage() {
                 <p className="text-muted-foreground">{store.subdomain}</p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 mt-4">
               <Button onClick={() => setEditOpen(true)}>
                 <Edit className="mr-2 h-4 w-4" /> Edit Store
               </Button>

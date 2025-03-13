@@ -360,14 +360,14 @@ export default function CreateGigPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || "Failed to create gig");
+        throw new Error(errorData?.message || "Failed to create a service");
       }
 
-      toast.success("Gig created successfully!");
+      toast.success("service created successfully!");
       router.push("/gigs/gig");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
-      console.error("Error creating gig:", error);
+      console.error("Error creating service:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -384,7 +384,7 @@ export default function CreateGigPage() {
           {mediaState.coverPreview ? (
             <Image
               src={mediaState.coverPreview || "./placeholder.svg" }
-              alt={formData.title || "Gig preview"}
+              alt={formData.title || "service preview"}
               quality={100}
               height={1920}
               width={1080}
@@ -405,7 +405,7 @@ export default function CreateGigPage() {
         </div>
         <div className="p-5">
           <h3 className="font-semibold text-lg line-clamp-2 mb-2">
-            {formData.title || "Your Gig Title"}
+            {formData.title || "Your service Title"}
           </h3>
           <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
             {formData.shortDesc || "Short description of your service goes here..."}
@@ -445,7 +445,7 @@ export default function CreateGigPage() {
             <div className="max-w-5xl mx-auto">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                 <div>
-                  <h1 className="text-3xl font-bold">Create a New Gig</h1>
+                  <h1 className="text-3xl font-bold">Create a New Service</h1>
                   <p className="text-muted-foreground mt-1">
                     Showcase your skills and start earning
                   </p>
@@ -615,7 +615,7 @@ export default function CreateGigPage() {
                                   />
                                 )}
                                 <p className="text-xs text-muted-foreground">
-                                  This will be the main image displayed for your gig
+                                  This will be the main image displayed for your service
                                 </p>
                               </div>
                               <div className="space-y-2">
@@ -717,7 +717,7 @@ export default function CreateGigPage() {
                           ) : (
                             <>
                               <Sparkles className="h-4 w-4" />
-                              Create Gig
+                              Create Service
                             </>
                           )}
                         </Button>
@@ -730,7 +730,7 @@ export default function CreateGigPage() {
                   <div className="sticky top-6">
                     <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                       <CheckCircle2 className="h-5 w-5 text-primary" />
-                      Gig Preview
+                      Service Preview
                     </h3>
                     <GigPreview />
                     <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
@@ -738,7 +738,7 @@ export default function CreateGigPage() {
                         <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
                         <div>
                           <h4 className="font-medium text-amber-800 dark:text-amber-400">
-                            Tips for a great gig
+                            Tips for a great Service
                           </h4>
                           <ul className="text-sm text-amber-700 dark:text-amber-300 mt-2 space-y-1 list-disc pl-4">
                             <li>Use high-quality images</li>

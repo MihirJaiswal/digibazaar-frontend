@@ -222,7 +222,7 @@ export default function OrdersDashboard() {
           <div className="max-w-7xl mx-auto">
             {/* Dashboard Title */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold">Seller Dashboard</h1>
+              <h1 className="text-3xl font-bold">Expert Dashboard</h1>
               <p className="text-gray-500 dark:text-gray-300 mt-1">Manage your orders and track your earnings</p>
             </div>
 
