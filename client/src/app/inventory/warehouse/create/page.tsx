@@ -13,6 +13,7 @@ import { Loader2, MapPin, Building2, Phone, Package, ArrowLeft } from 'lucide-re
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Header from "@/components/global/Header";
 
 const API_KEY = process.env.NEXT_PUBLIC_OPENCAGE_API_KEY;
 
@@ -129,6 +130,8 @@ const CreateWarehousePage = () => {
   };
 
   return (
+    <>
+    <Header/>
     <div className="min-h-screen bg-gradient-to-b py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <Button 
@@ -372,6 +375,7 @@ const CreateWarehousePage = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 

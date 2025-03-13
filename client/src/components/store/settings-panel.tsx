@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -40,19 +40,32 @@ export function SettingsPanel({
   token,
   onCustomizationUpdate,
 }: SettingsPanelProps) {
-  // State for customization fields
+  // Define default values
+  const defaultValues = {
+    theme: "",
+    bannerText: "",
+    bannerImage: "",
+    footerText: "",
+    backgroundColor: "#ffffff",
+    buttonColor: "#3b82f6",
+    textColor: "#000000",
+    fontFamily: "",
+    fontSize: "",
+    fontColor: "#000000",
+  };
+
+  // State for customization fields - prioritize initialCustomization values if they exist
   const [customization, setCustomization] = useState<Customization>({
-    theme: initialCustomization?.theme || "",
-    bannerText: initialCustomization?.bannerText || "",
-    // We still store an initial URL (if any) but it can be overridden by file upload
-    bannerImage: initialCustomization?.bannerImage || "",
-    footerText: initialCustomization?.footerText || "",
-    backgroundColor: initialCustomization?.backgroundColor || "#ffffff",
-    buttonColor: initialCustomization?.buttonColor || "#3b82f6",
-    textColor: initialCustomization?.textColor || "#000000",
-    fontFamily: initialCustomization?.fontFamily || "",
-    fontSize: initialCustomization?.fontSize || "",
-    fontColor: initialCustomization?.fontColor || "#000000",
+    theme: initialCustomization?.theme || defaultValues.theme,
+    bannerText: initialCustomization?.bannerText || defaultValues.bannerText,
+    bannerImage: initialCustomization?.bannerImage || defaultValues.bannerImage,
+    footerText: initialCustomization?.footerText || defaultValues.footerText,
+    backgroundColor: initialCustomization?.backgroundColor || defaultValues.backgroundColor,
+    buttonColor: initialCustomization?.buttonColor || defaultValues.buttonColor,
+    textColor: initialCustomization?.textColor || defaultValues.textColor,
+    fontFamily: initialCustomization?.fontFamily || defaultValues.fontFamily,
+    fontSize: initialCustomization?.fontSize || defaultValues.fontSize,
+    fontColor: initialCustomization?.fontColor || defaultValues.fontColor,
   });
 
   // State for banner image file upload
@@ -61,7 +74,12 @@ export function SettingsPanel({
     initialCustomization?.bannerImage || ""
   );
 
- 
+  // Debug effect to check what values are actually being used
+  useEffect(() => {
+    console.log("Initial customization:", initialCustomization);
+    console.log("Current customization state:", customization);
+  }, [initialCustomization, customization]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
     setCustomization((prev) => ({ ...prev, [id]: value }));
@@ -79,9 +97,6 @@ export function SettingsPanel({
     }
   };
 
-  // Handler for footer image file input change
-  
-
   const handleSaveChanges = async () => {
     try {
       // Determine whether to use POST or PUT based on existence of initialCustomization
@@ -92,7 +107,10 @@ export function SettingsPanel({
       const formPayload = new FormData();
       // Append text fields from customization
       for (const key in customization) {
-        formPayload.append(key, (customization as any)[key] || "");
+        // Only append if the value exists and is not undefined
+        if (customization[key as keyof Customization] !== undefined) {
+          formPayload.append(key, (customization as any)[key]);
+        }
       }
       // Append storeId
       formPayload.append("storeId", storeId);
@@ -101,7 +119,6 @@ export function SettingsPanel({
         formPayload.append("bannerImage", bannerImageFile);
       }
   
-      
       const response = await fetch(url, {
         method,
         headers: {
@@ -150,15 +167,17 @@ export function SettingsPanel({
               />
               {/* Display preview if available */}
               {bannerImagePreview && (
-                <Image
-                  src={bannerImagePreview}
-                  alt="Banner Preview"
-                  width={200}
-                  height={100}
-                  loading="lazy"
-                  quality={100}
-                  className="mt-2 w-full rounded-md object-cover"
-                />
+                <div className="mt-2">
+                  <Image
+                    src={bannerImagePreview}
+                    alt="Banner Preview"
+                    width={200}
+                    height={100}
+                    loading="lazy"
+                    quality={100}
+                    className="w-full rounded-md object-cover"
+                  />
+                </div>
               )}
             </div>
             <div className="space-y-2">
@@ -187,13 +206,13 @@ export function SettingsPanel({
                 <Input
                   id="backgroundColor"
                   type="color"
-                  value={customization.backgroundColor}
+                  value={customization.backgroundColor || defaultValues.backgroundColor}
                   onChange={handleInputChange}
                   className="h-10 w-10 p-1"
                 />
                 <Input
                   id="backgroundColor"
-                  value={customization.backgroundColor}
+                  value={customization.backgroundColor || defaultValues.backgroundColor}
                   onChange={handleInputChange}
                   className="flex-1"
                 />
@@ -205,13 +224,13 @@ export function SettingsPanel({
                 <Input
                   id="buttonColor"
                   type="color"
-                  value={customization.buttonColor}
+                  value={customization.buttonColor || defaultValues.buttonColor}
                   onChange={handleInputChange}
                   className="h-10 w-10 p-1"
                 />
                 <Input
                   id="buttonColor"
-                  value={customization.buttonColor}
+                  value={customization.buttonColor || defaultValues.buttonColor}
                   onChange={handleInputChange}
                   className="flex-1"
                 />
@@ -223,13 +242,13 @@ export function SettingsPanel({
                 <Input
                   id="textColor"
                   type="color"
-                  value={customization.textColor}
+                  value={customization.textColor || defaultValues.textColor}
                   onChange={handleInputChange}
                   className="h-10 w-10 p-1"
                 />
                 <Input
                   id="textColor"
-                  value={customization.textColor}
+                  value={customization.textColor || defaultValues.textColor}
                   onChange={handleInputChange}
                   className="flex-1"
                 />
@@ -251,7 +270,7 @@ export function SettingsPanel({
               <select
                 id="fontFamily"
                 className="w-full rounded-md border p-2"
-                value={customization.fontFamily}
+                value={customization.fontFamily || ""}
                 onChange={handleInputChange}
               >
                 <option value="">Select font</option>
@@ -266,7 +285,7 @@ export function SettingsPanel({
               <Label htmlFor="fontSize">Font Size</Label>
               <Input
                 id="fontSize"
-                value={customization.fontSize}
+                value={customization.fontSize || ""}
                 onChange={handleInputChange}
                 placeholder="e.g., 16px"
               />
@@ -277,13 +296,13 @@ export function SettingsPanel({
                 <Input
                   id="fontColor"
                   type="color"
-                  value={customization.fontColor}
+                  value={customization.fontColor || defaultValues.fontColor}
                   onChange={handleInputChange}
                   className="h-10 w-10 p-1"
                 />
                 <Input
                   id="fontColor"
-                  value={customization.fontColor}
+                  value={customization.fontColor || defaultValues.fontColor}
                   onChange={handleInputChange}
                   className="flex-1"
                 />

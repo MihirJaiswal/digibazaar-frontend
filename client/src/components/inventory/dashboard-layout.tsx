@@ -51,7 +51,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   // Mobile menu button
   const MobileMenuButton = () => (
     <button 
-      className="md:hidden fixed top-3 left-3 z-50 bg-white dark:bg-black p-4 rounded-full shadow-lg"
+      className="md:hidden fixed top-3 left-3 z-50 bg-white dark:bg-black p-4 rounded-full "
       onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
     >

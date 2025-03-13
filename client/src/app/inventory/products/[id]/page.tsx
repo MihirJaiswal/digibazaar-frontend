@@ -39,6 +39,7 @@ import ManageProductVariants from "@/components/inventory/ManageProductVariants"
 import StockMovementsTable from "@/components/inventory/StockMovementsTable";
 import ProductStock from "@/components/inventory/ProductStock";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import Header from "@/components/global/Header";
 
 // Create a QueryClient instance
 const queryClient = new QueryClient();
@@ -195,7 +196,9 @@ export function ProductDetailPageComponent() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+   <>
+   <Header/>
+   <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={() => router.back()}>
@@ -477,6 +480,7 @@ export function ProductDetailPageComponent() {
         </DialogContent>
       </Dialog>
     </div>
+   </>
   );
 }
 

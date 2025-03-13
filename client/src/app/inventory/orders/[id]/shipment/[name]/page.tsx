@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, TruckIcon, PackageIcon, CheckIcon, ArrowRightIcon, AlertTriangleIcon, BuildingIcon, ClipboardCheckIcon } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import Header from "@/components/global/Header";
 
 interface ShippingMethod {
   id: string;
@@ -143,6 +144,8 @@ export default function ShippingSelection() {
   };
 
   return (
+    <>
+    <Header/>
     <div className="container max-w-4xl mx-auto px-4 py-8">
       <Card className="shadow-xl border border-slate-200 overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 pb-6">
@@ -349,5 +352,6 @@ export default function ShippingSelection() {
         </CardFooter>
       </Card>
     </div>
+    </>
   );
 }

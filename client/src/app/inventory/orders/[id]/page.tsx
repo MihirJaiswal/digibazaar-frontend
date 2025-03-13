@@ -33,6 +33,7 @@ import { useAuthStore } from "@/store/authStore"
 // Utilities
 import { formatCurrency, formatDate } from "@/app/inventory/lib/utils"
 import Image from "next/image"
+import Header from "@/components/global/Header"
 
 // Fix for default marker icon issues in React Leaflet
 
@@ -517,6 +518,8 @@ export default function AssignInventoryPage() {
   }
 
   return (
+    <>
+    <Header/>
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -795,6 +798,7 @@ export default function AssignInventoryPage() {
         </Card>
       )}
     </div>
+    </>
   )
 }
 
