@@ -1,9 +1,9 @@
 "use client"
 
 import type React from "react"
-
+import { useState, useEffect } from "react"
 import { useAuthStore } from "@/store/authStore"
-import { Box, ClipboardList, Home, LogOut, Package, Settings, Truck, User, Warehouse } from "lucide-react"
+import { Box, ChevronRight, ClipboardList, Home, LogOut, Menu, Package, Settings, Truck, User, Warehouse, X } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -26,58 +26,128 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { logout } = useAuthStore()
   const { user } = useAuthStore()
   const pathname = usePathname()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
-    const navigation = [
-        { name: "Dashboard", href: "/inventory", icon: Home },
+  // Close mobile menu when screen size increases
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  const navigation = [
+    { name: "Dashboard", href: "/inventory", icon: Home },
     { name: "Products", href: "/inventory/products", icon: Package },
     { name: "Orders", href: "/inventory/orders", icon: ClipboardList },
     { name: "Warehouses", href: "/inventory/warehouse", icon: Warehouse },
     { name: "Stock", href: "/inventory/stock", icon: Box },
   ]
 
+  // Mobile menu button
+  const MobileMenuButton = () => (
+    <button 
+      className="md:hidden fixed top-3 left-3 z-50 bg-white dark:bg-black p-4 rounded-full shadow-lg"
+      onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+    >
+      {isMobileMenuOpen ? (
+        <X className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+      ) : (
+        <Menu className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+      )}
+    </button>
+  )
+
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
-      <div className="hidden md:flex md:flex-shrink-0 border-right border-r border-gray-800">
-        <div className="flex flex-col w-64">
-          <div className="flex flex-col flex-grow pt-5 overflow-y-auto bg-gradient-to-br from-indigo-900 to-blue-900 dark:bg-gradient dark:from-black ">
-            <div className="flex items-center flex-shrink-0 px-4 mb-5">
-              <Truck className="h-8 w-8 mr-2 text-white" />
-              <span className="text-xl font-bold text-white">WMS</span>
+    <>
+      <MobileMenuButton />
+      
+      <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-black">
+        {/* Sidebar */}
+        <div 
+          className={`
+            ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+            ${isCollapsed ? 'md:w-20' : 'md:w-64'}
+            md:translate-x-0 fixed md:relative z-40 md:flex md:flex-shrink-0
+            transition-all duration-300 ease-in-out h-full
+          `}
+        >
+          <div className={`flex flex-col h-full ${isCollapsed ? 'w-20' : 'w-64'}`}>
+            <div className="flex flex-col flex-grow overflow-y-auto bg-white dark:bg-black border-r shadow-lg">
+              {/* Logo area */}
+              <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} flex-shrink-0 px-4 h-16 border-b border-gray-200 dark:border-zinc-700`}>
+                {!isCollapsed && (
+                  <>
+                    <div className="flex items-center">
+                      <Truck className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                      <span className="ml-2 text-lg font-semibold text-gray-900 dark:text-white">WMS</span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => setIsCollapsed(true)}
+                      className="hidden md:flex"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+                {isCollapsed && (
+                  <div className="flex items-center justify-center">
+                    <Truck 
+                      className="h-6 w-6 text-indigo-600 dark:text-indigo-400" 
+                      onClick={() => setIsCollapsed(false)}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Navigation */}
+              <div className="flex flex-col flex-grow pt-5 pb-4">
+                <nav className="flex-1 px-2 space-y-1">
+                  {navigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        pathname === item.href
+                          ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-500"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-700/50 border-l-4 border-transparent",
+                        "group flex items-center px-3 py-3 text-sm font-medium transition-colors duration-150"
+                      )}
+                      title={isCollapsed ? item.name : undefined}
+                    >
+                      <item.icon className={`${isCollapsed ? 'mx-auto' : 'mr-3'} h-5 w-5`} aria-hidden="true" />
+                      {!isCollapsed && item.name}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
             </div>
-            <div className="flex flex-col flex-grow">
-              <nav className="flex-1 px-2 pb-4 space-y-1">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={cn(
-                      pathname === item.href
-                        ? "dark:bg-zinc-800 bg-blue-950 text-white"
-                        : "text-primary-foreground/70 text-gray-200 hover:bg-primary-foreground/10 hover:text-white",
-                      "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
-                    )}
-                  >
-                    <item.icon className="mr-3 h-5 w-5" aria-hidden="true" />
-                    {item.name}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-            <div className="flex-shrink-0 flex border-t bg-white dark:bg-zinc-900 border-primary-foreground/20 p-4">
+
+            {/* User profile */}
+            <div className="flex-shrink-0 flex border-t border-gray-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-800">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex items-center w-full text-sm text-left d"
-                  >
-                    <Avatar className="h-8 w-8 mr-2">
+                  <Button variant="ghost" className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'} w-full text-sm text-left text-gray-700 dark:text-gray-300`}>
+                    <Avatar className="h-8 w-8 ring-2 ring-offset-2 ring-gray-200 dark:ring-zinc-700">
                       <AvatarImage src="/placeholder-user.jpg" alt={user?.username || "User"} />
-                      <AvatarFallback>{user?.username?.charAt(0) || "U"}</AvatarFallback>
+                      <AvatarFallback className="bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-200">
+                        {user?.username?.charAt(0) || "U"}
+                      </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{user?.username || "User"}</span>
-                    </div>
+                    {!isCollapsed && (
+                      <div className="ml-2 flex flex-col">
+                        <span className="font-medium">{user?.username || "User"}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Inventory Manager</span>
+                      </div>
+                    )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -92,7 +162,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout}>
+                  <DropdownMenuItem onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    logout();
+                  }}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
@@ -101,53 +174,27 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main content */}
-      <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Mobile header */}
-        <div className="md:hidden  border-b">
-          <div className="flex items-center justify-between px-4 py-2">
-            <div className="flex items-center">
-              <Truck className="h-8 w-8 text-primary" />
-              <span className="ml-2 text-xl font-bold">WMS</span>
+        {/* Overlay when mobile menu is open */}
+        {isMobileMenuOpen && (
+          <div 
+            className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Main content */}
+        <div className="flex flex-col flex-1 overflow-hidden">
+         
+          
+          <main className="flex-1 relative overflow-y-auto focus:outline-none bg-gray-50 dark:bg-zinc-900">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
+              {children}
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Avatar>
-                    <AvatarImage src="/placeholder-user.jpg" alt={user?.username || "User"} />
-                    <AvatarFallback>{user?.username?.charAt(0) || "U"}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Navigation</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {navigation.map((item) => (
-                  <DropdownMenuItem key={item.name} asChild>
-                    <Link href={item.href} className="flex items-center">
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          </main>
         </div>
-
-        {/* Page content */}
-        <main className="flex-1 relative overflow-y-auto focus:outline-none">
-          <div className="py-6">{children}</div>
-        </main>
       </div>
-    </div>
+    </>
   )
 }
-

@@ -135,9 +135,9 @@ export default function StoresPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-b from-background to-background/60 mx-auto max-w-7xl">
+      <div className="min-h-screen mx-auto max-w-7xl">
         {/* Hero Section with Pattern Background */}
-        <div className="relative overflow-hidden py-16">
+        <div className="relative overflow-hidden py-8">
           <div className="absolute inset-0 opacity-10">
             <div
               className="absolute inset-0"
@@ -183,8 +183,8 @@ export default function StoresPage() {
         <div className="container py-12">
           {/* Category Tabs */}
           <Tabs defaultValue="all" className="mb-8">
-            <div className="flex items-center justify-between">
-              <TabsList className="grid w-full max-w-md grid-cols-5">
+            <div className="flex flex-wrap items-center justify-between">
+              <TabsList className="grid w-full max-w-md grid-cols-5 text-xs">
                 <TabsTrigger value="all" onClick={() => handleCategoryFilter("all")}>
                   All
                 </TabsTrigger>
@@ -201,10 +201,6 @@ export default function StoresPage() {
                   Food
                 </TabsTrigger>
               </TabsList>
-              <Button variant="ghost" size="sm" className="gap-1">
-                <Filter className="h-4 w-4" />
-                More Filters
-              </Button>
             </div>
           </Tabs>
 

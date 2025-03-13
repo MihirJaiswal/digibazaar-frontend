@@ -93,7 +93,7 @@ export default function Header() {
           {[
             { name: "Home", path: "/" },
             { name: "Store", path: "/store" },
-            { name: "Gigs", path: "/gigs" },
+            { name: "Experts", path: "/gigs" },
             { name: "Community", path: "/community" },
             { name: "Inventory", path: "/inventory" },
           ].map((route) => (
@@ -214,7 +214,7 @@ export default function Header() {
                 {[
                   { name: "Home", path: "/" },
                   { name: "Store", path: "/store" },
-                  { name: "Gigs", path: "/gigs" },
+                  { name: "Experts", path: "/gigs" },
                   { name: "Community", path: "/community" },
                   { name: "Inventory", path: "/inventory" },
                 ].map((route) => (

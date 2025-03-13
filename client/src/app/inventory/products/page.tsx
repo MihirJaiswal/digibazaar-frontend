@@ -336,7 +336,7 @@ function ProductsPageContent() {
   if (isLoading) {
     return (
       <>
-        <div className="container mx-auto px-4 py-6">
+        <div className="mx-auto px-4 py-6">
           <Card className="border-0 shadow-sm">
             <CardHeader>
               <Skeleton className="h-8 w-1/4" />
@@ -397,7 +397,7 @@ function ProductsPageContent() {
     <>
       <Header />
       <DashboardLayout>
-        <div className="container mx-auto px-4 py-6">
+        <div className="mx-auto md:px-4 md:py-6 ">
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
