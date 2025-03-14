@@ -18,6 +18,8 @@ import { motion } from "framer-motion";
 import { AlertCircle, FileImage, LinkIcon, Loader2, MessageSquare, Music, Send, Video } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
+import Header from "@/components/global/Header";
+import { ArrowLeft } from "lucide-react";
 
 const schema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
@@ -182,7 +184,17 @@ export default function CreateCommunityPost() {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto py-10 px-4">
+    <div className="bg-white dark:bg-zinc-900">
+    <Header/>
+    <div className="container max-w-4xl mx-auto py-8 px-4">
+      <div>
+      <Button className="mb-4"
+          onClick={() => router.push('/community/communities/posts')}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
+        </Button>
+      </div>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <Card className="border-0 shadow-xl overflow-hidden bg-gradient-to-b from-card to-background">
           <CardHeader className="pb-4 border-b bg-muted/30">
@@ -387,6 +399,7 @@ export default function CreateCommunityPost() {
           </form>
         </Card>
       </motion.div>
+    </div>
     </div>
   );
 }

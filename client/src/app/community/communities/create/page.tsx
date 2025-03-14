@@ -27,6 +27,7 @@ import { AlertCircle, ArrowLeft, ArrowRight, Check, CheckCircle2, Globe, Image a
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
+import Header from "@/components/global/Header"
 
 // Modified form schema to handle file uploads
 const formSchema = z.object({
@@ -323,7 +324,9 @@ for (const [key, value] of formData.entries()) {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4">
+    <>
+    <Header/>
+    <div className="min-h-screen bg-white dark:bg-zinc-900 py-8 px-4">
       <div className="container max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -339,8 +342,8 @@ for (const [key, value] of formData.entries()) {
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <Card className="border-0 shadow-xl overflow-hidden">
-                <CardHeader className="bg-primary/5 border-b">
+              <Card className="border shadow-xl overflow-hidden">
+                <CardHeader className="bg-white dark:bg-black border-b">
                   <CardTitle>
                     {step === 1 && "Basic Information"}
                     {step === 2 && "Community Settings"}
@@ -774,5 +777,6 @@ for (const [key, value] of formData.entries()) {
         </motion.div>
       </div>
     </div>
+    </>
   )
 }
