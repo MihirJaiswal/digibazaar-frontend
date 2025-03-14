@@ -67,8 +67,8 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        <section className="md:p-28 px-8  dark:bg-gradient-to-t from-black ">
-          <div className="container">
+        <section className="max-w-7xl mx-auto px-6 py-20 dark:bg-gradient-to-t from-black ">
+          <div>
             <div className="grid gap-12 lg:grid-cols-2 items-center">
               <div className="space-y-6">
                 <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Why Choose DigiBazar?</h2>
