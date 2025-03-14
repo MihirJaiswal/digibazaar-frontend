@@ -89,7 +89,7 @@ function OrdersPageContent() {
   return (
     <div className="min-h-screen">
       <Header />
-      <div className="flex">
+      <div className="flex bg-white dark:bg-zinc-900">
         <GigsSidebar />
         <main className="flex-1 p-6 lg:p-8">
           <div className="max-w-4xl mx-auto">
@@ -118,9 +118,9 @@ function OrdersPageContent() {
                 {orders?.map((order) => (
                   <Card
                     key={order.id}
-                    className="overflow-hidden bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md transition-shadow duration-200"
+                    className="overflow-hidden bg-white dark:bg-zinc-950 shadow-sm hover:shadow-md transition-shadow duration-200"
                   >
-                    <CardHeader className="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700 p-4">
+                    <CardHeader className="bg-gray-50 dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-700 p-4">
                       <div className="flex justify-between items-center">
                         <div>
                           <CardTitle className="text-lg font-semibold ">
@@ -141,15 +141,7 @@ function OrdersPageContent() {
                     </CardHeader>
                     <CardContent className="p-4">
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium text-gray-700 dark:text-zinc-300">
-                            {order.gig.title}
-                          </p>
-                          <p className="flex items-center text-sm text-gray-600">
-                            <User className="h-4 w-4 mr-1" />
-                            Buyer: {order.buyer?.username || "Unknown"}
-                          </p>
-                        </div>
+                       
                         <div className="flex items-center gap-4">
                           <p className="flex items-center text-sm font-medium">
                             <DollarSign className="h-4 w-4 mr-1 text-gray-400" />

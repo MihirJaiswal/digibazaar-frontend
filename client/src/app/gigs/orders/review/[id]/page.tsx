@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
+import Header from "@/components/global/Header";
 
 type GigDelivery = {
   id: string;
@@ -146,9 +147,11 @@ export default function BuyerDeliveryReview() {
   }
 
   return (
+    <div className="bg-white dark:bg-zinc-900 min-h-screen">
+    <Header/>
     <div className="max-w-4xl mx-auto p-8 shadow rounded-lg mt-8">
       <Card className="shadow-lg">
-        <CardHeader className="bg-gray-50 dark:bg-zinc-900 p-4 flex items-center justify-between">
+        <CardHeader className="bg-gray-50 dark:bg-zinc-950 p-4 flex items-center justify-between border-b">
           <CardTitle className="text-2xl font-bold">📦 Delivery Details</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -174,6 +177,6 @@ export default function BuyerDeliveryReview() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </div></div>
   );
 }

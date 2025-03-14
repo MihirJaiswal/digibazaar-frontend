@@ -203,7 +203,7 @@ export default function OrderTrackingPage() {
   return (
    <>
    <Header/>
-   <div className="p-6 lg:p-8">
+   <div className="p-6 lg:p-8 bg-white dark:bg-zinc-900">
       <div className="max-w-4xl mx-auto">
         <Button 
           variant="ghost" 

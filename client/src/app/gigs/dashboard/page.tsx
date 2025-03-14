@@ -218,7 +218,7 @@ export default function OrdersDashboard() {
         <GigsSidebar />
 
         {/* Main Content */}
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 bg-white dark:bg-zinc-900">
           <div className="max-w-7xl mx-auto">
             {/* Dashboard Title */}
             <div className="mb-8">

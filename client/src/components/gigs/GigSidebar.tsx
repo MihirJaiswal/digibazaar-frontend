@@ -282,7 +282,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
       }
       const conversation = await response.json()
       // Redirect to the messaging page with the conversation id.
-      router.push(`/chats/${conversation.id}`)
+      router.push(`/chats`)
     } catch (error: any) {
       console.error("Error creating conversation:", error)
       alert(error.message || "Failed to create conversation")
@@ -390,7 +390,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                   </Button>
                 </div>
               ) : 
-                hasOrdered && orderData?.status != "PENDING" ?(
+                hasOrdered && orderData?.status == " IN_PROGRESS" ?(
                   <div>
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <p className="text-blue-800 font-medium ">

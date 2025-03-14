@@ -192,7 +192,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <>
+    <div className="bg-white dark:bg-zinc-900 h-screen" >
     <Header/>
     <div className="container rounded-md max-w-4xl mx-auto py-8 px-4 md:px-0">
       {loading ? (
@@ -393,7 +393,7 @@ export default function ProfilePage() {
         </div>
       )}
     </div>
-    </>
+    </div>
   )
 }
 

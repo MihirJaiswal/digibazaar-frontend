@@ -181,7 +181,7 @@ export default function OrderDetailsPage() {
   return (
     <div className="min-h-screen">
       <Header />
-      <div className="flex">
+      <div className="flex bg-white dark:bg-zinc-900">
         <GigsSidebar />
         <main className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="max-w-5xl mx-auto">

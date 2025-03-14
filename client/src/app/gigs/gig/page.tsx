@@ -204,7 +204,7 @@ function GigsPageContent() {
 
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-zinc-900">
       <Header />
       <div className="flex">
         <GigsSidebar />
@@ -224,7 +224,7 @@ function GigsPageContent() {
           </div>
 
           {/* Search and Sorting */}
-          <div className="rounded-xl shadow-sm border border-neutral-200 dark:border-gray-700 p-4 mb-6">
+          <div className="rounded-xl shadow-sm border border-neutral-200 dark:border-gray-700 bg-gray-100 dark:bg-zinc-950 p-4 mb-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-grow">
                 <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />

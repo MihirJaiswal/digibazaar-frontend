@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, FileUp, LinkIcon, Loader2 } from "lucide-react"
 import { Label } from "@/components/ui/label"
+import Header from "@/components/global/Header"
 
 export default function SellerDeliveryUpload() {
   const router = useRouter()
@@ -62,7 +63,9 @@ export default function SellerDeliveryUpload() {
   }
 
   return (
-    <div className="container max-w-2xl mx-auto py-10 px-4">
+   <div className="bg-white dark:bg-zinc-900 min-h-screen">
+   <Header/>
+   <div className="container max-w-2xl mx-auto py-10 px-4">
       <Card className="shadow-lg ">
         <CardHeader className="space-y-1 bg-muted/30">
           <CardTitle className="text-2xl font-bold text-center">
@@ -136,6 +139,7 @@ export default function SellerDeliveryUpload() {
         </CardFooter>
       </Card>
     </div>
+   </div>
   )
 }
 

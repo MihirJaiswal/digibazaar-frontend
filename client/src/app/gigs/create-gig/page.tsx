@@ -438,9 +438,9 @@ export default function CreateGigPage() {
   return (
     <>
       <Header />
-      <div className="flex">
+      <div className="flex bg-white dark:bg-zinc-900">
         <GigsSidebar />
-        <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 mx-auto">
+        <div className="min-h-screen mx-auto">
           <div className="container py-12 px-4 sm:px-6" ref={formRef}>
             <div className="max-w-5xl mx-auto">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
@@ -451,7 +451,7 @@ export default function CreateGigPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground">Preview</span>
+                  <span className="text-sm">Preview</span>
                   <Switch checked={previewMode} onCheckedChange={setPreviewMode} />
                 </div>
               </div>
@@ -461,8 +461,8 @@ export default function CreateGigPage() {
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
-                  <Card className="border-0 shadow-lg overflow-hidden">
-                    <CardHeader className="bg-primary/5 border-b">
+                  <Card className="border shadow-lg overflow-hidden">
+                    <CardHeader className="bg-white dark:bg-black border-b">
                       <CardTitle>
                         <div className="flex items-center gap-2">
                           {steps[step - 1].icon}
