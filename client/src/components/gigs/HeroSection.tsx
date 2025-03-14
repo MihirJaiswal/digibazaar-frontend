@@ -13,7 +13,7 @@ export default function HeroSection() {
   const [activeTab, setActiveTab] = useState("hire")
 
   return (
-    <section className="relative overflow-hidden bg-white dark:bg-zinc-900 pb-16 md:pt-24 pt-12 md:pb-24  px-8">
+    <section className="relative overflow-hidden bg-white dark:bg-zinc-900 pb-16 md:pt-24 pt-12 md:pb-24 px-3 md:px-8">
       {/* Background decorative elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[-10%] top-[-5%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-3xl" />

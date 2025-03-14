@@ -15,7 +15,7 @@ import {
   Users,
   User,
 } from "lucide-react";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import Header from "@/components/global/Header";
@@ -67,8 +67,13 @@ export default function MergedChatsPage() {
   >({});
 
   useEffect(() => {
-    if (!token) return;
+    console.log("[DEBUG] useEffect: Fetching conversations triggered");
+    if (!token) {
+      console.log("[DEBUG] No token found. Skipping conversations fetch.");
+      return;
+    }
     const fetchConversations = async () => {
+      console.log("[DEBUG] fetchConversations: starting fetch");
       try {
         const res = await fetch(`${baseApiUrl}/conversations`, {
           headers: {
@@ -77,17 +82,19 @@ export default function MergedChatsPage() {
           },
           credentials: "include",
         });
+        console.log("[DEBUG] fetchConversations: response", res);
         if (res.ok) {
           const data = await res.json();
-          console.log("Fetched conversations:", data);
+          console.log("[DEBUG] Fetched conversations:", data);
           setConversations(data);
         } else {
-          console.error("Failed to fetch conversations. Status:", res.status);
+          console.error("[DEBUG] Failed to fetch conversations. Status:", res.status);
         }
       } catch (err) {
-        console.error("Error fetching conversations:", err);
+        console.error("[DEBUG] Error fetching conversations:", err);
       } finally {
         setLoadingConversations(false);
+        console.log("[DEBUG] fetchConversations: finished");
       }
     };
 
@@ -97,33 +104,45 @@ export default function MergedChatsPage() {
   // Helper function to compute the receiver's ID for a conversation
   const getReceiverId = (conv: Conversation) => {
     const fromParticipants = conv.participants?.find((p) => p.id !== user?.id)?.id;
-    if (fromParticipants) return fromParticipants;
-    if (conv.user1Id && conv.user2Id) {
-      return conv.user1Id === user?.id ? conv.user2Id : conv.user1Id;
+    if (fromParticipants) {
+      console.log("[DEBUG] getReceiverId: Found participant from conv:", fromParticipants);
+      return fromParticipants;
     }
+    if (conv.user1Id && conv.user2Id) {
+      const receiverId = conv.user1Id === user?.id ? conv.user2Id : conv.user1Id;
+      console.log("[DEBUG] getReceiverId: Using fallback fields, receiverId:", receiverId);
+      return receiverId;
+    }
+    console.log("[DEBUG] getReceiverId: Unable to determine receiverId");
     return undefined;
   };
 
   // For each conversation, prefetch the other user's details if not already fetched
   useEffect(() => {
-    if (!conversations.length || !token || !user?.id) return;
+    console.log("[DEBUG] useEffect: Prefetching other user's details for conversations");
+    if (!conversations.length || !token || !user?.id) {
+      console.log("[DEBUG] Skipping prefetch: conversations empty or missing token/user id");
+      return;
+    }
     conversations.forEach((conv) => {
       const receiverId = getReceiverId(conv);
       if (receiverId && !conversationUserDetails[receiverId]) {
+        console.log("[DEBUG] Fetching user details for receiverId:", receiverId);
         fetch(`${baseApiUrl}/users/${receiverId}`, {
           headers: { Authorization: `Bearer ${token}` },
           credentials: "include",
         })
           .then((res) => {
+            console.log("[DEBUG] Response for user details of", receiverId, res);
             if (res.ok) return res.json();
             throw new Error("Failed to fetch user details");
           })
           .then((data: OtherUser) => {
-            console.log("Fetched user details for", receiverId, ":", data);
+            console.log("[DEBUG] Fetched user details for", receiverId, ":", data);
             setConversationUserDetails((prev) => ({ ...prev, [receiverId]: data }));
           })
           .catch((err) => {
-            console.error("Error fetching user details for conversation list:", err);
+            console.error("[DEBUG] Error fetching user details for conversation list:", err);
           });
       }
     });
@@ -145,11 +164,13 @@ export default function MergedChatsPage() {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
+    console.log("[DEBUG] Scrolling to bottom of messages");
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   // Fetch conversation detail when a conversation is selected
   useEffect(() => {
+    console.log("[DEBUG] useEffect: Fetching conversation detail for id:", selectedConversationId);
     if (!selectedConversationId || !token) return;
     const fetchConversation = async () => {
       try {
@@ -157,15 +178,16 @@ export default function MergedChatsPage() {
           headers: { Authorization: `Bearer ${token}` },
           credentials: "include",
         });
+        console.log("[DEBUG] fetchConversation: response", res);
         if (res.ok) {
           const data = await res.json();
-          console.log("Fetched conversation detail:", data);
+          console.log("[DEBUG] Fetched conversation detail:", data);
           setConversation(data);
         } else {
-          console.error("Failed to fetch conversation. Status:", res.status);
+          console.error("[DEBUG] Failed to fetch conversation. Status:", res.status);
         }
       } catch (err) {
-        console.error("Error fetching conversation:", err);
+        console.error("[DEBUG] Error fetching conversation:", err);
       }
     };
     fetchConversation();
@@ -173,8 +195,10 @@ export default function MergedChatsPage() {
 
   // Fetch messages for the selected conversation
   useEffect(() => {
+    console.log("[DEBUG] useEffect: Fetching messages for conversation:", selectedConversationId);
     if (!selectedConversationId || !token) {
       setLoadingMessages(false);
+      console.log("[DEBUG] Skipping messages fetch due to missing conversationId or token");
       return;
     }
     const fetchMessages = async () => {
@@ -186,17 +210,19 @@ export default function MergedChatsPage() {
           },
           credentials: "include",
         });
+        console.log("[DEBUG] fetchMessages: response", res);
         if (res.ok) {
           const msgs = await res.json();
-          console.log("Fetched messages:", msgs);
+          console.log("[DEBUG] Fetched messages:", msgs);
           setMessages(msgs);
         } else {
-          console.error("Failed to fetch messages. Status:", res.status);
+          console.error("[DEBUG] Failed to fetch messages. Status:", res.status);
         }
       } catch (err) {
-        console.error("Error fetching messages:", err);
+        console.error("[DEBUG] Error fetching messages:", err);
       } finally {
         setLoadingMessages(false);
+        console.log("[DEBUG] fetchMessages: finished");
       }
     };
     fetchMessages();
@@ -208,9 +234,11 @@ export default function MergedChatsPage() {
       ? conversation.user2Id
       : conversation.user1Id
     : undefined;
+  console.log("[DEBUG] receiverIdForDetail computed as:", receiverIdForDetail);
 
   // Fetch the other user's details for the selected conversation
   useEffect(() => {
+    console.log("[DEBUG] useEffect: Fetching other user details for conversation detail");
     if (!receiverIdForDetail || !token) return;
     const fetchOtherUser = async () => {
       try {
@@ -218,15 +246,16 @@ export default function MergedChatsPage() {
           headers: { Authorization: `Bearer ${token}` },
           credentials: "include",
         });
+        console.log("[DEBUG] fetchOtherUser: response", res);
         if (res.ok) {
           const userData = await res.json();
-          console.log("Fetched other user details for chat detail:", userData);
+          console.log("[DEBUG] Fetched other user details for chat detail:", userData);
           setOtherUser(userData);
         } else {
-          console.error("Failed to fetch other user details. Status:", res.status);
+          console.error("[DEBUG] Failed to fetch other user details. Status:", res.status);
         }
       } catch (err) {
-        console.error("Error fetching other user details:", err);
+        console.error("[DEBUG] Error fetching other user details:", err);
       }
     };
     fetchOtherUser();
@@ -234,41 +263,51 @@ export default function MergedChatsPage() {
 
   // Setup socket connection for the selected conversation
   useEffect(() => {
+    console.log("[DEBUG] useEffect: Setting up socket connection for conversation:", selectedConversationId);
     if (!selectedConversationId) return;
     if (!socketRef.current) {
+      console.log("[DEBUG] Initializing socket connection");
       socketRef.current = io("http://localhost:8800", { transports: ["websocket"] });
     }
+    console.log("[DEBUG] Emitting joinRoom for", selectedConversationId);
     socketRef.current.emit("joinRoom", selectedConversationId);
     socketRef.current.on("messageReceived", (message) => {
-      console.log("New message received:", message);
+      console.log("[DEBUG] New message received via socket:", message);
       setMessages((prev) => [...prev, message]);
     });
     return () => {
+      console.log("[DEBUG] Cleaning up socket event listeners for messageReceived");
       socketRef.current?.off("messageReceived");
     };
   }, [selectedConversationId]);
 
   const sendMessage = async (e: FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !socketRef.current) return;
+    console.log("[DEBUG] sendMessage triggered with message:", newMessage);
+    if (!newMessage.trim() || !socketRef.current) {
+      console.log("[DEBUG] Message empty or socket not connected. Exiting sendMessage.");
+      return;
+    }
     setSending(true);
     const tempId = Date.now().toString();
     const messageData = {
       conversationId: selectedConversationId,
       message: {
         id: tempId,
-        userId: user?.id,
+        userId: user?.id as string,
         receiverId: receiverIdForDetail,
         content: newMessage,
         createdAt: new Date().toISOString(),
         status: "sending",
       } as Message,
     };
+    console.log("[DEBUG] Adding temporary message to state:", messageData.message);
     setMessages((prev) => [...prev, messageData.message]);
     setNewMessage("");
     socketRef.current.emit("newMessage", messageData);
-    console.log("Sent message:", messageData);
+    console.log("[DEBUG] Emitted newMessage via socket:", messageData);
     setTimeout(() => {
+      console.log("[DEBUG] Updating message status to 'sent' for tempId:", tempId);
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === tempId ? { ...msg, status: "sent" } : msg
@@ -289,6 +328,7 @@ export default function MergedChatsPage() {
   const getInitials = (text: string = "User") => text.charAt(0).toUpperCase();
 
   if (!token) {
+    console.log("[DEBUG] No token present. Rendering sign in prompt.");
     return (
       <div className="flex flex-col items-center justify-center h-[80vh] p-6">
         <div className="text-center space-y-4">
@@ -313,7 +353,7 @@ export default function MergedChatsPage() {
         <div className="w-full md:w-80 border-r p-4 overflow-y-auto">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-semibold">Conversations</h1>
-            <Button onClick={() => console.log("New chat")} size="sm" className="gap-1">
+            <Button onClick={() => { console.log("[DEBUG] New chat clicked"); }} size="sm" className="gap-1">
               <PlusCircle className="h-4 w-4" />
               <span className="hidden sm:inline">New Chat</span>
             </Button>
@@ -330,7 +370,7 @@ export default function MergedChatsPage() {
               <p className="text-sm text-muted-foreground mt-1 mb-4">
                 Start a new conversation to begin chatting
               </p>
-              <Button onClick={() => console.log("New chat")} variant="outline" className="gap-1">
+              <Button onClick={() => { console.log("[DEBUG] New chat clicked from empty state"); }} variant="outline" className="gap-1">
                 <PlusCircle className="h-4 w-4" />
                 Start a new chat
               </Button>
@@ -343,7 +383,10 @@ export default function MergedChatsPage() {
                 return (
                   <div
                     key={conv.id}
-                    onClick={() => setSelectedConversationId(conv.id)}
+                    onClick={() => {
+                      console.log("[DEBUG] Conversation clicked:", conv);
+                      setSelectedConversationId(conv.id);
+                    }}
                     className={cn(
                       "cursor-pointer hover:bg-accent transition-colors p-3 flex items-center gap-3 rounded-md border-b",
                       selectedConversationId === conv.id && "bg-accent"
@@ -390,7 +433,10 @@ export default function MergedChatsPage() {
                   variant="ghost"
                   size="icon"
                   className="md:hidden"
-                  onClick={() => setSelectedConversationId(null)}
+                  onClick={() => {
+                    console.log("[DEBUG] Back button clicked, clearing selected conversation");
+                    setSelectedConversationId(null);
+                  }}
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
@@ -500,7 +546,10 @@ export default function MergedChatsPage() {
                     type="text"
                     placeholder="Type your message..."
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={(e) => {
+                      console.log("[DEBUG] Input changed:", e.target.value);
+                      setNewMessage(e.target.value);
+                    }}
                     className="flex-1"
                     disabled={sending}
                   />

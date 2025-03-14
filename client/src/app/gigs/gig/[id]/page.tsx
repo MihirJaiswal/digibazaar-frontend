@@ -176,7 +176,7 @@ function GigDetailsPageContent() {
       <Header />
       <div className="min-h-screen flex bg-white dark:bg-zinc-900">
         <GigsSidebar />
-        <div className="container py-8 px-12">
+        <div className="container py-8 px-5 md:px-12 ">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Section – Gig Details */}
             <div className="lg:col-span-2 space-y-8">

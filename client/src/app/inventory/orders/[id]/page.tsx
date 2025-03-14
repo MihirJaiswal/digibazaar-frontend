@@ -36,9 +36,6 @@ import { formatCurrency, formatDate } from "@/app/inventory/lib/utils"
 import Image from "next/image"
 import Header from "@/components/global/Header"
 
-// Fix for default marker icon issues in React Leaflet
-
-
 // Custom marker icons
 const warehouseIcon = L.icon({
   iconUrl: "https://cdn.icon-icons.com/icons2/1883/PNG/512/storage-warehouse_121575.png",
@@ -112,9 +109,12 @@ export default function AssignInventoryPage() {
   const [order, setOrder] = useState<Order | null>(null)
   const [warehouses, setWarehouses] = useState<Warehouse[]>([])
   const [filteredWarehouses, setFilteredWarehouses] = useState<Warehouse[]>([])
-  const [selectedWarehouse, setSelectedWarehouse] = useState("select")
+  // Initialize with an empty string so that no warehouse is selected by default
+  const [selectedWarehouse, setSelectedWarehouse] = useState("")
   const [inventory, setInventory] = useState<InventoryItem[]>([])
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([])
+  // We still want to calculate the nearest warehouse for recommendation,
+  // but we won't use it to auto-select in the dropdown.
   const [nearestWarehouse, setNearestWarehouse] = useState<(Warehouse & { distance: number }) | null>(null)
   const [loading, setLoading] = useState(true)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -185,8 +185,8 @@ export default function AssignInventoryPage() {
   // Fetch order details
   useEffect(() => {
     if (!token || !_hasRehydrated) {
-      console.log("Waiting for token and rehydration to complete");
-      return;
+      console.log("Waiting for token and rehydration to complete")
+      return
     }
     const fetchOrderDetails = async () => {
       setLoading(true)
@@ -243,15 +243,15 @@ export default function AssignInventoryPage() {
 
         setWarehouses(mappedWarehouses)
 
-        // Use null for coordinates if not available
+        // Calculate the nearest warehouse for recommendation purposes
         const nearest = findNearestWarehouse(
           order?.shippingAddress?.latitude ?? null,
           order?.shippingAddress?.longitude ?? null,
           mappedWarehouses,
         )
-
-        setSelectedWarehouse(nearest?.id || "")
         setNearestWarehouse(nearest)
+        // NOTE: We are not automatically selecting the nearest warehouse;
+        // the dropdown will remain unselected until the user makes a choice.
       } catch (error) {
         console.error("Error fetching warehouses:", error)
         toast.error("Failed to load warehouses")
@@ -261,7 +261,7 @@ export default function AssignInventoryPage() {
     if (order) {
       fetchWarehouses()
     }
-  }, [order, order?.shippingAddress?.latitude, order?.shippingAddress?.longitude])
+  }, [order, order?.shippingAddress?.latitude, order?.shippingAddress?.longitude, token])
 
   // Filter warehouses with required stock
   useEffect(() => {
@@ -350,7 +350,7 @@ export default function AssignInventoryPage() {
     try {
       const res = await fetch(`http://localhost:8800/api/orders/${orderId}/assign-stock`, {
         method: "POST",
-          headers: {
+        headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
@@ -367,7 +367,7 @@ export default function AssignInventoryPage() {
       // Save selected warehouse ID to localStorage for the shipping step
       localStorage.setItem("selectedWarehouseId", selectedWarehouse)
 
-      router.push(`/inventory/orders/${orderId}/ship`)
+      router.push(`/inventory/orders`)
     } catch (error) {
       console.error("Error assigning inventory:", error)
       toast.error("Error assigning inventory")
@@ -401,8 +401,8 @@ export default function AssignInventoryPage() {
     }
 
     // If shipping address lacks coordinates, use first warehouse as center
-    const centerLat = order.shippingAddress.latitude || warehouses[0]?.coordinates?.latitude || 22.2702 // Fallback to a default latitude
-    const centerLon = order.shippingAddress.longitude || warehouses[0]?.coordinates?.longitude || 79.4258 // Fallback to a default longitude
+    const centerLat = order.shippingAddress.latitude || warehouses[0]?.coordinates?.latitude || 22.2702
+    const centerLon = order.shippingAddress.longitude || warehouses[0]?.coordinates?.longitude || 79.4258
 
     return (
       <Card className="mt-6 border-slate-200 dark:border-zinc-700 shadow-md overflow-hidden">
@@ -428,7 +428,6 @@ export default function AssignInventoryPage() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
 
-              {/* Conditionally render markers only if coordinates exist */}
               {order.shippingAddress.latitude && order.shippingAddress.longitude && (
                 <Marker
                   position={[order.shippingAddress.latitude, order.shippingAddress.longitude]}
@@ -441,7 +440,6 @@ export default function AssignInventoryPage() {
                 </Marker>
               )}
 
-              {/* Warehouses Markers */}
               {filteredWarehouses.map((warehouse) => (
                 <Marker
                   key={warehouse.id}
@@ -450,7 +448,6 @@ export default function AssignInventoryPage() {
                 >
                   <Popup className="custom-popup">
                     <div className="font-medium">🏢 {warehouse.name}</div>
-                    {/* Only show distance if shipping address coordinates exist */}
                     {order.shippingAddress.latitude && order.shippingAddress.longitude && (
                       <div className="text-sm mt-1">
                         <span className="font-medium">Distance:</span>{" "}
@@ -478,7 +475,6 @@ export default function AssignInventoryPage() {
               ))}
             </MapContainer>
 
-            {/* Map Legend */}
             <div className="absolute bottom-4 right-4 p-3 rounded-md shadow-md z-[1000] border border-slate-200 dark:border-zinc-700">
               <div className="text-sm font-medium mb-2">Map Legend</div>
               <div className="flex items-center gap-2 text-xs">
@@ -520,9 +516,9 @@ export default function AssignInventoryPage() {
 
   return (
     <div className="bg-white dark:bg-zinc-900">
-    <Header/>
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-    <Button 
+      <Header />
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <Button 
           variant="ghost" 
           className="mb-6 flex items-center text-gray-700 dark:text-gray-300 hover:text-gray-900"
           onClick={() => router.push("/inventory/orders")}
@@ -531,284 +527,284 @@ export default function AssignInventoryPage() {
           Back to Orders
         </Button>
         
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <PackageIcon className="h-6 w-6 text-primary" />
-          Assign Inventory
-        </h1>
-        <Badge
-          className={`px-3 py-1 text-sm ${
-            order.status === "ACCEPTED"
-              ? "bg-green-100 text-green-800 border-green-200"
-              : order.status === "PENDING"
-                ? "bg-yellow-100 text-yellow-800 border-yellow-200"
-                : "bg-blue-100 text-blue-800 border-blue-200"
-          }`}
-        >
-          {order.status}
-        </Badge>
-      </div>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <PackageIcon className="h-6 w-6 text-primary" />
+            Assign Inventory
+          </h1>
+          <Badge
+            className={`px-3 py-1 text-sm ${
+              order.status === "ACCEPTED"
+                ? "bg-green-100 text-green-800 border-green-200"
+                : order.status === "PENDING"
+                  ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                  : "bg-blue-100 text-blue-800 border-blue-200"
+            }`}
+          >
+            {order.status}
+          </Badge>
+        </div>
 
-      {/* Order Summary */}
-      <Card className="border-slate-200 dark:border-zinc-700 shadow-md overflow-hidden">
-        <CardHeader className=" border-b border-slate-200 dark:border-zinc-700">
-          <div className="flex items-center gap-2">
-            <InfoIcon className="h-5 w-5 text-primary" />
-            <div>
-              <CardTitle className="text-xl">Order Information</CardTitle>
-              <CardDescription>Order #{order.id}</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <CalendarIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-300">Order Date</p>
-                  <p className="font-medium">{formatDate(order.createdAt)}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <PhoneIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-300">Contact Phone</p>
-                  <p className="font-medium">{order.shippingAddress.phone}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <HomeIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-300">Shipping Address</p>
-                  <p className="font-medium">{order.shippingAddress.address}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <DollarSignIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-300">Total Amount</p>
-                  <p className="font-medium text-lg text-primary">{formatCurrency(order.totalPrice)}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <TruckIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-300">Shipping Status</p>
-                  <Badge
-                    className={`mt-1 ${
-                      order.status === "ACCEPTED"
-                        ? "bg-green-100 text-green-800 border-green-200"
-                        : order.status === "PENDING"
-                          ? "bg-yellow-100 text-yellow-800 border-yellow-200"
-                          : "bg-blue-100 text-blue-800 border-blue-200"
-                    }`}
-                  >
-                    {order.status}
-                  </Badge>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <PackageIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-300">Items Count</p>
-                  <p className="font-medium">{order.items.length} products</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Ordered Products */}
-      <Card className="mt-6 border-slate-200 dark:border-zinc-700 shadow-md">
-        <CardHeader className=" border-b border-slate-200 dark:border-zinc-700">
-          <div className="flex items-center gap-2">
-            <PackageIcon className="h-5 w-5 text-primary" />
-            <CardTitle className="text-xl">Ordered Products</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[80px]">Image</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead className="text-right">Quantity</TableHead>
-                <TableHead className="text-right">Unit Price</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {order.items.map((item) => (
-                <TableRow key={item.productId} className="hover:bg-slate-50">
-                  <TableCell>
-                    <div className="h-12 w-12 rounded-md overflow-hidden border border-slate-200 dark:border-zinc-700">
-                      <Image
-                        src={item.product?.mainImage || "/placeholder.svg?height=48&width=48"}
-                        alt={item.product?.title || "Product image"}
-                        width={48}
-                        height={48}
-                        loading="lazy"
-                        quality={100}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">{item.product?.title || "Unknown Product"}</TableCell>
-                  <TableCell className="text-right">{item.quantity}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(item.unitPrice)}</TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(item.totalPrice)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-        <CardFooter className="flex justify-end p-4  border-t border-slate-200 dark:border-zinc-700">
-          <div className="text-right">
-            <p className="text-sm text-slate-500 dark:text-slate-300">Order Total</p>
-            <p className="text-xl font-bold text-primary">{formatCurrency(order.totalPrice)}</p>
-          </div>
-        </CardFooter>
-      </Card>
-
-      {/* Warehouse Map */}
-      {order?.status === "ACCEPTED" && renderWarehouseMap()}
-
-      {/* Warehouse Selection */}
-      {order?.status === "ACCEPTED" && (
-        <Card className="mt-6 border-slate-200 dark:border-zinc-700 shadow-md">
-          <CardHeader className="border-b border-slate-200 dark:border-zinc-700">
+        {/* Order Summary */}
+        <Card className="border-slate-200 dark:border-zinc-700 shadow-md overflow-hidden">
+          <CardHeader className=" border-b border-slate-200 dark:border-zinc-700">
             <div className="flex items-center gap-2">
-              <BuildingIcon className="h-5 w-5 text-primary" />
+              <InfoIcon className="h-5 w-5 text-primary" />
               <div>
-                <CardTitle className="text-xl">Select Warehouse</CardTitle>
-                <CardDescription>Choose a warehouse with available inventory</CardDescription>
+                <CardTitle className="text-xl">Order Information</CardTitle>
+                <CardDescription>Order #{order.id}</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="p-6">
-            {loading ? (
-              <div className="flex items-center justify-center h-20">
-                <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                <span className="ml-2 text-slate-600">Loading warehouses...</span>
-              </div>
-            ) : (
-              <>
-                {nearestWarehouse && (
-                  <Alert className="mb-4 border-green-200 dark:border-zinc-700">
-                    <CheckCircleIcon className="h-4 w-4 text-green-600" />
-                    <AlertTitle className="text-green-700 font-medium">Recommended Warehouse</AlertTitle>
-                    <AlertDescription className="text-green-600">
-                      {nearestWarehouse.name} is the closest warehouse to the delivery address
-                      {nearestWarehouse.distance > 0 && ` (${nearestWarehouse.distance.toFixed(2)} km away)`}.
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                    <Select onValueChange={handleWarehouseSelect} value={selectedWarehouse}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a warehouse" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="select" className="py-3">
-                          <span className="font-medium">Select a warehouse</span>
-                        </SelectItem>
-                        {filteredWarehouses.length > 0 ? (
-                          filteredWarehouses.map((warehouse) => (
-                            <SelectItem key={warehouse.id} value={warehouse.id} className="py-3">
-                              <div className="flex items-center justify-between w-full">
-                                <span className="font-medium">{warehouse.name}</span>
-                                {order.shippingAddress.latitude && order.shippingAddress.longitude && (
-                                  <Badge variant="outline" className="ml-2">
-                                    {calculateDistance(
-                                      order.shippingAddress.latitude,
-                                      order.shippingAddress.longitude,
-                                      warehouse.coordinates.latitude,
-                                      warehouse.coordinates.longitude,
-                                    ).toFixed(2)}{" "}
-                                    km
-                                  </Badge>
-                                )}
-                              </div>
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <div className="p-3 text-slate-500 dark:text-slate-300 text-sm">
-                            No warehouse has the required products
-                          </div>
-                        )}
-                      </SelectContent>
-                    </Select>
-
-
-
-                {selectedWarehouse && inventory.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className="text-lg font-medium mb-3">Available Inventory</h3>
-                    <div className="rounded-md p-4 border border-slate-200 dark:border-zinc-700">
-                      <Table>
-                        <TableHeader className="bg-white">
-                          <TableRow>
-                            <TableHead>Product</TableHead>
-                            <TableHead className="text-right">Available</TableHead>
-                            <TableHead className="text-right">Required</TableHead>
-                            <TableHead className="text-right">Status</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {inventory.map((item) => {
-                            const orderItem = order.items.find((o) => o.productId === item.productId)
-                            const isAvailable = item.quantity >= (orderItem?.quantity || 0)
-
-                            return (
-                              <TableRow key={item.productId}>
-                                <TableCell className="font-medium">
-                                  {orderItem?.product?.title || `Product ${item.productId}`}
-                                </TableCell>
-                                <TableCell className="text-right">{item.quantity}</TableCell>
-                                <TableCell className="text-right">{orderItem?.quantity || 0}</TableCell>
-                                <TableCell className="text-right">
-                                  <Badge
-                                    className={isAvailable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
-                                  >
-                                    {isAvailable ? "Available" : "Insufficient"}
-                                  </Badge>
-                                </TableCell>
-                              </TableRow>
-                            )
-                          })}
-                        </TableBody>
-                      </Table>
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <CalendarIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-slate-500 dark:text-slate-300">Order Date</p>
+                    <p className="font-medium">{formatDate(order.createdAt)}</p>
                   </div>
-                )}
-              </>
-            )}
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <PhoneIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-slate-500 dark:text-slate-300">Contact Phone</p>
+                    <p className="font-medium">{order.shippingAddress.phone}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <HomeIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-slate-500 dark:text-slate-300">Shipping Address</p>
+                    <p className="font-medium">{order.shippingAddress.address}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <DollarSignIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-slate-500 dark:text-slate-300">Total Amount</p>
+                    <p className="font-medium text-lg text-primary">{formatCurrency(order.totalPrice)}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <TruckIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-slate-500 dark:text-slate-300">Shipping Status</p>
+                    <Badge
+                      className={`mt-1 ${
+                        order.status === "ACCEPTED"
+                          ? "bg-green-100 text-green-800 border-green-200"
+                          : order.status === "PENDING"
+                            ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                            : "bg-blue-100 text-blue-800 border-blue-200"
+                      }`}
+                    >
+                      {order.status}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <PackageIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-slate-500 dark:text-slate-300">Items Count</p>
+                    <p className="font-medium">{order.items.length} products</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </CardContent>
-          <CardFooter className="flex flex-wrap justify-between p-4 border-t border-slate-200 dark:border-zinc-700">
-            <Button variant="outline" className="mb-2">Cancel</Button>
-            <Button
-              onClick={handleAssignInventory}
-              disabled={isProcessing || !selectedWarehouse || inventory.length === 0}
-              className="gap-2"
-            >
-              {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircleIcon className="h-4 w-4" />}
-              Confirm Inventory Assignment
-              <ArrowRightIcon className="h-4 w-4 ml-1" />
-            </Button>
+          <CardFooter className="flex justify-end p-4  border-t border-slate-200 dark:border-zinc-700">
+            <div className="text-right">
+              <p className="text-sm text-slate-500 dark:text-slate-300">Order Total</p>
+              <p className="text-xl font-bold text-primary">{formatCurrency(order.totalPrice)}</p>
+            </div>
           </CardFooter>
         </Card>
-      )}
-    </div>
+
+        {/* Ordered Products */}
+        <Card className="mt-6 border-slate-200 dark:border-zinc-700 shadow-md">
+          <CardHeader className=" border-b border-slate-200 dark:border-zinc-700">
+            <div className="flex items-center gap-2">
+              <PackageIcon className="h-5 w-5 text-primary" />
+              <CardTitle className="text-xl">Ordered Products</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[80px]">Image</TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead className="text-right">Quantity</TableHead>
+                  <TableHead className="text-right">Unit Price</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {order.items.map((item) => (
+                  <TableRow key={item.productId}>
+                    <TableCell>
+                      <div className="h-12 w-12 rounded-md overflow-hidden border border-slate-200 dark:border-zinc-700">
+                        <Image
+                          src={item.product?.mainImage || "/placeholder.svg?height=48&width=48"}
+                          alt={item.product?.title || "Product image"}
+                          width={48}
+                          height={48}
+                          loading="lazy"
+                          quality={100}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">{item.product?.title || "Unknown Product"}</TableCell>
+                    <TableCell className="text-right">{item.quantity}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(item.unitPrice)}</TableCell>
+                    <TableCell className="text-right font-medium">{formatCurrency(item.totalPrice)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+          <CardFooter className="flex flex-wrap justify-between p-4 border-t border-slate-200 dark:border-zinc-700">
+            <div className="text-right">
+              <p className="text-sm text-slate-500 dark:text-slate-300">Order Total</p>
+              <p className="text-xl font-bold text-primary">{formatCurrency(order.totalPrice)}</p>
+            </div>
+          </CardFooter>
+        </Card>
+
+        {/* Warehouse Map */}
+        {order?.status === "ACCEPTED" && renderWarehouseMap()}
+
+        {/* Warehouse Selection */}
+        {order?.status === "ACCEPTED" && (
+          <Card className="mt-6 border-slate-200 dark:border-zinc-700 shadow-md">
+            <CardHeader className="border-b border-slate-200 dark:border-zinc-700">
+              <div className="flex items-center gap-2">
+                <BuildingIcon className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle className="text-xl">Select Warehouse</CardTitle>
+                  <CardDescription>Choose a warehouse with available inventory</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              {loading ? (
+                <div className="flex items-center justify-center h-20">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="ml-2 text-slate-600">Loading warehouses...</span>
+                </div>
+              ) : (
+                <>
+                  {nearestWarehouse && (
+                    <Alert className="mb-4 border-green-200 dark:border-zinc-700">
+                      <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                      <AlertTitle className="text-green-700 font-medium">Recommended Warehouse</AlertTitle>
+                      <AlertDescription className="text-green-600">
+                        {nearestWarehouse.name} is the closest warehouse to the delivery address
+                        {nearestWarehouse.distance > 0 && ` (${nearestWarehouse.distance.toFixed(2)} km away)`}.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <Select onValueChange={handleWarehouseSelect} value={selectedWarehouse}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a warehouse" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredWarehouses.length > 0 ? (
+                        filteredWarehouses.map((warehouse) => (
+                          <SelectItem key={warehouse.id} value={warehouse.id} className="py-3">
+                            <div className="flex items-center justify-between w-full">
+                              <span className="font-medium">{warehouse.name}</span>
+                              {order.shippingAddress.latitude && order.shippingAddress.longitude && (
+                                <Badge variant="outline" className="ml-2">
+                                  {calculateDistance(
+                                    order.shippingAddress.latitude,
+                                    order.shippingAddress.longitude,
+                                    warehouse.coordinates.latitude,
+                                    warehouse.coordinates.longitude,
+                                  ).toFixed(2)}{" "}
+                                  km
+                                </Badge>
+                              )}
+                            </div>
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-3 text-slate-500 dark:text-slate-300 text-sm">
+                          No warehouse has the required products
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+
+                  {selectedWarehouse && inventory.length > 0 && (
+                    <div className="mt-6">
+                      <h3 className="text-lg font-medium mb-3">Available Inventory</h3>
+                      <div className="rounded-md p-4 border border-slate-200 dark:border-zinc-700">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Product</TableHead>
+                              <TableHead className="text-right">Available</TableHead>
+                              <TableHead className="text-right">Required</TableHead>
+                              <TableHead className="text-right">Status</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {inventory.map((item) => {
+                              const orderItem = order.items.find((o) => o.productId === item.productId)
+                              const isAvailable = item.quantity >= (orderItem?.quantity || 0)
+
+                              return (
+                                <TableRow key={item.productId}>
+                                  <TableCell className="font-medium">
+                                    {orderItem?.product?.title || `Product ${item.productId}`}
+                                  </TableCell>
+                                  <TableCell className="text-right">{item.quantity}</TableCell>
+                                  <TableCell className="text-right">{orderItem?.quantity || 0}</TableCell>
+                                  <TableCell className="text-right">
+                                    <Badge
+                                      className={isAvailable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                                    >
+                                      {isAvailable ? "Available" : "Insufficient"}
+                                    </Badge>
+                                  </TableCell>
+                                </TableRow>
+                              )
+                            })}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+            <CardFooter className="flex flex-wrap justify-between p-4 border-t border-slate-200 dark:border-zinc-700">
+              <Button variant="outline" className="mb-2">Cancel</Button>
+              <Button
+                onClick={handleAssignInventory}
+                disabled={isProcessing || !selectedWarehouse || inventory.length === 0}
+                className="gap-2"
+              >
+                {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircleIcon className="h-4 w-4" />}
+                Confirm Inventory Assignment
+                <ArrowRightIcon className="h-4 w-4 ml-1" />
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
+      </div>
     </div>
   )
 }
-

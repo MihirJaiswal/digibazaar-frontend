@@ -144,11 +144,11 @@ export default function ShippingSelection() {
   };
 
   return (
-    <>
+    <div className=" bg-white dark:bg-zinc-900">
     <Header/>
     <div className="container max-w-4xl mx-auto px-4 py-8">
-      <Card className="shadow-xl border border-slate-200 overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 pb-6">
+      <Card className="shadow-xl border overflow-hidden">
+        <CardHeader className="bg-white dark:bg-zinc-950 border-b border-slate-200 dark:border-zinc-700 pb-6">
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 p-2 rounded-full">
               <TruckIcon className="h-6 w-6 text-primary" />
@@ -167,19 +167,19 @@ export default function ShippingSelection() {
             <div className="flex justify-between mt-2 text-xs text-slate-500">
               <div className={`flex flex-col items-center ${currentStep >= 1 ? "text-primary font-medium" : ""}`}>
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center mb-1 ${
-                  currentStep >= 1 ? "bg-primary text-white" : "bg-slate-200"
+                  currentStep >= 1 ? "bg-primary text-white dark:text-black" : "bg-slate-200 dark:bg-zinc-600"
                 }`}>1</div>
                 <span>Select Method</span>
               </div>
               <div className={`flex flex-col items-center ${currentStep >= 2 ? "text-primary font-medium" : ""}`}>
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center mb-1 ${
-                  currentStep >= 2 ? "bg-primary text-white" : "bg-slate-200"
+                  currentStep >= 2 ? "bg-primary text-white dark:text-black" : "bg-slate-200 dark:bg-zinc-600"
                 }`}>2</div>
                 <span>Generate Tracking</span>
               </div>
               <div className={`flex flex-col items-center ${currentStep >= 3 ? "text-primary font-medium" : ""}`}>
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center mb-1 ${
-                  currentStep >= 3 ? "bg-primary text-white" : "bg-slate-200"
+                  currentStep >= 3 ? "bg-primary text-white dark:text-black" : "bg-slate-200 dark:bg-zinc-600"
                 }`}>3</div>
                 <span>Ship Order</span>
               </div>
@@ -199,7 +199,7 @@ export default function ShippingSelection() {
           )}
 
           {warehouseId && (
-            <Alert className="mb-4 border-green-200 bg-green-50">
+            <Alert className="mb-4 border-green-200">
               <BuildingIcon className="h-4 w-4 text-green-600" />
               <AlertTitle className="font-semibold text-green-700">Warehouse Selected</AlertTitle>
               <AlertDescription className="text-green-600">
@@ -213,13 +213,13 @@ export default function ShippingSelection() {
             <div className={`transition-all duration-300 ${currentStep === 1 ? "opacity-100" : "opacity-70"}`}>
               <div className="flex items-center gap-2 mb-3">
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                  currentStep === 1 ? "bg-primary text-white" : "bg-slate-200 text-slate-600"
+                  currentStep === 1 ? "bg-primary text-white dark:text-black" : "bg-slate-200 text-slate-600 dark:bg-zinc-900 dark:text-gray-200"
                 }`}>1</div>
                 <h3 className="text-lg font-semibold">Select Shipping Method</h3>
               </div>
               
               {loading ? (
-                <div className="flex items-center gap-2 text-slate-500 p-4 bg-slate-50 rounded-lg">
+                <div className="flex items-center gap-2 text-slate-500 p-4 bg-slate-50 dark:bg-zinc-900 rounded-lg">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Loading shipping methods...</span>
                 </div>
@@ -232,9 +232,9 @@ export default function ShippingSelection() {
                   </AlertDescription>
                 </Alert>
               ) : (
-                <div className="bg-slate-50 p-4 rounded-lg">
+                <div className="p-4 rounded-lg">
                   <Select onValueChange={(value) => setSelectedMethod(value)}>
-                    <SelectTrigger className="w-full bg-white border-slate-300">
+                    <SelectTrigger className="w-full border-slate-300 dark:border-zinc-700">
                       <SelectValue placeholder="Choose a shipping method" />
                     </SelectTrigger>
                     <SelectContent>
@@ -246,7 +246,7 @@ export default function ShippingSelection() {
                               <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
                                 ${method.price}
                               </Badge>
-                              <Badge variant="secondary" className="bg-slate-100">
+                              <Badge variant="secondary" className="bg-slate-100 dark:bg-blue-800">
                                 {method.estimatedDeliveryDays} days
                               </Badge>
                             </div>
@@ -257,7 +257,7 @@ export default function ShippingSelection() {
                   </Select>
 
                   {selectedMethod && (
-                    <div className="mt-4 p-4 rounded-md bg-white border border-slate-200 shadow-sm">
+                    <div className="mt-4 p-4 rounded-md border border-slate-200 dark:border-zinc-700 shadow-sm">
                       <h4 className="font-medium text-primary mb-2 flex items-center gap-2">
                         <CheckIcon className="h-4 w-4" /> Selected Method:
                       </h4>
@@ -305,14 +305,14 @@ export default function ShippingSelection() {
               </div>
               <div className="bg-slate-50 p-4 rounded-lg">
               {trackingNumber && (
-                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 dark:border-zinc-700 rounded-md">
                   <h4 className="font-medium text-green-700 mb-2 flex items-center gap-2">
                     <ClipboardCheckIcon className="h-4 w-4" /> Tracking Information:
                   </h4>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <PackageIcon className="text-green-600 mr-2 h-4 w-4" />
-                      <code className="font-mono bg-white px-3 py-2 rounded border border-green-200 text-green-800 flex-1 text-center">
+                      <code className="font-mono bg-white px-3 py-2 rounded border border-green-200 dark:border-zinc-700 text-green-800 flex-1 text-center">
                         {trackingNumber}
                       </code>
                     </div>
@@ -334,7 +334,7 @@ export default function ShippingSelection() {
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col bg-slate-50 rounded-b-lg pt-6 pb-4 border-t border-slate-200 mt-6">
+        <CardFooter className="flex flex-col bg-slate-50 dark:bg-black rounded-b-lg pt-6 pb-4 border-t border-slate-200 dark:border-zinc-700 mt-6">
           <Button 
             onClick={handleMarkAsShipped} 
             className="w-full gap-2 bg-primary hover:bg-primary/90" 
@@ -352,6 +352,6 @@ export default function ShippingSelection() {
         </CardFooter>
       </Card>
     </div>
-    </>
+    </div>
   );
 }

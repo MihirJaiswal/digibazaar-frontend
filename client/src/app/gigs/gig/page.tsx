@@ -95,11 +95,11 @@ function GigsPageContent() {
   const itemsPerPage = 9;
 
   // Fetch categories using React Query
-  const {data: categoriesData} = useQuery({
+  const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const res = await fetch("http://localhost:8800/api/categories");
-      if (!res.ok) throw new Error
+      if (!res.ok) throw new Error("Failed to fetch categories");
       return res.json();
     },
   });
@@ -201,13 +201,14 @@ function GigsPageContent() {
     setDeliveryTime([30]);
   };
 
-
-
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900">
       <Header />
-      <div className="flex">
-        <GigsSidebar />
+      <div className="flex flex-col md:flex-row">
+        {/* Sidebar remains unchanged */}
+        <div className="w-full md:w-auto">
+          <GigsSidebar />
+        </div>
         <main className="flex-1 max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           {/* Page Title & Create Gig Button */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -238,126 +239,21 @@ function GigsPageContent() {
               </div>
 
               <div className="flex gap-3">
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="flex items-center gap-2 border-neutral-300 dark:border-gray-700 text-neutral-700"
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 border-neutral-300 dark:border-gray-700 text-neutral-700"
+                >
+                  <Filter className="h-4 w-4" />
+                  Filters
+                  {activeFilters > 0 && (
+                    <Badge
+                      variant="secondary"
+                      className="ml-1 bg-primary/10 text-primary text-xs"
                     >
-                      <Filter className="h-4 w-4" />
-                      Filters
-                      {activeFilters > 0 && (
-                        <Badge
-                          variant="secondary"
-                          className="ml-1 bg-primary/10 text-primary text-xs"
-                        >
-                          {activeFilters}
-                        </Badge>
-                      )}
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent className="w-full sm:max-w-md">
-                    <div className="flex items-center justify-between mb-6">
-                      <DialogTitle className="text-lg font-semibold">
-                        Filters
-                      </DialogTitle>
-                      {activeFilters > 0 && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={resetFilters}
-                          className="text-neutral-500 dark:text-neutral-300 hover:text-neutral-900 text-xs"
-                        >
-                          Clear all
-                        </Button>
-                      )}
-                    </div>
-
-                    <div className="space-y-6">
-                      {/* Category Filter */}
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">
-                          Category
-                        </h4>
-                        <Select
-                          value={selectedCategory}
-                          onValueChange={setSelectedCategory}
-                        >
-                          <SelectTrigger className="w-full border-neutral-300 dark:border-gray-700">
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((category) => (
-                              <SelectItem
-                                key={category.value}
-                                value={category.value}
-                              >
-                                {category.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <Separator />
-
-                      {/* Price Slider */}
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">
-                          Price Range
-                        </h4>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-neutral-500">
-                            ${priceRange[0]}
-                          </span>
-                          <span className="text-sm text-neutral-500">
-                            ${priceRange[1]}
-                          </span>
-                        </div>
-                        <Slider
-                          value={priceRange}
-                          min={0}
-                          max={300}
-                          step={5}
-                          className="py-4"
-                          onValueChange={(value) =>
-                            setPriceRange(value as [number, number])
-                          }
-                        />
-                      </div>
-
-                      <Separator />
-
-                      {/* Delivery Time Slider */}
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">
-                          Delivery Time
-                        </h4>
-                        <p className="text-sm text-neutral-500 mb-2">
-                          Up to {deliveryTime[0]} days
-                        </p>
-                        <Slider
-                          value={deliveryTime}
-                          min={1}
-                          max={30}
-                          step={1}
-                          className="py-4"
-                          onValueChange={setDeliveryTime}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <Button
-                        onClick={resetFilters}
-                        className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-900"
-                      >
-                        Reset Filters
-                      </Button>
-                    </div>
-                  </SheetContent>
-                </Sheet>
-
+                      {activeFilters}
+                    </Badge>
+                  )}
+                </Button>
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-[180px] border-neutral-300 dark:border-gray-700">
                     <div className="flex items-center gap-2">

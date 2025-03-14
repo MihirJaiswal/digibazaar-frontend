@@ -264,7 +264,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
       return
     }
     try {
-      const response = await fetch(`http://localhost:8800/api/conversations`, {
+      const response = await fetch(`${baseApiUrl}/conversations`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -281,8 +281,8 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
         throw new Error(errorData.message || "Failed to create conversation")
       }
       const conversation = await response.json()
-      // Redirect to the messaging page with the conversation id.
-      router.push(`/chats`)
+      // Redirect to the messaging page with the conversation id as a query parameter
+      router.push(`/chats?conversationId=${conversation.id}`)
     } catch (error: any) {
       console.error("Error creating conversation:", error)
       alert(error.message || "Failed to create conversation")
