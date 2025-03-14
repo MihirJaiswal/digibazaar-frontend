@@ -334,7 +334,7 @@ export default function StoreDashboardPage() {
 
         {/* Edit Store Dialog */}
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl bg-white dark:bg-zinc-900">
             <DialogHeader>
               <DialogTitle>Edit Store Settings</DialogTitle>
             </DialogHeader>
@@ -515,7 +515,7 @@ export default function StoreDashboardPage() {
 
         {/* Delete Confirmation Dialog */}
         <Dialog open={deleteConfirm} onOpenChange={setDeleteConfirm}>
-          <DialogContent>
+          <DialogContent className="bg-white dark:bg-zinc-900">
             <DialogHeader>
               <DialogTitle>Delete Store</DialogTitle>
             </DialogHeader>

@@ -135,7 +135,7 @@ export default function StoresPage() {
 
   return (
     <>
-      <div className="min-h-screen mx-auto max-w-7xl">
+      <div className="min-h-screen mx-auto max-w-7xl px-6">
         {/* Hero Section with Pattern Background */}
         <div className="relative overflow-hidden py-8">
           <div className="absolute inset-0 opacity-10">
