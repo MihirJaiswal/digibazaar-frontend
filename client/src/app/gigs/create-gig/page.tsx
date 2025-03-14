@@ -441,7 +441,7 @@ export default function CreateGigPage() {
       <div className="flex bg-white dark:bg-zinc-900">
         <GigsSidebar />
         <div className="min-h-screen mx-auto">
-          <div className="container py-12 px-4 sm:px-6" ref={formRef}>
+          <div className="container py-8" ref={formRef}>
             <div className="max-w-5xl mx-auto">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                 <div>

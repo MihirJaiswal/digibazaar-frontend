@@ -209,7 +209,7 @@ function GigsPageContent() {
         <div className="w-full md:w-auto">
           <GigsSidebar />
         </div>
-        <main className="flex-1 max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <main className="py-8 px-4 sm:px-6 lg:px-8">
           {/* Page Title & Create Gig Button */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
