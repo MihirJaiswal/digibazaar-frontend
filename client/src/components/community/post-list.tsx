@@ -176,10 +176,10 @@ export function PostList({ posts }: PostListProps) {
               <CardHeader>
                 <CardDescription>
                   <Link href={`/communities/${post.communityId}`} className="hover:underline">
-                    r/{post.community?.name}
+                    {post.community?.name}
                   </Link>
                   {" • "}
-                  <span>Posted by u/{post.author?.username}</span>
+                  <span>Posted by {post.author?.username}</span>
                   {" • "}
                   <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
                 </CardDescription>

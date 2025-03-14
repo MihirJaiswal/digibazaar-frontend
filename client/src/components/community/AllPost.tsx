@@ -2,9 +2,21 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowUpIcon, ArrowDownIcon, MessageSquare, Share2 } from "lucide-react";
+import {
+  ArrowUpIcon,
+  ArrowDownIcon,
+  MessageSquare,
+  Share2,
+} from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import axios from "axios";
@@ -17,9 +29,7 @@ interface Post {
   id: string;
   title: string;
   communityId: string;
-  community?: {
-    name: string;
-  };
+  // Removing community property since we fetch it separately
   createdAt: string;
   image?: string;
   content: string;
@@ -57,6 +67,27 @@ const PostCard: React.FC<PostCardProps> = React.memo(function PostCard({
   user,
   router,
 }) {
+  // State to store the fetched community name
+  const [communityName, setCommunityName] = useState<string>("Loading community...");
+
+  // Fetch community details based on the communityId
+  useEffect(() => {
+    async function fetchCommunity() {
+      try {
+        const res = await axios.get(`http://localhost:8800/api/communities/${post.communityId}`);
+        // Assuming the API returns an object with a "name" property
+        setCommunityName(res.data.name);
+      } catch (error) {
+        console.error("Error fetching community name:", error);
+        setCommunityName("Community not found");
+      }
+    }
+    fetchCommunity();
+  }, [post.communityId]);
+
+  // Log the post to check its structure
+  console.log("Rendering PostCard for post:", post);
+
   return (
     <Card key={post.id} className="rounded-md">
       <div className="flex">
@@ -65,7 +96,9 @@ const PostCard: React.FC<PostCardProps> = React.memo(function PostCard({
             variant="ghost"
             size="icon"
             className={`rounded-full h-8 w-8 ${liked ? "bg-blue-500" : ""}`}
-            onClick={() => (user ? onLike(post.id) : router.push("/auth/login"))}
+            onClick={() =>
+              user ? onLike(post.id) : router.push("/auth/login")
+            }
             disabled={liked}
           >
             <ArrowUpIcon className="h-4 w-4" />
@@ -75,7 +108,9 @@ const PostCard: React.FC<PostCardProps> = React.memo(function PostCard({
             variant="ghost"
             size="icon"
             className="rounded-full h-8 w-8"
-            onClick={() => (user ? onUnlike(post.id) : router.push("/auth/login"))}
+            onClick={() =>
+              user ? onUnlike(post.id) : router.push("/auth/login")
+            }
             disabled={!liked}
           >
             <ArrowDownIcon className="h-4 w-4" />
@@ -85,11 +120,18 @@ const PostCard: React.FC<PostCardProps> = React.memo(function PostCard({
           <CardHeader>
             <CardTitle>{post.title}</CardTitle>
             <CardDescription>
-              <Link href={`/communities/${post.communityId}`} className="hover:underline">
-                r/{post.community?.name}
+              <Link
+                href={`/community/communities/${post.communityId}`}
+                className="hover:underline"
+              >
+                {communityName}
               </Link>
               {" • "}
-              <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
+              <span>
+                {formatDistanceToNow(new Date(post.createdAt), {
+                  addSuffix: true,
+                })}
+              </span>
             </CardDescription>
           </CardHeader>
           {post.image && (
@@ -105,11 +147,15 @@ const PostCard: React.FC<PostCardProps> = React.memo(function PostCard({
             </CardContent>
           )}
           <CardContent>
-            <p className="line-clamp-3 text-sm text-muted-foreground">{post.content}</p>
+            <p className="line-clamp-3 text-sm text-muted-foreground">
+              {post.content}
+            </p>
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button variant="ghost" size="sm" asChild>
-              <Link href={`/community/posts/${post.id}`}>
+              <Link
+                href={`/community/communities/${post.communityId}/posts/${post.id}`}
+              >
                 <MessageSquare className="h-4 w-4" />
                 {commentCount} Comments
               </Link>
@@ -139,7 +185,10 @@ export default function Posts() {
   useEffect(() => {
     async function fetchPosts(): Promise<void> {
       try {
-        const { data } = await axios.get<Post[]>("http://localhost:8800/api/community-posts");
+        const { data } = await axios.get<Post[]>(
+          "http://localhost:8800/api/community-posts"
+        );
+        console.log("Posts fetched:", data);
         setPosts(data);
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -163,7 +212,10 @@ export default function Posts() {
         posts.map(async (post) => {
           // Fetch comment counts
           try {
-            const res = await axios.get<Comment[]>(`http://localhost:8800/api/community-comments/${post.id}/comments`);
+            const res = await axios.get<any>(
+              `http://localhost:8800/api/community-comments/${post.id}/comments`
+            );
+            console.log(`Comments for post ${post.id}:`, res.data);
             commentCountsTemp[post.id] = res.data.length;
           } catch (error) {
             console.error(`Error fetching comments for post ${post.id}:`, error);
@@ -172,11 +224,17 @@ export default function Posts() {
 
           // Fetch likes and liked status
           try {
-            const res = await axios.get<Like[]>(`http://localhost:8800/api/community-posts/${post.id}/likes`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
+            const res = await axios.get<Like[]>(
+              `http://localhost:8800/api/community-posts/${post.id}/likes`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+            console.log(`Likes for post ${post.id}:`, res.data);
             likeCountsTemp[post.id] = res.data.length;
-            likedStatusTemp[post.id] = res.data.some((like) => like.userId === user?.id);
+            likedStatusTemp[post.id] = res.data.some(
+              (like) => like.userId === user?.id
+            );
           } catch (error) {
             console.error(`Error fetching likes for post ${post.id}:`, error);
             likeCountsTemp[post.id] = 0;
@@ -194,51 +252,63 @@ export default function Posts() {
   }, [posts, token, user]);
 
   // Memoized like handler
-  const handleLike = useCallback(async (postId: string): Promise<void> => {
-    try {
-      await axios.post(
-        `http://localhost:8800/api/community-posts/${postId}/like`,
-        { userId: user?.id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success("Post liked!");
-      setLikeCounts((prev) => ({ ...prev, [postId]: (prev[postId] || 0) + 1 }));
-      setLikedStatus((prev) => ({ ...prev, [postId]: true }));
-    } catch (error) {
-      toast.error("Failed to like post");
-      console.error("Error liking post:", error);
-    }
-  }, [token, user]);
+  const handleLike = useCallback(
+    async (postId: string): Promise<void> => {
+      try {
+        await axios.post(
+          `http://localhost:8800/api/community-posts/${postId}/like`,
+          { userId: user?.id },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast.success("Post liked!");
+        setLikeCounts((prev) => ({ ...prev, [postId]: (prev[postId] || 0) + 1 }));
+        setLikedStatus((prev) => ({ ...prev, [postId]: true }));
+      } catch (error) {
+        toast.error("Failed to like post");
+        console.error("Error liking post:", error);
+      }
+    },
+    [token, user]
+  );
 
   // Memoized unlike handler
-  const handleUnlike = useCallback(async (postId: string): Promise<void> => {
-    try {
-      await axios.post(
-        `http://localhost:8800/api/community-posts/${postId}/unlike`,
-        { userId: user?.id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success("Post unliked!");
-      setLikeCounts((prev) => ({
-        ...prev,
-        [postId]: Math.max((prev[postId] || 0) - 1, 0),
-      }));
-      setLikedStatus((prev) => ({ ...prev, [postId]: false }));
-    } catch (error) {
-      toast.error("Failed to unlike post");
-      console.error("Error unliking post:", error);
-    }
-  }, [token, user]);
+  const handleUnlike = useCallback(
+    async (postId: string): Promise<void> => {
+      try {
+        await axios.post(
+          `http://localhost:8800/api/community-posts/${postId}/unlike`,
+          { userId: user?.id },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast.success("Post unliked!");
+        setLikeCounts((prev) => ({
+          ...prev,
+          [postId]: Math.max((prev[postId] || 0) - 1, 0),
+        }));
+        setLikedStatus((prev) => ({ ...prev, [postId]: false }));
+      } catch (error) {
+        toast.error("Failed to unlike post");
+        console.error("Error unliking post:", error);
+      }
+    },
+    [token, user]
+  );
 
   if (loading) {
-    return <p className="text-center py-10 text-muted-foreground">Loading posts...</p>;
+    return (
+      <p className="text-center py-10 text-muted-foreground">
+        Loading posts...
+      </p>
+    );
   }
 
   if (posts.length === 0) {
     return (
       <div className="text-center py-10">
         <h3 className="text-lg font-medium">No posts yet</h3>
-        <p className="text-muted-foreground mt-2">Be the first to post something!</p>
+        <p className="text-muted-foreground mt-2">
+          Be the first to post something!
+        </p>
       </div>
     );
   }

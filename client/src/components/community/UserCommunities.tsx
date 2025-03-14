@@ -101,7 +101,7 @@ export default function UserCommunities() {
                   </div>
                 )}
                 <div className="flex flex-col gap-2 justify-start items-start ml-2">
-                <CardTitle>r/{community.name}</CardTitle>
+                <CardTitle>{community.name}</CardTitle>
                 <CardDescription className="flex items-center gap-1">
                 <Users className="h-3 w-3" />
                 <span>{memberCounts[community.id] || 0} members</span>
@@ -122,7 +122,7 @@ export default function UserCommunities() {
           </Card>
         ))
       ) : (
-        <p className="text-gray-600 text-center col-span-3">You haven&apos;t joined any communities yet.</p>
+        <p className="text-gray-600 dark:text-gray-300 text-center col-span-3">You haven&apos;t joined any communities yet.</p>
       )}
     </div>
   );

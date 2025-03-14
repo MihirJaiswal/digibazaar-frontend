@@ -10,11 +10,10 @@ export default function page() {
       <Header />
       <div className='flex'>
         <Sidebar/>
-        <div className='flex-1 mx-auto px-12'>
+        <div className='flex-1 mx-auto px-10 bg-white dark:bg-zinc-900'>
             <CommunityList/>
         </div>
       </div>
-      <Footer/>
     </>
   )
 }

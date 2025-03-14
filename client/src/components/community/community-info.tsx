@@ -77,48 +77,57 @@ export function CommunityInfo({ community }: CommunityInfoProps) {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-muted/30 w-full rounded-lg">
-      {/* Left Section (Community Icon & Info) */}
-      <div className="flex items-center space-x-4">
-        {/* Community Icon */}
-        {community.image ? (
-          <Image
-            src={community.image}
-            alt="Community Icon"
-            width={80}
-            height={80}
-            className="rounded-full w-20 h-20 border-gray-200 shadow-md"
-          />
-        ) : (
-          <div className="w-20 h-20 rounded-full bg-gray-300 dark:bg-gray-700 border-4 border-gray-200 shadow-md"></div>
-        )}
+    <div className="flex flex-col w-full rounded-lg bg-blue-100 dark:bg-zinc-950 p-4">
+      {/* Community Content Container */}
+      <div className="flex flex-col w-full gap-4">
+        {/* Community Icon & Info - stack on mobile, row on larger screens */}
+        <div className="flex flex-col items-center sm:flex-row sm:items-start gap-4">
+          {/* Community Icon - centered on mobile */}
+          <div className="flex-shrink-0">
+            {community.image ? (
+              <Image
+                src={community.image}
+                alt="Community Icon"
+                width={80}
+                height={80}
+                className="rounded-full w-16 h-16 sm:w-20 sm:h-20 border-gray-200 shadow-md"
+              />
+            ) : (
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gray-300 dark:bg-zinc-950 border-4 border-gray-200 shadow-md"></div>
+            )}
+          </div>
 
-        {/* Community Info */}
-        <div className="text-center sm:text-left">
-          <h1 className="text-2xl font-bold">{community.name}</h1>
-          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
-            <div className="flex items-center gap-1">
-              <Users className="h-4 w-4" />
-              <span>{memberCount} members</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <CalendarDays className="h-4 w-4" />
-              <span>Created {formatDistanceToNow(new Date(community.createdAt), { addSuffix: true })}</span>
+          {/* Community Info - text centered on mobile, left aligned on larger screens */}
+          <div className="text-center sm:text-left">
+            <h1 className="text-xl sm:text-2xl font-bold">{community.name}</h1>
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <div className="flex items-center gap-1">
+                <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span>{memberCount} members</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <CalendarDays className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-xs sm:text-sm">
+                  Created {formatDistanceToNow(new Date(community.createdAt), { addSuffix: true })}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Right Section (Join/Leave Button) */}
-      {user && (
-        <Button
-          className="px-5 py-2 rounded-full text-sm mt-4 sm:mt-0 sm:ml-auto bg-gradient-to-r from-purple-500 to-cyan-600 text-white"
-          variant={isMember ? "outline" : "default"}
-          onClick={handleJoinLeave}
-        >
-          {isMember ? "Leave" : "Join"} Community
-        </Button>
-      )}
+        {/* Join/Leave Button - full width on mobile */}
+        {user && (
+          <div className="w-full sm:flex sm:justify-end mt-2 sm:mt-0">
+            <Button
+              className="w-full sm:w-auto px-4 py-2 rounded-full text-sm bg-gradient-to-r from-purple-500 to-cyan-600 text-white"
+              variant={isMember ? "outline" : "default"}
+              onClick={handleJoinLeave}
+            >
+              {isMember ? "Leave" : "Join"} Community
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,146 +1,185 @@
 import Image from "next/image"
 import { ChevronDown, Plus, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { motion } from "framer-motion"
+
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden pt-12">
+    <section className="relative min-h-screen overflow-hidden bg-white dark:bg-zinc-900 px-4 py-8 md:px-5 md:py-10">
       {/* Background decorative elements */}
-      <div className="absolute inset-0 z-0 opacity-30">
-        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute top-1/2 -left-20 h-60 w-60 rounded-full bg-secondary/20 blur-3xl" />
-      </div>
+      <motion.div 
+        className="absolute inset-0 z-0 opacity-30"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.3 }}
+        transition={{ duration: 1.5 }}
+      >
+        <motion.div 
+          className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/20 blur-3xl" 
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.7, 1, 0.7] 
+          }}
+          transition={{ 
+            duration: 8, 
+            repeat: Infinity,
+            repeatType: "reverse" 
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/2 -left-20 h-60 w-60 rounded-full bg-secondary/20 blur-3xl"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.8, 1, 0.8]  
+          }}
+          transition={{ 
+            duration: 10, 
+            repeat: Infinity,
+            repeatType: "reverse",
+            delay: 2
+          }}
+        />
+      </motion.div>
 
       <div className="container relative z-10 px-4 md:px-6">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-8">
           {/* Left column - Text content */}
-          <div className="flex flex-col justify-center space-y-8">
+          <motion.div 
+            className="flex flex-col justify-center space-y-6 md:space-y-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             <div className="space-y-4">
-              <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary">
-                <Users className="mr-2 h-4 w-4" />
-                Join 50,000+ community members
-              </div>
+              <motion.h1 
+                className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-blue-400 to-cyan-500"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                Join the Ultimate <span className="text-primary">eCommerce Hub</span>
+              </motion.h1>
 
-              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl  bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-blue-400 to-cyan-500">
-                Connect with your <span className="text-primary">perfect</span> community
-              </h1>
-
-              <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                Discover, join, and contribute to communities that match your interests. Share ideas, get feedback, and
-                build connections that matter.
-              </p>
+              <motion.p 
+                className="max-w-[600px] text-sm md:text-base lg:text-xl text-muted-foreground"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+              >
+                Connect with store owners, warehouse managers, and eCommerce professionals to share insights, discuss
+                strategies, and scale your business to new heights.
+              </motion.p>
             </div>
 
             {/* Community selection */}
-            <div className="space-y-4">
+            <motion.div 
+              className="space-y-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9, duration: 0.8 }}
+            >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <div className="relative w-full sm:w-[240px]">
-                  <Button variant="outline" className="w-full justify-between">
-                    Select a community
-                    <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button className="w-full sm:w-auto">
+                    <Plus className="mr-2 h-4 w-4" /> Start a Discussion
                   </Button>
-                </div>
-
-                <Button className="w-full sm:w-auto">
-                  <Plus className="mr-2 h-4 w-4" /> Create Post
-                </Button>
+                </motion.div>
               </div>
 
-              <p className="text-sm text-muted-foreground">Select a community to create a post</p>
-            </div>
-          </div>
+              <p className="text-sm text-muted-foreground">Ask questions, get expert advice, and grow your business.</p>
+            </motion.div>
+          </motion.div>
 
           {/* Right column - Visual content */}
           <div className="relative flex items-center justify-center lg:justify-end">
-            <div className="relative h-[400px] w-full max-w-[500px] overflow-hidden rounded-lg border bg-background/50 shadow-xl backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80" />
+  <motion.div 
+    className="relative h-[380px] sm:h-[420px] md:h-[460px] w-full max-w-[500px] overflow-hidden rounded-lg border bg-background/50 shadow-xl backdrop-blur-sm flex flex-col items-center justify-center"
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.3, duration: 0.8 }}
+  >
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80" />
+    
+    {/* Community Cards */}
+    <motion.div 
+      className="absolute left-4 top-6 sm:top-8 h-[160px] sm:h-[180px] w-[250px] sm:w-[280px] rounded-lg bg-card p-3 sm:p-4 shadow-lg"
+      initial={{ x: -100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ delay: 0.6, duration: 0.8 }}
+    >
+      <h3 className="font-semibold text-sm sm:text-base">eCommerce Growth Hacks</h3>
+      <p className="text-xs text-muted-foreground">20,453 members</p>
+      <p className="text-xs sm:text-sm mt-2 sm:mt-4">Discuss marketing strategies, SEO tips, and sales-boosting techniques.</p>
+      <Button size="sm" variant="outline" className="w-full mt-2 sm:mt-3 text-xs sm:text-sm">
+        Join Now
+      </Button>
+    </motion.div>
 
-              {/* Community cards */}
-              <div className="absolute left-4 top-8 h-[180px] w-[280px] rounded-lg bg-card p-4 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-primary">
-                    <Image
-                      src="/placeholder.svg?height=48&width=48"
-                      alt="Community"
-                      width={48}
-                      height={48}
-                      className="object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Design Enthusiasts</h3>
-                    <p className="text-xs text-muted-foreground">12,453 members</p>
-                  </div>
-                </div>
-                <div className="mt-4 space-y-2">
-                  <p className="text-sm">Latest discussions on UI/UX trends and tools for modern design workflows.</p>
-                  <Button size="sm" variant="outline" className="w-full">
-                    Join Community
-                  </Button>
-                </div>
-              </div>
+    <motion.div 
+      className="absolute bottom-6 sm:bottom-8 right-4 h-[160px] sm:h-[180px] w-[250px] sm:w-[280px] rounded-lg bg-card p-3 sm:p-4 shadow-lg"
+      initial={{ x: 100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ delay: 0.9, duration: 0.8 }}
+    >
+      <h3 className="font-semibold text-sm sm:text-base">Warehouse & Logistics</h3>
+      <p className="text-xs text-muted-foreground">12,762 members</p>
+      <p className="text-xs sm:text-sm mt-2 sm:mt-4">Optimize inventory management, shipping, and warehouse automation.</p>
+      <Button size="sm" variant="outline" className="w-full mt-2 sm:mt-3 text-xs sm:text-sm">
+        Join Now
+      </Button>
+    </motion.div>
+  </motion.div>
 
-              <div className="absolute bottom-8 right-4 h-[180px] w-[280px] rounded-lg bg-card p-4 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-primary">
-                    <Image
-                      src="/placeholder.svg?height=48&width=48"
-                      alt="Community"
-                      width={48}
-                      height={48}
-                      className="object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Tech Innovators</h3>
-                    <p className="text-xs text-muted-foreground">8,762 members</p>
-                  </div>
-                </div>
-                <div className="mt-4 space-y-2">
-                  <p className="text-sm">
-                    Discuss emerging technologies and share your innovative projects with peers.
-                  </p>
-                  <Button size="sm" variant="outline" className="w-full">
-                    Join Community
-                  </Button>
-                </div>
-              </div>
+  {/* Center Logo */}
+  <motion.div 
+    className="absolute md:left-1/2 top-44 -translate-x-1/2 -translate-y-1/2 transform z-20"
+    initial={{ scale: 0, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    transition={{ delay: 1.2, duration: 0.8, type: "spring", stiffness: 200 }}
+  >
+    <motion.div 
+      className="flex h-16 w-16 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
+      whileHover={{ scale: 1.1, rotate: 10 }}
+      whileTap={{ scale: 0.9 }}
+    >
+      <Image
+        src="/logo.png"
+        alt="Community"
+        width={96}
+        height={96}
+        className="object-cover rounded-full"
+      />
+    </motion.div>
+  </motion.div>
+</div>
 
-              {/* Center icon */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">
-                  <Image
-                    src="/logo.png"
-                    alt="Community"
-                    width={64}
-                    height={64}
-                    className="object-cover"
-                    />
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Stats section */}
-        <div className="mt-16 grid grid-cols-2 gap-4 pb-16 sm:grid-cols-4 md:mt-24">
-          {[
-            { label: "Communities", value: "500+" },
-            { label: "Active Members", value: "50K+" },
-            { label: "Posts Daily", value: "2.5K+" },
-            { label: "Countries", value: "120+" },
+        <div className="mt-12 md:mt-16 lg:mt-24 grid grid-cols-2 gap-3 sm:gap-4 pb-8 sm:pb-16 sm:grid-cols-4">
+          {[ 
+            { label: "Business Owners", value: "30K+" },
+            { label: "Active Discussions", value: "5K+" },
+            { label: "Expert Insights Daily", value: "1.2K+" },
+            { label: "Countries Represented", value: "80+" },
           ].map((stat, i) => (
-            <div
+            <motion.div
               key={i}
-              className="flex flex-col items-center justify-center rounded-lg border bg-card p-4 text-center"
+              className="flex flex-col items-center justify-center rounded-lg border bg-card p-3 sm:p-4 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + (i * 0.1), duration: 0.5 }}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
             >
-              <span className="text-2xl font-bold sm:text-3xl">{stat.value}</span>
-              <span className="text-sm text-muted-foreground">{stat.label}</span>
-            </div>
+              <span className="text-xl sm:text-2xl lg:text-3xl font-bold">{stat.value}</span>
+              <span className="text-xs sm:text-sm text-muted-foreground">{stat.label}</span>
+            </motion.div>
           ))}
         </div>
       </div>
     </section>
   )
 }
-

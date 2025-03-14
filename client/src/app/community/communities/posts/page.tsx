@@ -7,7 +7,7 @@ export default function page() {
   return (
     <>
     <Header/>
-    <div className='flex'>
+    <div className='flex bg-white dark:bg-zinc-900'>
       <Sidebar/>
       <div className='flex-1 p-6'>
         <Posts/>

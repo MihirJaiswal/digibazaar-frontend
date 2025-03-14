@@ -20,7 +20,7 @@ const MainPage = () => {
         
         <Sidebar />
         {/* ✅ Dynamic Content Based on Route */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 ">
           {pathname === "/community" && <Hero/> }
           {pathname === "/community/posts" && <Posts />}
           {user && pathname === "/community/user/posts" && <UserPosts />}
