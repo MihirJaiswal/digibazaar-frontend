@@ -247,7 +247,7 @@ function DashboardContent() {
   return (
     <>
       {/* Key Metrics */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8 max-w-7xl mx-auto">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8 max-w-7xl mx-auto p-6 md:p-0">
         <Card className="overflow-hidden border-l-4 border-l-blue-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2 bg-blue-50 dark:bg-blue-950/20">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -321,7 +321,7 @@ function DashboardContent() {
       </div>
 
       {/* Tabs for different dashboard sections */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8  max-w-7xl mx-auto">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8  max-w-7xl mx-auto p-6 md:p-0">
         <TabsList className="grid w-full grid-cols-3 md:w-auto md:inline-flex">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>

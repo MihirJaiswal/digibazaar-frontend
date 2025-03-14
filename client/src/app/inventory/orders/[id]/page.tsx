@@ -27,6 +27,7 @@ import {
   HomeIcon,
   CalendarIcon,
   DollarSignIcon,
+  ArrowLeft
 } from "lucide-react"
 import { useAuthStore } from "@/store/authStore"
 
@@ -380,10 +381,10 @@ export default function AssignInventoryPage() {
     // If no warehouses or no shipping address, don't render map
     if (!order?.shippingAddress || warehouses.length === 0) {
       return (
-        <Card className="mt-4 border-slate-200 shadow-md">
+        <Card className="mt-4 border-slate-200 dark:border-zinc-700 shadow-md ">
           <CardHeader className="border-b border-slate-200">
             <div className="flex items-center gap-2">
-              <MapPinIcon className="h-5 w-5 text-slate-500" />
+              <MapPinIcon className="h-5 w-5 text-slate-500 -z-10" />
               <CardTitle className="text-xl">Warehouse Locations</CardTitle>
             </div>
           </CardHeader>
@@ -404,7 +405,7 @@ export default function AssignInventoryPage() {
     const centerLon = order.shippingAddress.longitude || warehouses[0]?.coordinates?.longitude || 79.4258 // Fallback to a default longitude
 
     return (
-      <Card className="mt-6 border-slate-200 shadow-md overflow-hidden">
+      <Card className="mt-6 border-slate-200 dark:border-zinc-700 shadow-md overflow-hidden">
         <CardHeader className=" border-b border-slate-200 pb-4">
           <div className="flex items-center gap-2">
             <MapPinIcon className="h-5 w-5 text-primary" />
@@ -478,7 +479,7 @@ export default function AssignInventoryPage() {
             </MapContainer>
 
             {/* Map Legend */}
-            <div className="absolute bottom-4 right-4 p-3 rounded-md shadow-md z-[1000] border border-slate-200">
+            <div className="absolute bottom-4 right-4 p-3 rounded-md shadow-md z-[1000] border border-slate-200 dark:border-zinc-700">
               <div className="text-sm font-medium mb-2">Map Legend</div>
               <div className="flex items-center gap-2 text-xs">
                 <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
@@ -518,9 +519,18 @@ export default function AssignInventoryPage() {
   }
 
   return (
-    <>
+    <div className="bg-white dark:bg-zinc-900">
     <Header/>
     <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <Button 
+          variant="ghost" 
+          className="mb-6 flex items-center text-gray-700 dark:text-gray-300 hover:text-gray-900"
+          onClick={() => router.push("/inventory/orders")}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Orders
+        </Button>
+        
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <PackageIcon className="h-6 w-6 text-primary" />
@@ -540,8 +550,8 @@ export default function AssignInventoryPage() {
       </div>
 
       {/* Order Summary */}
-      <Card className="border-slate-200 shadow-md overflow-hidden">
-        <CardHeader className=" border-b border-slate-200">
+      <Card className="border-slate-200 dark:border-zinc-700 shadow-md overflow-hidden">
+        <CardHeader className=" border-b border-slate-200 dark:border-zinc-700">
           <div className="flex items-center gap-2">
             <InfoIcon className="h-5 w-5 text-primary" />
             <div>
@@ -554,25 +564,25 @@ export default function AssignInventoryPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <CalendarIcon className="h-5 w-5 text-slate-500 mt-0.5" />
+                <CalendarIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
                 <div>
-                  <p className="text-sm text-slate-500">Order Date</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-300">Order Date</p>
                   <p className="font-medium">{formatDate(order.createdAt)}</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <PhoneIcon className="h-5 w-5 text-slate-500 mt-0.5" />
+                <PhoneIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
                 <div>
-                  <p className="text-sm text-slate-500">Contact Phone</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-300">Contact Phone</p>
                   <p className="font-medium">{order.shippingAddress.phone}</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <HomeIcon className="h-5 w-5 text-slate-500 mt-0.5" />
+                <HomeIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
                 <div>
-                  <p className="text-sm text-slate-500">Shipping Address</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-300">Shipping Address</p>
                   <p className="font-medium">{order.shippingAddress.address}</p>
                 </div>
               </div>
@@ -580,17 +590,17 @@ export default function AssignInventoryPage() {
 
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <DollarSignIcon className="h-5 w-5 text-slate-500 mt-0.5" />
+                <DollarSignIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
                 <div>
-                  <p className="text-sm text-slate-500">Total Amount</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-300">Total Amount</p>
                   <p className="font-medium text-lg text-primary">{formatCurrency(order.totalPrice)}</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <TruckIcon className="h-5 w-5 text-slate-500 mt-0.5" />
+                <TruckIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
                 <div>
-                  <p className="text-sm text-slate-500">Shipping Status</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-300">Shipping Status</p>
                   <Badge
                     className={`mt-1 ${
                       order.status === "ACCEPTED"
@@ -606,9 +616,9 @@ export default function AssignInventoryPage() {
               </div>
 
               <div className="flex items-start gap-3">
-                <PackageIcon className="h-5 w-5 text-slate-500 mt-0.5" />
+                <PackageIcon className="h-5 w-5 text-slate-500 dark:text-slate-300 mt-0.5" />
                 <div>
-                  <p className="text-sm text-slate-500">Items Count</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-300">Items Count</p>
                   <p className="font-medium">{order.items.length} products</p>
                 </div>
               </div>
@@ -618,8 +628,8 @@ export default function AssignInventoryPage() {
       </Card>
 
       {/* Ordered Products */}
-      <Card className="mt-6 border-slate-200 shadow-md">
-        <CardHeader className=" border-b border-slate-200">
+      <Card className="mt-6 border-slate-200 dark:border-zinc-700 shadow-md">
+        <CardHeader className=" border-b border-slate-200 dark:border-zinc-700">
           <div className="flex items-center gap-2">
             <PackageIcon className="h-5 w-5 text-primary" />
             <CardTitle className="text-xl">Ordered Products</CardTitle>
@@ -640,7 +650,7 @@ export default function AssignInventoryPage() {
               {order.items.map((item) => (
                 <TableRow key={item.productId} className="hover:bg-slate-50">
                   <TableCell>
-                    <div className="h-12 w-12 rounded-md overflow-hidden border border-slate-200">
+                    <div className="h-12 w-12 rounded-md overflow-hidden border border-slate-200 dark:border-zinc-700">
                       <Image
                         src={item.product?.mainImage || "/placeholder.svg?height=48&width=48"}
                         alt={item.product?.title || "Product image"}
@@ -661,9 +671,9 @@ export default function AssignInventoryPage() {
             </TableBody>
           </Table>
         </CardContent>
-        <CardFooter className="flex justify-end p-4  border-t border-slate-200">
+        <CardFooter className="flex justify-end p-4  border-t border-slate-200 dark:border-zinc-700">
           <div className="text-right">
-            <p className="text-sm text-slate-500">Order Total</p>
+            <p className="text-sm text-slate-500 dark:text-slate-300">Order Total</p>
             <p className="text-xl font-bold text-primary">{formatCurrency(order.totalPrice)}</p>
           </div>
         </CardFooter>
@@ -674,8 +684,8 @@ export default function AssignInventoryPage() {
 
       {/* Warehouse Selection */}
       {order?.status === "ACCEPTED" && (
-        <Card className="mt-6 border-slate-200 shadow-md">
-          <CardHeader className="border-b border-slate-200">
+        <Card className="mt-6 border-slate-200 dark:border-zinc-700 shadow-md">
+          <CardHeader className="border-b border-slate-200 dark:border-zinc-700">
             <div className="flex items-center gap-2">
               <BuildingIcon className="h-5 w-5 text-primary" />
               <div>
@@ -693,7 +703,7 @@ export default function AssignInventoryPage() {
             ) : (
               <>
                 {nearestWarehouse && (
-                  <Alert className="mb-4 border-green-200">
+                  <Alert className="mb-4 border-green-200 dark:border-zinc-700">
                     <CheckCircleIcon className="h-4 w-4 text-green-600" />
                     <AlertTitle className="text-green-700 font-medium">Recommended Warehouse</AlertTitle>
                     <AlertDescription className="text-green-600">
@@ -731,7 +741,7 @@ export default function AssignInventoryPage() {
                             </SelectItem>
                           ))
                         ) : (
-                          <div className="p-3 text-slate-500 text-sm">
+                          <div className="p-3 text-slate-500 dark:text-slate-300 text-sm">
                             No warehouse has the required products
                           </div>
                         )}
@@ -743,7 +753,7 @@ export default function AssignInventoryPage() {
                 {selectedWarehouse && inventory.length > 0 && (
                   <div className="mt-6">
                     <h3 className="text-lg font-medium mb-3">Available Inventory</h3>
-                    <div className="rounded-md p-4 border border-slate-200">
+                    <div className="rounded-md p-4 border border-slate-200 dark:border-zinc-700">
                       <Table>
                         <TableHeader className="bg-white">
                           <TableRow>
@@ -783,8 +793,8 @@ export default function AssignInventoryPage() {
               </>
             )}
           </CardContent>
-          <CardFooter className="flex justify-between p-4 border-t border-slate-200">
-            <Button variant="outline">Cancel</Button>
+          <CardFooter className="flex flex-wrap justify-between p-4 border-t border-slate-200 dark:border-zinc-700">
+            <Button variant="outline" className="mb-2">Cancel</Button>
             <Button
               onClick={handleAssignInventory}
               disabled={isProcessing || !selectedWarehouse || inventory.length === 0}
@@ -798,7 +808,7 @@ export default function AssignInventoryPage() {
         </Card>
       )}
     </div>
-    </>
+    </div>
   )
 }
 

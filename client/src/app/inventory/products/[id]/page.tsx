@@ -196,9 +196,9 @@ export function ProductDetailPageComponent() {
   }
 
   return (
-   <>
+   <div className="bg-white dark:bg-zinc-900 min-h-screen">
    <Header/>
-   <div className="container mx-auto p-6 space-y-6">
+   <div className="container mx-auto p-6 space-y-6 ">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={() => router.back()}>
@@ -480,7 +480,7 @@ export function ProductDetailPageComponent() {
         </DialogContent>
       </Dialog>
     </div>
-   </>
+   </div>
   );
 }
 

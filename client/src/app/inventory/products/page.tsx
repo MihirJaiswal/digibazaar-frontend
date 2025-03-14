@@ -398,7 +398,7 @@ function ProductsPageContent() {
       <Header />
       <DashboardLayout>
         <div className="mx-auto md:px-4 md:py-6 ">
-          <Card className="border-0 shadow-sm">
+          <Card className="shadow-sm p-4 border">
             <CardHeader className="pb-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
@@ -865,5 +865,4 @@ function ProductsPageContent() {
   );
 }
 
-// Add the default export at the end
 export default ProductsPageWrapper;

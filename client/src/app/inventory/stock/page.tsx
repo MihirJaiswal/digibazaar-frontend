@@ -188,7 +188,7 @@ function StockManagementComponent() {
           </div>
           <Button
             variant="outline"
-            onClick={() => router.push("/inventory/dashboard")}
+            onClick={() => router.push("/inventory")}
             className="mt-4 md:mt-0"
           >
             Back to Dashboard
@@ -415,7 +415,7 @@ function StockManagementComponent() {
               <CardContent className="p-6">
                 {loadingWarehouses ? (
                   <div className="flex justify-center items-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                    <Loader2 className="h-8 w-8 animate-spin text-gray-400 dark:text-zinc-300" />
                   </div>
                 ) : warehouses && warehouses.length > 0 ? (
                   <div className="space-y-6">
@@ -437,9 +437,9 @@ function StockManagementComponent() {
                               {capacityUsage}% Used
                             </Badge>
                           </div>
-                          <p className="text-sm text-gray-500">{warehouse.location}</p>
+                          <p className="text-sm text-gray-500 dark:text-zinc-300">{warehouse.location}</p>
                           <Progress value={capacityUsage} className="h-2" />
-                          <div className="flex justify-between text-xs text-gray-500">
+                          <div className="flex justify-between text-xs text-gray-500 dark:text-zinc-300">
                             <span>Available: {warehouse.availableCapacity} units</span>
                             <span>Total: {warehouse.capacity} units</span>
                           </div>
@@ -448,8 +448,8 @@ function StockManagementComponent() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <Building2 className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                  <div className="text-center py-8 text-gray-500 dark:text-zinc-300">
+                    <Building2 className="h-12 w-12 mx-auto mb-2 text-gray-400 dark:text-zinc-300" />
                     <p>No warehouses found</p>
                   </div>
                 )}
@@ -458,7 +458,7 @@ function StockManagementComponent() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => router.push("/warehouses")}
+                  onClick={() => router.push("/inventory/warehouses")}
                 >
                   <Building2 className="mr-2 h-4 w-4" />
                   Manage Warehouses
@@ -494,7 +494,7 @@ function StockManagementComponent() {
                     <Separator />
 
                     <div>
-                      <h3 className="font-medium text-sm text-gray-700 mb-2">
+                      <h3 className="font-medium text-sm text-gray-700 dark:text-zinc-300 mb-2">
                         Low Stock Products
                       </h3>
                       {products &&
@@ -530,7 +530,7 @@ function StockManagementComponent() {
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="bg-gray-50 px-6 py-4 border-t">
+              <CardFooter className="bg-gray-50 dark:bg-zinc-800 px-6 py-4 border-t">
                 <Button
                   variant="outline"
                   className="w-full"

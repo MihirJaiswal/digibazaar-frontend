@@ -22,7 +22,7 @@ export function ModeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="relative h-10 w-10 rounded-full border-2 border-slate-100 dark:border-zinc-700 bg-white dark:bg-zinc-900 transition-colors duration-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-zinc-600"
+      className="relative h-10 w-10 rounded-full border-2 border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-colors duration-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-zinc-600"
       aria-label="Toggle theme"
     >
       <div className="absolute inset-0 flex items-center justify-center">

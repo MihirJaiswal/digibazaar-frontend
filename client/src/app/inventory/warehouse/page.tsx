@@ -532,7 +532,7 @@ const WarehousesPage = () => {
     <>
       <Header />
       <DashboardLayout>
-        <div className="container mx-auto px-4 py-6 space-y-6">
+        <div className="container mx-auto px-5 py-8 border rounded-lg space-y-6 bg-white dark:bg-black">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold">Warehouses</h1>

@@ -42,18 +42,20 @@ const CreateProductVariant = ({ productId }: { productId: string }) => {
   };
 
   return (
-    <div className="p-6 mt-6 bg-white shadow-md rounded-md">
-      <h2 className="text-xl font-bold mb-4">Add Product Variants</h2>
+    <div className="p-6 mt-6 shadow-md rounded-md">
+      <h2 className="text-md md:text-xl font-bold mb-4">Add Product Variants</h2>
       {variants.map((variant, index) => (
-        <div key={index} className="grid grid-cols-4 gap-4 mb-4">
+        <div key={index} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <Input placeholder="Name (e.g., Color)" value={variant.name} onChange={e => handleVariantChange(index, "name", e.target.value)} />
           <Input placeholder="Value (e.g., Red)" value={variant.value} onChange={e => handleVariantChange(index, "value", e.target.value)} />
           <Input placeholder="Price" type="number" value={variant.price} onChange={e => handleVariantChange(index, "price", parseFloat(e.target.value))} />
           <Input placeholder="Stock" type="number" value={variant.stock} onChange={e => handleVariantChange(index, "stock", parseInt(e.target.value, 10))} />
         </div>
       ))}
-      <Button onClick={addVariant} className="mr-4">+ Add More</Button>
-      <Button onClick={handleSubmit}>Save Variants</Button>
+    <div className="flex justify-center items-center">
+    <Button onClick={addVariant} className="mr-4">+ Add More</Button>
+    <Button onClick={handleSubmit}>Save Variants</Button>
+    </div>
     </div>
   );
 };

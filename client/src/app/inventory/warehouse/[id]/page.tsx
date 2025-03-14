@@ -304,9 +304,9 @@ const WarehouseDetailsPage = () => {
               <Button variant="outline" size="icon" onClick={() => router.push("/inventory/warehouse")}>
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <h1 className="text-2xl font-bold">Warehouse Details</h1>
+              <h1 className="text-xl md:text-2xl font-bold">Warehouse Details</h1>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={() => setIsUpdateModalOpen(true)} className="flex items-center gap-1">
                 <Edit className="h-4 w-4" />
                 Edit

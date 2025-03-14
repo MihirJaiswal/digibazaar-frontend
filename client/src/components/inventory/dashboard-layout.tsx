@@ -189,7 +189,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
          
           
           <main className="flex-1 relative overflow-y-auto focus:outline-none bg-gray-50 dark:bg-zinc-900">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
+            <div className="max-w-7xl mx-auto  md:px-8 md:py-6">
               {children}
             </div>
           </main>

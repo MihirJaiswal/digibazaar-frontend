@@ -132,7 +132,7 @@ const CreateWarehousePage = () => {
   return (
     <>
     <Header/>
-    <div className="min-h-screen bg-gradient-to-b py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white dark:bg-zinc-900 py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <Button 
           variant="ghost" 
@@ -143,12 +143,12 @@ const CreateWarehousePage = () => {
           Back to Warehouses
         </Button>
         
-        <Card className="shadow-lg border-0 overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <Card className="shadow-lg border overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-purple-600 to-cyan-500 text-white">
             <div className="flex items-center">
               <Building2 className="h-8 w-8 mr-3" />
               <div>
-                <CardTitle className="text-2xl font-bold">Create New Warehouse</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold">Create New Warehouse</CardTitle>
                 <CardDescription className="text-blue-100 mt-1">
                   Add a new storage location to your inventory network
                 </CardDescription>

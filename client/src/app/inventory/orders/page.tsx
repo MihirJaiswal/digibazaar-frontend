@@ -505,28 +505,32 @@ function OrdersPage() {
           )}
 
           {/* Orders Table */}
-          <Card className="border border-slate-200 shadow-sm overflow-hidden">
+          <Card className="border border-slate-200 dark:border-zinc-700 shadow-sm overflow-hidden">
             <CardHeader className="pb-0">
-              <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid grid-cols-6 mb-4">
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="pending" className="text-amber-600">
-                    Pending
-                  </TabsTrigger>
-                  <TabsTrigger value="processing" className="text-blue-600">
-                    Processing
-                  </TabsTrigger>
-                  <TabsTrigger value="completed" className="text-indigo-600">
-                    Completed
-                  </TabsTrigger>
-                  <TabsTrigger value="delivered" className="text-emerald-600">
-                    Delivered
-                  </TabsTrigger>
-                  <TabsTrigger value="cancelled" className="text-rose-600">
-                    Cancelled
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+              {/* Wrap Tabs in a horizontal scrolling container */}
+              <div className="overflow-x-auto">
+                <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  {/* Use flex on mobile, grid on larger screens */}
+                  <TabsList className="flex sm:grid sm:grid-cols-6 mb-4 space-x-2 sm:space-x-0">
+                    <TabsTrigger value="all">All</TabsTrigger>
+                    <TabsTrigger value="pending" className="text-amber-600">
+                      Pending
+                    </TabsTrigger>
+                    <TabsTrigger value="processing" className="text-blue-600">
+                      Processing
+                    </TabsTrigger>
+                    <TabsTrigger value="completed" className="text-indigo-600">
+                      Completed
+                    </TabsTrigger>
+                    <TabsTrigger value="delivered" className="text-emerald-600">
+                      Delivered
+                    </TabsTrigger>
+                    <TabsTrigger value="cancelled" className="text-rose-600">
+                      Cancelled
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               {isLoading ? (
@@ -543,129 +547,134 @@ function OrdersPage() {
                 </div>
               ) : (
                 <div className="rounded-md border-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-slate-50 hover:bg-slate-50 dark:bg-zinc-800">
-                        <TableHead className="font-semibold">Order ID</TableHead>
-                        <TableHead className="font-semibold">Product</TableHead>
-                        <TableHead className="font-semibold">Customer</TableHead>
-                        <TableHead className="font-semibold">Date</TableHead>
-                        <TableHead className="font-semibold">Status</TableHead>
-                        <TableHead className="font-semibold text-right">Total</TableHead>
-                        <TableHead className="font-semibold text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredOrders.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={7} className="text-center py-12">
-                            <div className="flex flex-col items-center justify-center">
-                              <ClipboardList className="h-12 w-12 mb-2" />
-                              <p className="text-muted-foreground font-medium">No orders found</p>
-                              <p className="text-sm text-muted-foreground mt-1">Try adjusting your filters</p>
-                              {activeTab !== "all" && (
-                                <Button variant="link" className="mt-2" onClick={() => setActiveTab("all")}>
-                                  View all orders
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
+                  {/* Wrap table in a scrollable container */}
+                  <div className="overflow-x-auto">
+                    <Table className="min-w-[800px]">
+                      <TableHeader>
+                        <TableRow className="bg-slate-50 hover:bg-slate-50 dark:bg-zinc-800">
+                          <TableHead className="font-semibold">Order ID</TableHead>
+                          <TableHead className="font-semibold">Product</TableHead>
+                          <TableHead className="font-semibold">Customer</TableHead>
+                          <TableHead className="font-semibold">Date</TableHead>
+                          <TableHead className="font-semibold">Status</TableHead>
+                          <TableHead className="font-semibold text-right">Total</TableHead>
+                          <TableHead className="font-semibold text-right">Actions</TableHead>
                         </TableRow>
-                      ) : (
-                        // Only render visible items to improve performance
-                        filteredOrders.slice(0, 30).map((order) => (
-                          <TableRow key={order.id} className="group">
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <Package className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-mono">{order.id.slice(0, 8)}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="max-w-[200px] truncate font-medium">
-                                {order.items[0]?.product?.title || "Unknown Product"}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {order.items.length > 1 ? `+${order.items.length - 1} more items` : ""}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="font-medium">{order.shippingAddress.phone}</div>
-                              <div className="text-xs text-muted-foreground truncate max-w-[150px]">
-                                {order.shippingAddress.address}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="font-medium">{new Date(order.createdAt).toLocaleDateString()}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {new Date(order.createdAt).toLocaleTimeString()}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge className={cn("font-medium", getStatusBadgeColor(order.status))}>
-                                {order.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-right font-medium">{formatCurrency(order.totalPrice)}</TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                  onClick={() => {
-                                    setSelectedOrder(order)
-                                    setIsViewDialogOpen(true)
-                                  }}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon">
-                                      <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                    <DropdownMenuItem
-                                      onClick={() => {
-                                        setSelectedOrder(order)
-                                        setIsViewDialogOpen(true)
-                                      }}
-                                    >
-                                      <Eye className="mr-2 h-4 w-4" />
-                                      View Details
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    {order.status === "PENDING" && (
-                                      <>
-                                        <DropdownMenuItem onClick={() => updateOrderStatus(order.id, "ACCEPTED")}>
-                                          ✅ Confirm Order
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => updateOrderStatus(order.id, "REJECTED")}>
-                                          ❌ Reject Order
-                                        </DropdownMenuItem>
-                                      </>
-                                    )}
-                                    {order.status === "ACCEPTED" && (
-                                      <DropdownMenuItem onClick={() => router.push(`/inventory/orders/${order.id}`)}>
-                                        📦 Assign Inventory
-                                      </DropdownMenuItem>
-                                    )}
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredOrders.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={7} className="text-center py-12">
+                              <div className="flex flex-col items-center justify-center">
+                                <ClipboardList className="h-12 w-12 mb-2" />
+                                <p className="text-muted-foreground font-medium">No orders found</p>
+                                <p className="text-sm text-muted-foreground mt-1">Try adjusting your filters</p>
+                                {activeTab !== "all" && (
+                                  <Button variant="link" className="mt-2" onClick={() => setActiveTab("all")}>
+                                    View all orders
+                                  </Button>
+                                )}
                               </div>
                             </TableCell>
                           </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
+                        ) : (
+                          filteredOrders.slice(0, 30).map((order) => (
+                            <TableRow key={order.id} className="group">
+                              <TableCell className="font-medium">
+                                <div className="flex items-center gap-2">
+                                  <Package className="h-4 w-4 text-muted-foreground" />
+                                  <span className="font-mono">{order.id.slice(0, 8)}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="max-w-[200px] truncate font-medium">
+                                  {order.items[0]?.product?.title || "Unknown Product"}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {order.items.length > 1 ? `+${order.items.length - 1} more items` : ""}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="font-medium">{order.shippingAddress.phone}</div>
+                                <div className="text-xs text-muted-foreground truncate max-w-[150px]">
+                                  {order.shippingAddress.address}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="font-medium">{new Date(order.createdAt).toLocaleDateString()}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {new Date(order.createdAt).toLocaleTimeString()}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge className={cn("font-medium", getStatusBadgeColor(order.status))}>
+                                  {order.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right font-medium">
+                                {formatCurrency(order.totalPrice)}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={() => {
+                                      setSelectedOrder(order)
+                                      setIsViewDialogOpen(true)
+                                    }}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="icon">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                      <DropdownMenuItem
+                                        onClick={() => {
+                                          setSelectedOrder(order)
+                                          setIsViewDialogOpen(true)
+                                        }}
+                                      >
+                                        <Eye className="mr-2 h-4 w-4" />
+                                        View Details
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                      {order.status === "PENDING" && (
+                                        <>
+                                          <DropdownMenuItem onClick={() => updateOrderStatus(order.id, "ACCEPTED")}>
+                                            ✅ Confirm Order
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem onClick={() => updateOrderStatus(order.id, "REJECTED")}>
+                                            ❌ Reject Order
+                                          </DropdownMenuItem>
+                                        </>
+                                      )}
+                                      {order.status === "ACCEPTED" && (
+                                        <DropdownMenuItem onClick={() => router.push(`/inventory/orders/${order.id}`)}>
+                                          📦 Assign Inventory
+                                        </DropdownMenuItem>
+                                      )}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
+
 
           {/* View Order Dialog - Only render when open */}
           {isViewDialogOpen && selectedOrder && (
