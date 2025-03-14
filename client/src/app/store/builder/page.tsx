@@ -1,19 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Code,
-  Eye,
-  Laptop,
-  Redo,
-  Smartphone,
-  Tablet,
-  Undo,
-  Plus,
-} from "lucide-react"
+import { ArrowLeft, ArrowRight, Check, Code, Eye, Laptop, Redo, Smartphone, Tablet, Undo, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -28,8 +16,8 @@ import { useAuthStore } from "@/store/authStore"
 import { ThemeSelector } from "@/components/store/ThemeSelector"
 
 interface ThemeCustomization {
-  theme?: string;
-  [key: string]: any;
+  theme?: string
+  [key: string]: any
 }
 
 export default function BuilderPage() {
@@ -39,6 +27,7 @@ export default function BuilderPage() {
   const { token, _hasRehydrated } = useAuthStore()
   const [themeCustomization, setThemeCustomization] = useState<ThemeCustomization>({})
   const [_isCustomizationLoading, setIsCustomizationLoading] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   // In a real app, storeSlug would come from the logged in user's data or route params.
 
@@ -57,7 +46,7 @@ export default function BuilderPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         })
         if (!response.ok) {
@@ -81,7 +70,7 @@ export default function BuilderPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         })
         if (!response.ok) throw new Error("Failed to fetch theme customization")
@@ -113,7 +102,7 @@ export default function BuilderPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         })
         if (!response.ok) {
@@ -138,7 +127,7 @@ export default function BuilderPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           id: store?.id, // Ensure the store id is passed to the backend
@@ -168,15 +157,15 @@ export default function BuilderPage() {
     window.open(`/store/stores/${store?.name}`, "_blank")
   }
 
-  const userId = token ? "user-from-token" : "guest";
+  const userId = token ? "user-from-token" : "guest"
 
   return (
-    <div>
+    <div className="flex min-h-screen w-full flex-col">
       <Header />
       <StoreLayout>
         <div className="flex h-[calc(100vh-4rem)] flex-col">
-          <div className="flex items-center justify-between border-b bg-background p-4">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b bg-background p-4 gap-4 sm:gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <Button variant="outline" size="icon">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -194,7 +183,7 @@ export default function BuilderPage() {
                 </select>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto justify-end">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -225,7 +214,7 @@ export default function BuilderPage() {
                   <TooltipContent>Mobile View</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              <div className="mx-2 h-6 w-px bg-border"></div>
+              <div className="mx-2 h-6 w-px bg-border hidden sm:block"></div>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -246,23 +235,29 @@ export default function BuilderPage() {
                   <TooltipContent>Redo</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              <div className="mx-2 h-6 w-px bg-border"></div>
+              <div className="mx-2 h-6 w-px bg-border hidden sm:block"></div>
               <Button variant="outline" size="sm" className="gap-1">
                 <Code className="h-4 w-4" />
-                Custom Code
+                <span className="hidden sm:inline">Custom Code</span>
               </Button>
               <Button variant="outline" size="sm" className="gap-1" onClick={handlePreview}>
                 <Eye className="h-4 w-4" />
-                Preview
+                <span className="hidden sm:inline">Preview</span>
               </Button>
               <Button size="sm" className="gap-1" onClick={handlePublish} disabled={isPublishing}>
                 <Check className="h-4 w-4" />
-                {isPublishing ? "Publishing..." : "Publish"}
+                <span className="hidden sm:inline">{isPublishing ? "Publishing..." : "Publish"}</span>
               </Button>
             </div>
           </div>
-          <div className="flex flex-1 overflow-hidden">
-            <div className="w-64 overflow-auto border-r">
+          <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
+            <button
+              className="md:hidden p-2 m-2 bg-primary text-primary-foreground rounded-md"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? "Hide Sidebar" : "Show Sidebar"}
+            </button>
+            <div className={`${sidebarOpen ? "block" : "hidden"} w-full md:block md:w-64 overflow-auto border-r`}>
               <Tabs defaultValue="settings">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="settings">
@@ -321,7 +316,7 @@ export default function BuilderPage() {
                     token={token || ""}
                     onThemeUpdate={(updatedTheme) => {
                       // Update local state or trigger a re-fetch of the customization
-                      setThemeCustomization((prev: ThemeCustomization) => ({ ...prev, theme: updatedTheme }));
+                      setThemeCustomization((prev: ThemeCustomization) => ({ ...prev, theme: updatedTheme }))
                     }}
                   />
                 </TabsContent>
@@ -334,9 +329,7 @@ export default function BuilderPage() {
                 }`}
               >
                 {isStoreLoading || isProductsLoading ? (
-                  <div className="flex h-full items-center justify-center">
-                    Loading store preview...
-                  </div>
+                  <div className="flex h-full items-center justify-center">Loading store preview...</div>
                 ) : (
                   <StorePreview
                     viewMode={viewMode}
@@ -359,3 +352,4 @@ export default function BuilderPage() {
     </div>
   )
 }
+

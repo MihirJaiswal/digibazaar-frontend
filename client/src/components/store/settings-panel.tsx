@@ -25,6 +25,10 @@ interface Customization {
   bannerText?: string;
   footerText?: string;
   theme?: string;
+  id?: string;
+  storeId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 interface SettingsPanelProps {
@@ -54,35 +58,53 @@ export function SettingsPanel({
     fontColor: "#000000",
   };
 
-  // State for customization fields - prioritize initialCustomization values if they exist
-  const [customization, setCustomization] = useState<Customization>({
-    theme: initialCustomization?.theme || defaultValues.theme,
-    bannerText: initialCustomization?.bannerText || defaultValues.bannerText,
-    bannerImage: initialCustomization?.bannerImage || defaultValues.bannerImage,
-    footerText: initialCustomization?.footerText || defaultValues.footerText,
-    backgroundColor: initialCustomization?.backgroundColor || defaultValues.backgroundColor,
-    buttonColor: initialCustomization?.buttonColor || defaultValues.buttonColor,
-    textColor: initialCustomization?.textColor || defaultValues.textColor,
-    fontFamily: initialCustomization?.fontFamily || defaultValues.fontFamily,
-    fontSize: initialCustomization?.fontSize || defaultValues.fontSize,
-    fontColor: initialCustomization?.fontColor || defaultValues.fontColor,
+  // State for customization fields - use initialCustomization values if they exist, otherwise use defaults
+  const [customization, setCustomization] = useState<Customization>(() => {
+    // Create a new object with defaults first
+    const initialState = { ...defaultValues };
+    
+    // Then override with any existing values from initialCustomization
+    if (initialCustomization) {
+      Object.keys(initialState).forEach((key) => {
+        const typedKey = key as keyof Customization;
+        if (initialCustomization[typedKey] !== undefined && initialCustomization[typedKey] !== null) {
+          (initialState as any)[key] = initialCustomization[typedKey];
+        }
+      });
+    }
+    
+    return initialState;
   });
 
   // State for banner image file upload
   const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
-  const [bannerImagePreview, setBannerImagePreview] = useState<string>(
-    initialCustomization?.bannerImage || ""
-  );
+  const [bannerImagePreview, setBannerImagePreview] = useState<string>(() => {
+    return initialCustomization?.bannerImage || "";
+  });
 
-  // Debug effect to check what values are actually being used
+  // Update state if initialCustomization changes
   useEffect(() => {
-    console.log("Initial customization:", initialCustomization);
-    console.log("Current customization state:", customization);
-  }, [initialCustomization, customization]);
+    if (initialCustomization) {
+      setCustomization(prevState => {
+        const newState = { ...prevState };
+        Object.keys(initialCustomization).forEach(key => {
+          const typedKey = key as keyof Customization;
+          if (initialCustomization[typedKey] !== undefined && initialCustomization[typedKey] !== null) {
+            (newState as any)[key] = initialCustomization[typedKey];
+          }
+        });
+        return newState;
+      });
+
+      if (initialCustomization.bannerImage) {
+        setBannerImagePreview(initialCustomization.bannerImage);
+      }
+    }
+  }, [initialCustomization]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
-    setCustomization((prev) => ({ ...prev, [id]: value }));
+    setCustomization(prev => ({ ...prev, [id]: value }));
   };
 
   // Handler for banner image file input change
@@ -93,7 +115,7 @@ export function SettingsPanel({
       const previewUrl = URL.createObjectURL(file);
       setBannerImagePreview(previewUrl);
       // Optionally clear the text URL if a file is chosen
-      setCustomization((prev) => ({ ...prev, bannerImage: "" }));
+      setCustomization(prev => ({ ...prev, bannerImage: "" }));
     }
   };
 
@@ -103,17 +125,29 @@ export function SettingsPanel({
       const method = initialCustomization ? "PUT" : "POST";
       const url = "http://localhost:8800/api/stores/theme-customization";
       
-      // Build FormData payload so that we can include file uploads
+      // Build FormData payload
       const formPayload = new FormData();
-      // Append text fields from customization
-      for (const key in customization) {
-        // Only append if the value exists and is not undefined
-        if (customization[key as keyof Customization] !== undefined) {
-          formPayload.append(key, (customization as any)[key]);
+      
+      // IMPORTANT: Make sure to NOT include storeId in the customization object
+      // First append the storeId separately
+      formPayload.append("storeId", storeId);
+      
+      // Then append other customization fields, excluding any that might be in initialCustomization but not in our state
+      const customizationToSend = { ...customization };
+      
+      // Remove any fields that might cause issues
+      delete customizationToSend.id;
+      delete customizationToSend.storeId;
+      delete customizationToSend.createdAt;
+      delete customizationToSend.updatedAt;
+      
+      // Append the remaining fields
+      for (const key in customizationToSend) {
+        if (customizationToSend[key as keyof Customization] !== undefined) {
+          formPayload.append(key, String(customizationToSend[key as keyof Customization]));
         }
       }
-      // Append storeId
-      formPayload.append("storeId", storeId);
+      
       // Append banner image file if one was selected
       if (bannerImageFile) {
         formPayload.append("bannerImage", bannerImageFile);
@@ -122,7 +156,6 @@ export function SettingsPanel({
       const response = await fetch(url, {
         method,
         headers: {
-          // Let the browser set the Content-Type with proper boundary.
           Authorization: `Bearer ${token}`,
         },
         body: formPayload,
@@ -151,7 +184,7 @@ export function SettingsPanel({
               <Label htmlFor="bannerText">Banner Text</Label>
               <Input
                 id="bannerText"
-                value={customization.bannerText}
+                value={customization.bannerText || ""}
                 onChange={handleInputChange}
                 placeholder="Enter banner text"
               />
@@ -184,7 +217,7 @@ export function SettingsPanel({
               <Label htmlFor="footerText">Footer Text</Label>
               <Input
                 id="footerText"
-                value={customization.footerText}
+                value={customization.footerText || ""}
                 onChange={handleInputChange}
                 placeholder="Enter footer text"
               />
