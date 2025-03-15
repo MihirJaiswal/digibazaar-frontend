@@ -282,7 +282,7 @@ function InquiryList({
 
         return (
           <Link key={inquiry.id} href={`/gigs/inquiries/${inquiry.id}`}>
-            <Card className="overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer border-gray-200 dark:border-gray-700">
+            <Card className="overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer border-gray-200 dark:border-gray-700 mb-8">
               <CardContent className="p-0">
                 <div className="p-5">
                   <div className="flex items-center justify-between flex-wrap gap-4">
