@@ -16,10 +16,54 @@ import GigImageGallery from "@/components/gigs/GigImageGallery";
 import GigTabs from "@/components/gigs/GigTabs";
 import GigSidebar from "@/components/gigs/GigSidebar";
 import { useAuthStore } from "@/store/authStore";
-import type { Gig } from "@/app/gigs/types/gig";
 import LoadingSkeleton from "@/components/gigs/LoadingSkeleton";
 
-// The inner component that uses React Query hooks
+// Update your gig type definition in your project accordingly.
+// For now, we're including an inline definition for clarity.
+export interface Gig {
+  id: string;
+  userId: string;
+  category: string; // You could also use an enum (e.g., StoreCategory) if defined
+  title: string;
+  description: string;
+  bulkPrice: number; // Price per unit in bulk
+  cover: string;
+  images: string[]; // Array of image URLs
+  minOrderQty: number; // Minimum Order Quantity
+  leadTime: number; // Estimated fulfillment time (in days)
+  available: boolean; // Product availability
+  supplyCapacity?: number | null; // Maximum production/supply capacity per month (can be number or null)
+  features: string[]; // e.g., available colors, sizes
+  totalStars: number;
+  starNumber: number;
+  sales: number;
+  likes?: number; // Optional: Number of likes
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    username: string;
+    profilePic?: string;
+    bio?: string;
+    country?: string;
+    createdAt: string;
+    badges?: string[];
+  };
+  reviews?: Review[];
+}
+
+
+
+
+
+export interface Review {
+  id: string;
+  userId: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 function GigDetailsPageContent() {
   const params = useParams();
   const gigId = params.id as string;
@@ -49,7 +93,7 @@ function GigDetailsPageContent() {
   }, [error, router]);
 
   // Check if the current user is the owner
-  const isOwner = Boolean(user && gig && gig.userId === user.id);
+  const isOwner = Boolean(user && gig && gig.user.id === user.id);
 
   // Query the like status (only if user exists, gig is loaded, and not the owner)
   const { data: likeStatus } = useQuery({
@@ -107,7 +151,6 @@ function GigDetailsPageContent() {
     },
     onSuccess: () => {
       setIsLiked((prev) => !prev);
-      // Update the gig's like count in the query cache if needed
       queryClient.setQueryData<Gig | undefined>(["gig", gigId], (oldData) => {
         if (!oldData) return oldData;
         const newLikes = isLiked
@@ -135,12 +178,9 @@ function GigDetailsPageContent() {
     },
   });
 
-  // Handlers are async to satisfy expected type signatures.
   const handleLike = async (): Promise<void> => {
     if (!user) {
-      router.push(
-        "/login?redirect=" + encodeURIComponent(`/gigs/${gigId}`)
-      );
+      router.push("/login?redirect=" + encodeURIComponent(`/gigs/${gigId}`));
       return;
     }
     likeMutation.mutate();
@@ -148,9 +188,7 @@ function GigDetailsPageContent() {
 
   const handleBookmark = async (): Promise<void> => {
     if (!user) {
-      router.push(
-        "/login?redirect=" + encodeURIComponent(`/gigs/${gigId}`)
-      );
+      router.push("/login?redirect=" + encodeURIComponent(`/gigs/${gigId}`));
       return;
     }
     bookmarkMutation.mutate();
@@ -168,8 +206,7 @@ function GigDetailsPageContent() {
     );
   }
 
-  if (!gig)
-    return <div className="container py-10 text-center">Gig not found</div>;
+  if (!gig) return <div className="container py-10 text-center">Gig not found</div>;
 
   return (
     <>
@@ -202,7 +239,6 @@ function GigDetailsPageContent() {
   );
 }
 
-// Wrap the page content with QueryClientProvider so that React Query can work.
 export default function GigDetailsPage() {
   const queryClient = useMemo(() => new QueryClient(), []);
   return (

@@ -49,23 +49,15 @@ import Image from "next/image";
 const Header = dynamic(() => import("@/components/global/Header"), { ssr: false });
 const GigsSidebar = dynamic(() => import("@/components/gigs/GigsSidebar"), { ssr: false });
 
-// Move static data outside the component to prevent recreation on each render
+// Sample categories (make sure these align with your new StoreCategory enum)
 const categories = [
-  { value: "WEB_DEVELOPMENT", label: "Web Development", icon: "💻" },
-  { value: "GRAPHIC_DESIGN", label: "Graphic Design", icon: "🎨" },
-  { value: "DIGITAL_MARKETING", label: "Digital Marketing", icon: "📱" },
-  { value: "CONTENT_WRITING", label: "Content Writing", icon: "✍️" },
-  { value: "VIDEO_ANIMATION", label: "Video & Animation", icon: "🎬" },
-  { value: "SOFTWARE_DEVELOPMENT", label: "Software Development", icon: "⚙️" },
-  { value: "MOBILE_DEVELOPMENT", label: "Mobile Development", icon: "📱" },
-  { value: "DATA_ANALYTICS", label: "Data Analytics", icon: "📊" },
-  { value: "BUSINESS", label: "Business Consulting", icon: "💼" },
-  { value: "AUDIO_PRODUCTION", label: "Audio Production", icon: "🎵" },
-  { value: "PHOTOGRAPHY", label: "Photography", icon: "📷" },
-  { value: "VIRTUAL_ASSISTANTS", label: "Virtual Assistants", icon: "🤖" },
+  { value: "FASHION", label: "Fashion", icon: "👗" },
+  { value: "ELECTRONICS", label: "Electronics", icon: "📱" },
+  { value: "GROCERY", label: "Grocery", icon: "🛒" },
+  { value: "HOME_DECOR", label: "Home Decor", icon: "🏠" },
+  // add additional product categories as needed
 ];
 
-// Define a memoized FeatureCard component to prevent unnecessary re-renders
 const FeatureCard = React.memo(function FeatureCard({
   value,
   onChange,
@@ -107,7 +99,6 @@ const FeatureCard = React.memo(function FeatureCard({
   );
 });
 
-// Memoize progress indicator to prevent re-renders
 const ProgressIndicator = React.memo(function ProgressIndicator({
   currentStep,
   totalSteps,
@@ -133,7 +124,6 @@ const ProgressIndicator = React.memo(function ProgressIndicator({
   );
 });
 
-// Memoize step indicator to prevent re-renders
 const StepIndicator = React.memo(function StepIndicator({
   steps,
   currentStep,
@@ -169,7 +159,6 @@ const StepIndicator = React.memo(function StepIndicator({
   );
 });
 
-// Main component with optimizations
 export default function CreateGigPage() {
   const router = useRouter();
   const { user, token } = useAuthStore();
@@ -178,21 +167,18 @@ export default function CreateGigPage() {
   const [previewMode, setPreviewMode] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
 
-  // Reduce state updates by combining related fields
+  // Updated form data for supplier listing
   const [formData, setFormData] = useState({
     title: "",
-    shortDesc: "",
-    desc: "",
+    description: "", // Full product description
     categoryId: "",
-    price: "",
-    deliveryTime: 1,
-    revisionNumber: 1,
+    bulkPrice: "", // Price per unit for bulk orders
+    minOrderQty: "", // Minimum Order Quantity
+    leadTime: "", // Fulfillment time in days
+    supplyCapacity: "", // Optional: Maximum units per month
     features: [""],
-    resume: "",
-    yearsOfExp: "",
   });
 
-  // Separate media state for better performance
   const [mediaState, setMediaState] = useState({
     coverFile: null as File | null,
     coverPreview: "",
@@ -200,26 +186,25 @@ export default function CreateGigPage() {
     imagePreviews: [] as string[],
   });
 
-  // Memoize steps configuration to prevent recreation on re-renders
+  // Updated steps
   const steps = useMemo(() => [
     {
       title: "Basic Info",
       icon: <Tag className="h-5 w-5" />,
-      fields: ["title", "shortDesc", "desc"],
+      fields: ["title", "description"],
     },
     {
-      title: "Pricing",
+      title: "Pricing & Terms",
       icon: <Coins className="h-5 w-5" />,
-      fields: ["categoryId", "price", "deliveryTime", "revisionNumber"],
+      fields: ["categoryId", "bulkPrice", "minOrderQty", "leadTime"],
     },
     {
-      title: "Media & Experience",
+      title: "Media & Supply",
       icon: <FileImage className="h-5 w-5" />,
-      fields: ["cover", "images", "resume", "yearsOfExp", "features"],
+      fields: ["cover", "images", "supplyCapacity", "features"],
     },
   ], []);
 
-  // Optimize scrolling effect with debounce for performance
   useEffect(() => {
     const timer = setTimeout(() => {
       if (formRef.current) {
@@ -229,7 +214,6 @@ export default function CreateGigPage() {
     return () => clearTimeout(timer);
   }, [step]);
 
-  // Use useCallback for event handlers to prevent recreation on re-renders
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -239,7 +223,6 @@ export default function CreateGigPage() {
     setFormData((prev) => ({ ...prev, categoryId: value }));
   }, []);
 
-  // Memoized feature handlers
   const addFeature = useCallback(() => {
     setFormData((prev) => ({ ...prev, features: [...prev.features, ""] }));
   }, []);
@@ -259,14 +242,12 @@ export default function CreateGigPage() {
     }));
   }, []);
 
-  // Navigation handlers
   const handleNext = useCallback(() => setStep((s) => Math.min(s + 1, steps.length)), [steps.length]);
   const handleBack = useCallback(() => setStep((s) => Math.max(s - 1, 1)), []);
   const handleStepClick = useCallback((newStep: number) => {
     setStep((current) => (newStep <= current ? newStep : current));
   }, []);
 
-  // Optimize validation by memoizing it
   const isCurrentStepValid = useCallback(() => {
     const currentStepFields = steps[step - 1].fields;
     return currentStepFields.every((field) => {
@@ -282,11 +263,9 @@ export default function CreateGigPage() {
     });
   }, [step, steps, formData, mediaState.coverFile]);
 
-  // File handling with better memory management
   const handleCoverChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      // Revoke previous object URL to prevent memory leaks
       if (mediaState.coverPreview) {
         URL.revokeObjectURL(mediaState.coverPreview);
       }
@@ -301,12 +280,9 @@ export default function CreateGigPage() {
 
   const handleImagesChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      // Revoke previous object URLs to prevent memory leaks
       mediaState.imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-      
       const files = Array.from(e.target.files);
       const previews = files.map((file) => URL.createObjectURL(file));
-      
       setMediaState((prev) => ({
         ...prev,
         imageFiles: files,
@@ -315,7 +291,6 @@ export default function CreateGigPage() {
     }
   }, [mediaState.imagePreviews]);
 
-  // Properly clean up preview URLs to prevent memory leaks
   useEffect(() => {
     return () => {
       if (mediaState.coverPreview) URL.revokeObjectURL(mediaState.coverPreview);
@@ -323,14 +298,13 @@ export default function CreateGigPage() {
     };
   }, []);
 
-  // Optimized form submission with better error handling
   const handleSubmitGig = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
       const formPayload = new FormData();
 
-      // Append text fields
+      // Append updated text fields
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "features") {
           formPayload.append(key, JSON.stringify(value));
@@ -339,10 +313,10 @@ export default function CreateGigPage() {
         }
       });
       
-      // Append userId if needed
+      // Append userId if available
       if (user?.id) formPayload.append("userId", user.id);
 
-      // Append files if available
+      // Append media files
       if (mediaState.coverFile) formPayload.append("cover", mediaState.coverFile);
       if (mediaState.imageFiles.length > 0) {
         mediaState.imageFiles.forEach((file) => {
@@ -360,21 +334,19 @@ export default function CreateGigPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || "Failed to create a service");
+        throw new Error(errorData?.message || "Failed to create supplier listing");
       }
 
-      toast.success("service created successfully!");
+      toast.success("Supplier listing created successfully!");
       router.push("/gigs/gig");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
-      console.error("Error creating service:", error);
+      console.error("Error creating supplier listing:", error);
     } finally {
       setIsSubmitting(false);
     }
   }, [formData, mediaState, user, token, router]);
 
-
-  
   const GigPreview = useMemo(() => () => {
     const categoryItem = categories.find((c) => c.value === formData.categoryId);
     
@@ -383,8 +355,8 @@ export default function CreateGigPage() {
         <div className="h-48 bg-muted relative">
           {mediaState.coverPreview ? (
             <Image
-              src={mediaState.coverPreview || "./placeholder.svg" }
-              alt={formData.title || "service preview"}
+              src={mediaState.coverPreview || "./placeholder.svg"}
+              alt={formData.title || "listing preview"}
               quality={100}
               height={1920}
               width={1080}
@@ -398,38 +370,40 @@ export default function CreateGigPage() {
           )}
           {formData.categoryId && (
             <Badge className="absolute top-3 left-3 bg-black/70 text-white hover:bg-black/70">
-              {categoryItem?.icon || "🔍"}{" "}
-              {categoryItem?.label || "Category"}
+              {categoryItem?.icon || "🔍"} {categoryItem?.label || "Category"}
             </Badge>
           )}
         </div>
         <div className="p-5">
           <h3 className="font-semibold text-lg line-clamp-2 mb-2">
-            {formData.title || "Your service Title"}
+            {formData.title || "Your product title"}
           </h3>
           <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-            {formData.shortDesc || "Short description of your service goes here..."}
+            {formData.description || "Detailed description of your product..."}
           </p>
-
           <div className="flex items-center gap-2 mb-4">
             <Clock className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">
-              Delivers in {formData.deliveryTime || 1} day{String(formData.deliveryTime) !== "1" ? "s" : ""}
+              Lead Time: {formData.leadTime || "0"} day{formData.leadTime !== "1" ? "s" : ""}
             </span>
           </div>
-
           <Separator className="my-4" />
-
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Trophy className="h-4 w-4 text-amber-500" />
-              <span className="text-xs">{formData.yearsOfExp || "0"}+ years exp</span>
+            <div className="text-right">
+              <span className="text-xs text-muted-foreground">BULK PRICE</span>
+              <p className="font-bold text-lg">${formData.bulkPrice || "0"}</p>
             </div>
             <div className="text-right">
-              <span className="text-xs text-muted-foreground">STARTING AT</span>
-              <p className="font-bold text-lg">${formData.price || "0"}</p>
+              <span className="text-xs text-muted-foreground">MOQ</span>
+              <p className="font-bold text-lg">{formData.minOrderQty || "0"} units</p>
             </div>
           </div>
+          {formData.supplyCapacity && (
+            <div className="mt-4 text-right">
+              <span className="text-xs text-muted-foreground">Supply Capacity</span>
+              <p className="font-bold text-lg">{formData.supplyCapacity} units/month</p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -445,9 +419,9 @@ export default function CreateGigPage() {
             <div className="max-w-5xl mx-auto">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                 <div>
-                  <h1 className="text-3xl font-bold">Create a New Service</h1>
+                  <h1 className="text-3xl font-bold">Create a New Supplier Listing</h1>
                   <p className="text-muted-foreground mt-1">
-                    Showcase your skills and start earning
+                    Showcase your product and reach bulk buyers
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -470,9 +444,9 @@ export default function CreateGigPage() {
                         </div>
                       </CardTitle>
                       <CardDescription>
-                        {step === 1 && "Tell us about your service"}
-                        {step === 2 && "Set your pricing and delivery terms"}
-                        {step === 3 && "Add media and showcase your experience"}
+                        {step === 1 && "Tell us about your product"}
+                        {step === 2 && "Set your pricing and order terms"}
+                        {step === 3 && "Add media and supply information"}
                       </CardDescription>
                     </CardHeader>
 
@@ -496,31 +470,19 @@ export default function CreateGigPage() {
                                   name="title"
                                   value={formData.title}
                                   onChange={handleChange}
-                                  placeholder="I will create a professional website for your business"
+                                  placeholder="E.g., Men's Cotton T-Shirts (Pack of 50)"
                                   className="h-12"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <Label htmlFor="shortDesc" className="text-base font-medium">
-                                  Short Description
-                                </Label>
-                                <Input
-                                  name="shortDesc"
-                                  value={formData.shortDesc}
-                                  onChange={handleChange}
-                                  placeholder="A brief summary of your service (100 characters max)"
-                                  className="h-12"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="desc" className="text-base font-medium">
-                                  Full Description
+                                <Label htmlFor="description" className="text-base font-medium">
+                                  Description
                                 </Label>
                                 <Textarea
-                                  name="desc"
-                                  value={formData.desc}
+                                  name="description"
+                                  value={formData.description}
                                   onChange={handleChange}
-                                  placeholder="Describe your service in detail. What makes it unique? What will buyers receive?"
+                                  placeholder="Describe your product in detail..."
                                   className="min-h-[200px] resize-y"
                                 />
                               </div>
@@ -548,43 +510,43 @@ export default function CreateGigPage() {
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <div className="space-y-2">
-                                  <Label htmlFor="price" className="text-base font-medium">
-                                    Price ($)
+                                  <Label htmlFor="bulkPrice" className="text-base font-medium">
+                                    Bulk Price ($ per unit)
                                   </Label>
                                   <Input
                                     type="number"
-                                    name="price"
-                                    value={formData.price}
+                                    name="bulkPrice"
+                                    value={formData.bulkPrice}
                                     onChange={handleChange}
-                                    placeholder="50"
+                                    placeholder="5"
                                     className="h-12"
                                   />
                                 </div>
                                 <div className="space-y-2">
-                                  <Label htmlFor="deliveryTime" className="text-base font-medium">
-                                    Delivery (days)
+                                  <Label htmlFor="minOrderQty" className="text-base font-medium">
+                                    Minimum Order Qty
                                   </Label>
                                   <Input
                                     type="number"
-                                    name="deliveryTime"
-                                    value={String(formData.deliveryTime)}
+                                    name="minOrderQty"
+                                    value={formData.minOrderQty}
                                     onChange={handleChange}
-                                    placeholder="1"
+                                    placeholder="100"
                                     className="h-12"
                                   />
                                 </div>
                                 <div className="space-y-2">
-                                  <Label htmlFor="revisionNumber" className="text-base font-medium">
-                                    Revisions
+                                  <Label htmlFor="leadTime" className="text-base font-medium">
+                                    Lead Time (days)
                                   </Label>
                                   <Input
                                     type="number"
-                                    name="revisionNumber"
-                                    value={String(formData.revisionNumber)}
+                                    name="leadTime"
+                                    value={formData.leadTime}
                                     onChange={handleChange}
-                                    placeholder="1"
+                                    placeholder="7"
                                     className="h-12"
                                   />
                                 </div>
@@ -605,7 +567,7 @@ export default function CreateGigPage() {
                                 />
                                 {mediaState.coverPreview && (
                                   <Image
-                                    src={mediaState.coverPreview || "./placeholder.svg" }
+                                    src={mediaState.coverPreview || "./placeholder.svg"}
                                     alt="Cover Image"
                                     width={400}
                                     height={200}
@@ -615,7 +577,7 @@ export default function CreateGigPage() {
                                   />
                                 )}
                                 <p className="text-xs text-muted-foreground">
-                                  This will be the main image displayed for your service
+                                  This will be the main image for your product
                                 </p>
                               </div>
                               <div className="space-y-2">
@@ -645,15 +607,15 @@ export default function CreateGigPage() {
                                 </div>
                               </div>
                               <div className="space-y-2">
-                                <Label htmlFor="yearsOfExp" className="text-base font-medium">
-                                  Years of Experience
+                                <Label htmlFor="supplyCapacity" className="text-base font-medium">
+                                  Supply Capacity (units/month)
                                 </Label>
                                 <Input
                                   type="number"
-                                  name="yearsOfExp"
-                                  value={formData.yearsOfExp}
+                                  name="supplyCapacity"
+                                  value={formData.supplyCapacity}
                                   onChange={handleChange}
-                                  placeholder="3"
+                                  placeholder="10000"
                                   className="h-12"
                                 />
                               </div>
@@ -717,7 +679,7 @@ export default function CreateGigPage() {
                           ) : (
                             <>
                               <Sparkles className="h-4 w-4" />
-                              Create Service
+                              Create Listing
                             </>
                           )}
                         </Button>
@@ -730,7 +692,7 @@ export default function CreateGigPage() {
                   <div className="sticky top-6">
                     <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                       <CheckCircle2 className="h-5 w-5 text-primary" />
-                      Service Preview
+                      Listing Preview
                     </h3>
                     <GigPreview />
                     <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
@@ -738,13 +700,13 @@ export default function CreateGigPage() {
                         <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
                         <div>
                           <h4 className="font-medium text-amber-800 dark:text-amber-400">
-                            Tips for a great Service
+                            Tips for a great listing
                           </h4>
                           <ul className="text-sm text-amber-700 dark:text-amber-300 mt-2 space-y-1 list-disc pl-4">
                             <li>Use high-quality images</li>
-                            <li>Be specific about what you offer</li>
-                            <li>Highlight your unique skills</li>
-                            <li>Set competitive pricing</li>
+                            <li>Be specific about your product details</li>
+                            <li>Highlight bulk pricing and MOQ</li>
+                            <li>Showcase product features clearly</li>
                           </ul>
                         </div>
                       </div>

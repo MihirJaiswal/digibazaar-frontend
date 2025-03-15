@@ -1,13 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Star, MapPin } from "lucide-react"
-import type { Gig } from "@/app/gigs/types/gig"
 
-interface GigHeaderProps {
-  gig: Gig
-}
-
-export default function GigHeader({ gig }: GigHeaderProps) {
+export default function GigHeader({ gig }) {
   // Calculate rating
   const rating = gig.totalStars > 0 ? (gig.totalStars / gig.starNumber).toFixed(1) : "New"
 

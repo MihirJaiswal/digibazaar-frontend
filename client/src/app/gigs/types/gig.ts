@@ -28,29 +28,23 @@ export interface User {
   }
   
   export interface Gig {
-    id: string
-    userId: string
-    category: string
-    title: string
-    desc: string
-    totalStars: number
-    starNumber: number
-    price: number
-    cover: string
-    images: string[]
-    shortDesc: string
-    deliveryTime: number
-    revisionNumber: number
-    resume: string
-    yearsOfExp: number
-    features: string[]
-    sales: number
-    likes?: number
-    createdAt: string
-    updatedAt: string
-    user: User
-    reviews?: Review[]
-    isLiked?: boolean
+    id: string;
+    userId: string;
+    title: string;
+    description: string;
+    bulkPrice: number; // Price per unit in bulk
+    cover: string; // Cover image URL
+    images: string[]; // Array of image URLs
+    minOrderQty: number; // Minimum Order Quantity
+    leadTime: number; // Estimated fulfillment time (in days)
+    available: boolean; // Whether the product is available
+    supplyCapacity?: number; // Optional: Max production/supply capacity per month
+    features: Record<string, any>; // Features stored as JSON (e.g., colors, sizes)
+    createdAt: string;
+    updatedAt: string;
+
   }
+  
+
   
   

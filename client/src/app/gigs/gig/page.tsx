@@ -1,5 +1,5 @@
 "use client";
-
+import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -48,7 +48,7 @@ interface Gig {
   id: string;
   title: string;
   description: string;
-  price: number;
+  bulkPrice: number;
   rating: number;
   reviews: number;
   seller: {
@@ -60,27 +60,23 @@ interface Gig {
   images: string[];
   category: string;
   tags: string[];
-  deliveryTime: number;
+  leadTime: number;
+  minOrderQty: number;
+  supplyCapacity?: number;
   cover: string;
+  features: string[];  // Added property
 }
 
-// Default categories (static list)
+
 const defaultCategories: Category[] = [
-  { value: "WEB_DEVELOPMENT", label: "Web Development" },
-  { value: "GRAPHIC_DESIGN", label: "Graphic Design" },
-  { value: "DIGITAL_MARKETING", label: "Digital Marketing" },
-  { value: "CONTENT_WRITING", label: "Content Writing" },
-  { value: "VIDEO_ANIMATION", label: "Video & Animation" },
-  { value: "SOFTWARE_DEVELOPMENT", label: "Software Development" },
-  { value: "MOBILE_DEVELOPMENT", label: "Mobile Development" },
-  { value: "DATA_ANALYTICS", label: "Data Analytics" },
-  { value: "BUSINESS", label: "Business Consulting" },
-  { value: "AUDIO_PRODUCTION", label: "Audio Production" },
-  { value: "PHOTOGRAPHY", label: "Photography" },
-  { value: "VIRTUAL_ASSISTANTS", label: "Virtual Assistants" },
+  { value: "FASHION", label: "Fashion" },
+  { value: "ELECTRONICS", label: "Electronics" },
+  { value: "GROCERY", label: "Grocery" },
+  { value: "HOME_DECOR", label: "Home Decor" },
+  { value: "BEAUTY", label: "Beauty" },
+  { value: "TOYS", label: "Toys" },
 ];
 
-// Create a QueryClient instance outside the component to avoid re-creation
 const queryClient = new QueryClient();
 
 function GigsPageContent() {
@@ -94,7 +90,6 @@ function GigsPageContent() {
 
   const itemsPerPage = 9;
 
-  // Fetch categories using React Query
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -104,25 +99,19 @@ function GigsPageContent() {
     },
   });
 
-  // Merge default categories with fetched ones
   const categories = useMemo(() => {
     const fetchedCategories: Category[] =
       Array.isArray(categoriesData) ? categoriesData : categoriesData?.categories ?? [];
-    const mergedCategories = [
+    return [
       { value: "All", label: "All Categories" },
       ...defaultCategories,
       ...fetchedCategories.filter(
         (fc) => !defaultCategories.some((dc) => dc.value === fc.value)
       ),
     ];
-    return mergedCategories;
   }, [categoriesData]);
 
-  // Fetch gigs using React Query
-  const {
-    data: gigsData,
-    isLoading: gigsLoading,
-  } = useQuery({
+  const { data: gigsData, isLoading: gigsLoading } = useQuery({
     queryKey: ["gigs"],
     queryFn: async () => {
       const res = await fetch("http://localhost:8800/api/gigs");
@@ -131,14 +120,12 @@ function GigsPageContent() {
     },
   });
 
-  // Extract gigs array
   const gigs: Gig[] = useMemo(() => {
     const gigsArray: Gig[] =
       Array.isArray(gigsData) ? gigsData : gigsData?.gigs ?? [];
     return gigsArray;
   }, [gigsData]);
 
-  // Filtering logic using useMemo for performance
   const filteredGigs = useMemo(() => {
     let results = [...gigs];
     if (searchTerm) {
@@ -155,16 +142,16 @@ function GigsPageContent() {
       results = results.filter((gig) => gig.category === selectedCategory);
     }
     results = results.filter(
-      (gig) => gig.price >= priceRange[0] && gig.price <= priceRange[1]
+      (gig) => gig.bulkPrice >= priceRange[0] && gig.bulkPrice <= priceRange[1]
     );
-    results = results.filter((gig) => gig.deliveryTime <= deliveryTime[0]);
+    results = results.filter((gig) => gig.leadTime <= deliveryTime[0]);
 
     switch (sortBy) {
       case "price-low":
-        results.sort((a, b) => a.price - b.price);
+        results.sort((a, b) => a.bulkPrice - b.bulkPrice);
         break;
       case "price-high":
-        results.sort((a, b) => b.price - a.price);
+        results.sort((a, b) => b.bulkPrice - a.bulkPrice);
         break;
       case "rating":
         results.sort((a, b) => b.rating - a.rating);
@@ -178,23 +165,20 @@ function GigsPageContent() {
     return results;
   }, [gigs, searchTerm, selectedCategory, priceRange, deliveryTime, sortBy]);
 
-  // Update active filters count
   useEffect(() => {
     let count = 0;
     if (selectedCategory !== "All") count++;
     if (priceRange[0] > 0 || priceRange[1] < 300) count++;
-    if (deliveryTime[0] !== 7) count++;
+    if (deliveryTime[0] !== 30) count++;
     setActiveFilters(count);
   }, [selectedCategory, priceRange, deliveryTime]);
 
-  // Pagination calculation
   const totalPages = Math.ceil(filteredGigs.length / itemsPerPage);
   const currentGigs = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredGigs.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredGigs, currentPage]);
 
-  // Reset filters function
   const resetFilters = () => {
     setSelectedCategory("All");
     setPriceRange([0, 300]);
@@ -205,33 +189,30 @@ function GigsPageContent() {
     <div className="min-h-screen bg-white dark:bg-zinc-900">
       <Header />
       <div className="flex flex-col md:flex-row">
-        {/* Sidebar remains unchanged */}
         <div className="w-full md:w-auto">
           <GigsSidebar />
         </div>
         <main className="py-8 px-4 sm:px-6 lg:px-8">
-          {/* Page Title & Create Gig Button */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">Explore Experts</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold">Explore Supplier Listings</h1>
               <p className="text-neutral-500 dark:text-neutral-300 mt-1">
-                Find the perfect Experts to manage your shop.
+                Find the perfect suppliers for your bulk orders.
               </p>
             </div>
             <Button className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-sm flex items-center gap-2">
               <Plus className="h-4 w-4" />
-              <a href="/gigs/create-gig">Create a Gig</a>
+              <a href="/gigs/create-gig">Create a Listing</a>
             </Button>
           </div>
 
-          {/* Search and Sorting */}
           <div className="rounded-xl shadow-sm border border-neutral-200 dark:border-gray-700 bg-gray-100 dark:bg-zinc-950 p-4 mb-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-grow">
                 <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
                 <Input
                   type="search"
-                  placeholder="Search for services..."
+                  placeholder="Search for listings..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 border-neutral-300 dark:border-gray-700 focus-visible:ring-primary"
@@ -265,18 +246,13 @@ function GigsPageContent() {
                     <SelectItem value="recommended">Recommended</SelectItem>
                     <SelectItem value="newest">Newest</SelectItem>
                     <SelectItem value="rating">Best Rating</SelectItem>
-                    <SelectItem value="price-low">
-                      Price: Low to High
-                    </SelectItem>
-                    <SelectItem value="price-high">
-                      Price: High to Low
-                    </SelectItem>
+                    <SelectItem value="price-low">Price: Low to High</SelectItem>
+                    <SelectItem value="price-high">Price: High to Low</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            {/* Active filters */}
             {activeFilters > 0 && (
               <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-neutral-100 dark:border-gray-700">
                 {selectedCategory !== "All" && (
@@ -314,17 +290,17 @@ function GigsPageContent() {
                   </Badge>
                 )}
 
-                {deliveryTime[0] !== 7 && (
+                {deliveryTime[0] !== 30 && (
                   <Badge
                     variant="outline"
                     className="flex items-center gap-1 px-3 py-1 rounded-full"
                   >
-                    Delivery: Up to {deliveryTime[0]} days
+                    Lead Time: Up to {deliveryTime[0]} days
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-4 w-4 ml-1 hover:bg-neutral-200"
-                      onClick={() => setDeliveryTime([7])}
+                      onClick={() => setDeliveryTime([30])}
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -334,15 +310,13 @@ function GigsPageContent() {
             )}
           </div>
 
-          {/* Results count */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-neutral-600 dark:text-neutral-200">
               {filteredGigs.length}{" "}
-              {filteredGigs.length === 1 ? "service" : "services"} available
+              {filteredGigs.length === 1 ? "listing" : "listings"} available
             </p>
           </div>
 
-          {/* Gigs Grid */}
           {gigsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -373,34 +347,21 @@ function GigsPageContent() {
                   <GigCard key={gig.id} gig={gig} showDescription={true} />
                 ))}
               </div>
-
-              {/* Pagination */}
               {totalPages > 1 && (
-                <>
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                  />
-                  <PaginationContent className="mt-10 flex justify-center gap-2">
-                    {/* Previous Button */}
+                <div className="mt-10">
+                  <PaginationContent className="flex justify-center gap-2">
                     <PaginationItem>
                       <PaginationPrevious
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          if (currentPage > 1)
-                            setCurrentPage(currentPage - 1);
+                          if (currentPage > 1) setCurrentPage(currentPage - 1);
                         }}
                         className={
-                          currentPage === 1
-                            ? "pointer-events-none opacity-50"
-                            : ""
+                          currentPage === 1 ? "pointer-events-none opacity-50" : ""
                         }
                       />
                     </PaginationItem>
-
-                    {/* Page Numbers */}
                     {Array.from({ length: totalPages }).map((_, i) => (
                       <PaginationItem key={i}>
                         <PaginationLink
@@ -410,13 +371,10 @@ function GigsPageContent() {
                             setCurrentPage(i + 1);
                           }}
                           isActive={currentPage === i + 1}
-                        >
-                          {i + 1}
+                        >{i + 1}
                         </PaginationLink>
                       </PaginationItem>
                     ))}
-
-                    {/* Next Button */}
                     <PaginationItem>
                       <PaginationNext
                         href="#"
@@ -433,15 +391,15 @@ function GigsPageContent() {
                       />
                     </PaginationItem>
                   </PaginationContent>
-                </>
+                </div>
               )}
             </>
           ) : (
             <div className="text-center py-16 rounded-xl border border-neutral-200 dark:border-gray-700 bg-neutral-50 dark:bg-zinc-900">
               <Briefcase className="h-12 w-12 mx-auto text-neutral-300 dark:text-neutral-600 mb-4" />
-              <h3 className="text-lg font-medium mb-2">No gigs found</h3>
+              <h3 className="text-lg font-medium mb-2">No listings found</h3>
               <p className="text-neutral-500 dark:text-neutral-200 max-w-md mx-auto mb-6">
-                We couldn&apos;t find any gigs matching your current filters.
+                We couldn&apos;t find any listings matching your current filters.
                 Try adjusting your search criteria.
               </p>
               <Button onClick={resetFilters} variant="outline" className="border-neutral-300">

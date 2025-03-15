@@ -7,11 +7,10 @@ import { Heart, Share2, Pencil, Bookmark } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "sonner";
-import type { Gig } from "@/app/gigs/types/gig";
 import Image from "next/image";
 
 interface GigImageGalleryProps {
-  gig: Gig;
+  gig: any;
   isLiked: boolean;
   isBookmarked: boolean;
   onLike: () => Promise<void>;
@@ -52,7 +51,7 @@ export default function GigImageGallery({
 
         if (!res.ok) throw new Error("Failed to fetch liked gigs");
 
-        const gigs: Gig[] = await res.json();
+        const gigs = await res.json();
         const likedGig = gigs.find((g) => g.id === gig.id);
         setLiked(!!likedGig?.isLiked);
       } catch (error) {

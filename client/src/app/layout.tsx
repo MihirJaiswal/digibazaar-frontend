@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${roboto.variable}  antialiased bg-white dark:bg-black `}>
+      <body className={`${roboto.variable}  antialiased bg-white dark:bg-black `} suppressHydrationWarning={true}>
         <ThemeProvider
         attribute="class"
         defaultTheme="system"

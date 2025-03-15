@@ -3,8 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Clock, RefreshCw, CheckCircle, MessageSquare, Edit, Trash2, X, Package } from "lucide-react"
-import type { Gig } from "@/app/gigs/types/gig"
+import { Clock, CheckCircle, MessageSquare, Edit, Trash2, X, Package, Shield } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useAuthStore } from "@/store/authStore"
@@ -19,9 +18,44 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
+//
+// Updated Gig interface with new supplier listing fields
+//
+export interface Gig {
+  id: string;
+  title: string;
+  description: string;
+  leadTime: number;
+  bulkPrice: number;
+  minOrderQty: number;
+  totalStars: number;
+  starNumber: number;
+  sales: number;
+  features?: string[];
+  category?: string;
+  user: {
+    id: string;
+    username: string;
+    profilePic?: string;
+    bio?: string;
+    country?: string;
+    createdAt: string;
+    badges?: string[];
+  };
+  reviews?: Review[];
+}
+
+export interface Review {
+  id: string;
+  userId: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 interface GigSidebarProps {
-  gig: Gig
-  isOwner: boolean
+  gig: Gig;
+  isOwner: boolean;
 }
 
 export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
@@ -35,33 +69,31 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
   const [isCancelling, setIsCancelling] = useState(false)
   const baseApiUrl = "http://localhost:8800/api"
   const { token, user } = useAuthStore()
-
-  // State for form fields with safer initialization
+  
+  // Updated form state based on new supplier listing fields
   const [formData, setFormData] = useState({
     title: gig.title || "",
-    shortDesc: gig.shortDesc || "",
-    price: gig.price || 0,
-    deliveryTime: gig.deliveryTime || 1,
-    revisionNumber: gig.revisionNumber || 1,
-    features: Array.isArray(gig.features) ? gig.features : ["", "", ""]
+    description: gig.description || "",
+    bulkPrice: gig.bulkPrice || 0,
+    leadTime: gig.leadTime || 1,
+    minOrderQty: gig.minOrderQty || 0,
+    features: Array.isArray(gig.features) ? gig.features : [""]
   })
 
-  // Format date
+  // Format date for "Member since" info
   const memberSince = new Date(gig.user.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
   })
 
-  // Check if user has already ordered this gig
+  // Check if the user has already ordered this listing
   useEffect(() => {
     const checkOrderStatus = async () => {
       if (!token || !user?.id) {
         setIsLoading(false)
         return
       }
-
       try {
-        // Get all orders for the current user
         const response = await fetch(`${baseApiUrl}/gig-orders/user/${user.id}`, {
           method: "GET",
           headers: {
@@ -69,12 +101,9 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
           },
           credentials: "include",
         })
-
         if (response.ok) {
           const orders = await response.json()
-          // Check if any order contains this gig
           const existingOrder = orders.find((order: any) => order.gigId === gig.id)
-          
           if (existingOrder) {
             setHasOrdered(true)
             setOrderData(existingOrder)
@@ -88,18 +117,46 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
         setIsLoading(false)
       }
     }
-
     checkOrderStatus()
   }, [token, user, gig.id, baseApiUrl])
+
+  // Define handleDeleteGig to delete the listing
+  const handleDeleteGig = async () => {
+    if (!confirm("Are you sure you want to delete this listing? This action cannot be undone.")) {
+      return
+    }
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`${baseApiUrl}/gigs/${gig.id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      })
+      if (response.ok) {
+        router.push("/dashboard/gigs")
+        router.refresh()
+      } else {
+        const errorData = await response.json().catch(() => null)
+        throw new Error(`Failed to delete listing: ${errorData?.message || response.status}`)
+      }
+    } catch (error: any) {
+      console.error("Error deleting listing:", error)
+      alert("Failed to delete listing. Please try again.")
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
   const handleEditGig = () => {
     setFormData({
       title: gig.title || "",
-      shortDesc: gig.shortDesc || "",
-      price: gig.price || 0,
-      deliveryTime: gig.deliveryTime || 1,
-      revisionNumber: gig.revisionNumber || 1,
-      features: Array.isArray(gig.features) ? gig.features : ["", "", ""]
+      description: gig.description || "",
+      bulkPrice: gig.bulkPrice || 0,
+      leadTime: gig.leadTime || 1,
+      minOrderQty: gig.minOrderQty || 0,
+      features: Array.isArray(gig.features) ? gig.features : [""]
     })
     setIsEditDialogOpen(true)
   }
@@ -108,18 +165,14 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
     const { name, value } = e.target
     setFormData({
       ...formData,
-      [name]: name === "price" || name === "deliveryTime" || name === "revisionNumber" 
-        ? parseInt(value) || 0 
+      [name]: (name === "bulkPrice" || name === "leadTime" || name === "minOrderQty")
+        ? parseInt(value) || 0
         : value
     })
   }
 
   const handleFeatureChange = (index: number, value: string) => {
-    // Ensure features is an array before updating it
-    const currentFeatures = Array.isArray(formData.features) 
-      ? [...formData.features] 
-      : ["", "", ""]
-    
+    const currentFeatures = Array.isArray(formData.features) ? [...formData.features] : [""]
     currentFeatures[index] = value
     setFormData({
       ...formData,
@@ -129,7 +182,6 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
 
   const handleUpdateGig = async (updatedData: Partial<Gig>) => {
     setIsUpdating(true)
-
     try {
       const response = await fetch(`${baseApiUrl}/gigs/${gig.id}`, {
         method: "PUT",
@@ -140,17 +192,14 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
         body: JSON.stringify(updatedData),
         credentials: "include",
       })
-
       if (!response.ok) {
-        throw new Error(`Failed to update gig: ${response.status}`)
+        throw new Error(`Failed to update listing: ${response.status}`)
       }
-
-      // Refresh the page to show updated data
       window.location.reload()
       return true
     } catch (error) {
-      console.error("Error updating gig:", error)
-      alert("Failed to update gig. Please try again.")
+      console.error("Error updating listing:", error)
+      alert("Failed to update listing. Please try again.")
       return false
     } finally {
       setIsUpdating(false)
@@ -159,20 +208,12 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
 
   const handleSubmitUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Ensure features is an array before filtering
-    const featuresToFilter = Array.isArray(formData.features) 
-      ? formData.features 
-      : ["", "", ""]
-      
-    // Filter out empty features
+    const featuresToFilter = Array.isArray(formData.features) ? formData.features : [""]
     const filteredFeatures = featuresToFilter.filter(feature => feature.trim() !== "")
-    
     const success = await handleUpdateGig({
       ...formData,
       features: filteredFeatures
     })
-    
     if (success) {
       setIsEditDialogOpen(false)
     }
@@ -180,13 +221,10 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
 
   const handleCancelOrder = async () => {
     if (!orderData) return;
-  
     if (!confirm("Are you sure you want to cancel this order? This action cannot be undone.")) {
       return;
     }
-  
     setIsCancelling(true);
-  
     try {
       const response = await fetch(`${baseApiUrl}/gig-orders/${orderData.id}/cancel`, {
         method: "PUT",
@@ -195,15 +233,13 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
         },
         credentials: "include",
       });
-  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to cancel order");
       }
-  
       alert("Order canceled successfully!");
-      setHasOrdered(false); // Update UI to remove order actions
-      setOrderData(null); // Reset order data
+      setHasOrdered(false);
+      setOrderData(null);
     } catch (error: any) {
       console.error("Error canceling order:", error);
       alert(error.message || "Failed to cancel order. Please try again.");
@@ -212,52 +248,20 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
     }
   };
 
-  const handleDeleteGig = async () => {
-    if (!confirm("Are you sure you want to delete this gig? This action cannot be undone.")) {
-      return
-    }
-
-    setIsDeleting(true)
-
-    try {
-      const response = await fetch(`${baseApiUrl}/gigs/${gig.id}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
-        router.push("/dashboard/gigs")
-        router.refresh()
-      } else {
-        const errorData = await response.json().catch(() => null)
-        throw new Error(`Failed to delete gig: ${errorData?.message || response.status}`)
-      }
-    } catch (error) {
-      console.error("Error deleting gig:", error)
-      alert("Failed to delete gig. Please try again.")
-    } finally {
-      setIsDeleting(false)
-    }
-  }
-
   const handleProceedToOrder = () => {
     if (!token) {
-      router.push("/login") // Redirect to login if user is not authenticated
+      router.push("/login")
     } else {
-      router.push(`/gigs/gig/${gig.id}/confirm-order`) // Redirect to order confirmation page
+      router.push(`/gigs/gig/${gig.id}/create-inquiry`)
     }
   }
 
   const handleTrackOrder = () => {
     if (orderData) {
-      router.push(`/gigs/orders/track/${orderData.id}`); // Redirects to the dynamic order tracking page
+      router.push(`/gigs/orders/track/${orderData.id}`);
     }
   };
 
-  // NEW: Create conversation when "Contact Seller" is clicked
   const handleContactSeller = async () => {
     if (!token) {
       router.push("/login")
@@ -272,16 +276,14 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
         },
         credentials: "include",
         body: JSON.stringify({
-          to: gig.user.id, // The seller's user id
+          to: gig.user.id,
         }),
       })
-
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.message || "Failed to create conversation")
       }
       const conversation = await response.json()
-      // Redirect to the messaging page with the conversation id as a query parameter
       router.push(`/chats?conversationId=${conversation.id}`)
     } catch (error: any) {
       console.error("Error creating conversation:", error)
@@ -295,8 +297,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
         {isOwner ? (
           <Card className="border-primary/20 shadow-md">
             <CardContent className="pt-6">
-              <h2 className="text-xl font-bold mb-4">Manage Your Gig</h2>
-
+              <h2 className="text-xl font-bold mb-4">Manage Your Listing</h2>
               <div className="space-y-4">
                 <Button 
                   className="w-full" 
@@ -304,9 +305,8 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                   disabled={isUpdating || isDeleting}
                 >
                   <Edit className="mr-2 h-4 w-4" />
-                  Edit Gig
+                  Edit Listing
                 </Button>
-
                 <Button 
                   variant="destructive" 
                   className="w-full" 
@@ -314,15 +314,17 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                   disabled={isDeleting || isUpdating}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  {isDeleting ? "Deleting..." : "Delete Gig"}
+                  {isDeleting ? "Deleting..." : "Delete Listing"}
                 </Button>
-
                 <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-amber-800 text-sm">
-                  <p className="font-medium">Gig Statistics</p>
+                  <p className="font-medium">Listing Statistics</p>
                   <ul className="mt-2 space-y-1">
                     <li>Views: 124</li>
                     <li>Orders: {gig.sales}</li>
-                    <li>Conversion Rate: {gig.sales > 0 ? ((gig.sales / 124) * 100).toFixed(1) + "%" : "0%"}</li>
+                    <li>
+                      Conversion Rate:{" "}
+                      {gig.sales > 0 ? ((gig.sales / 124) * 100).toFixed(1) + "%" : "0%"}
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -333,25 +335,22 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
             <CardContent className="pt-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Standard Package</h2>
-                <span className="text-2xl font-bold text-primary">${gig.price}</span>
+                <span className="text-2xl font-bold text-primary">
+                  ${gig.bulkPrice}
+                </span>
               </div>
-
-              <p className="text-muted-foreground mb-6">{gig.shortDesc}</p>
-
+              <p className="text-muted-foreground mb-6">{gig.description}</p>
               <div className="space-y-3 mb-6">
                 <div className="flex items-center">
                   <Clock className="h-5 w-5 text-muted-foreground mr-3" />
                   <span>
-                    {gig.deliveryTime} day{gig.deliveryTime !== 1 ? "s" : ""} delivery
+                    {gig.leadTime} day{gig.leadTime !== 1 ? "s" : ""} lead time
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <RefreshCw className="h-5 w-5 text-muted-foreground mr-3" />
-                  <span>
-                    {gig.revisionNumber} revision{gig.revisionNumber !== 1 ? "s" : ""} 
-                  </span>
+                  <CheckCircle className="h-5 w-5 text-muted-foreground mr-3" />
+                  <span>MOQ: {gig.minOrderQty} units</span>
                 </div>
-
                 {gig.features && Array.isArray(gig.features) && gig.features.filter((f) => f).length > 0 && (
                   <>
                     {gig.features.map(
@@ -366,7 +365,6 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                   </>
                 )}
               </div>
-
               {isLoading ? (
                 <Button disabled className="w-full bg-primary hover:bg-primary/90 text-white mb-3">
                   Loading...
@@ -390,46 +388,41 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                   </Button>
                 </div>
               ) : 
-                hasOrdered && orderData?.status == " IN_PROGRESS" ?(
-                  <div>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <p className="text-blue-800 font-medium ">
-                        You cannot cancel this order. Please contact the seller to request cancellation.
-                      </p>
-                    </div>
-
-                   <Button 
-                   className="w-full mt-3" 
-                   onClick={handleTrackOrder}
-                 >
-                   <Package className="mr-2 h-4 w-4" />
-                   Track Order
-                 </Button>
+              hasOrdered && orderData?.status === "IN_PROGRESS" ? (
+                <div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-blue-800 font-medium">
+                      You cannot cancel this order. Please contact the supplier to request cancellation.
+                    </p>
                   </div>
-                )
-              : (
+                  <Button 
+                    className="w-full mt-3" 
+                    onClick={handleTrackOrder}
+                  >
+                    <Package className="mr-2 h-4 w-4" />
+                    Track Order
+                  </Button>
+                </div>
+              ) : (
                 <Button 
                   className="w-full bg-gradient-to-r from-purple-500 to-cyan-500 text-white mb-3" 
                   onClick={handleProceedToOrder}
                 >
-                  Continue (${gig.price})
+                  Continue (${gig.bulkPrice} per unit)
                 </Button>
               )}
-
-              {/* Contact Seller Button triggers conversation creation */}
               <Button 
                 variant="outline" 
                 className="w-full mt-3"
                 onClick={handleContactSeller}
               >
                 <MessageSquare className="mr-2 h-4 w-4" />
-                Contact Seller
+                Contact Supplier
               </Button>
             </CardContent>
           </Card>
         )}
 
-        {/* Seller Card */}
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 mb-4">
@@ -445,14 +438,12 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                 </p>
               </div>
             </div>
-
             <Button variant="outline" className="w-full" onClick={() => router.push(`/profile/${gig.user.id}`)}>
               View Profile
             </Button>
           </CardContent>
         </Card>
 
-        {/* Trust & Safety */}
         {!isOwner && (
           <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg">
             <h3 className="font-medium mb-3 flex items-center">
@@ -477,12 +468,11 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
         )}
       </div>
 
-      {/* Edit Gig Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-md md:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
-              Edit Gig
+              Edit Listing
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -507,11 +497,11 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="shortDesc">Short Description</Label>
+              <Label htmlFor="description">Description</Label>
               <Textarea
-                id="shortDesc"
-                name="shortDesc"
-                value={formData.shortDesc}
+                id="description"
+                name="description"
+                value={formData.description}
                 onChange={handleInputChange}
                 rows={3}
                 required
@@ -520,39 +510,37 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Price ($)</Label>
+                <Label htmlFor="bulkPrice">Bulk Price ($ per unit)</Label>
                 <Input
-                  id="price"
-                  name="price"
+                  id="bulkPrice"
+                  name="bulkPrice"
                   type="number"
                   min="1"
-                  value={formData.price}
+                  value={formData.bulkPrice}
                   onChange={handleInputChange}
                   required
                 />
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="deliveryTime">Delivery (days)</Label>
+                <Label htmlFor="leadTime">Lead Time (days)</Label>
                 <Input
-                  id="deliveryTime"
-                  name="deliveryTime"
+                  id="leadTime"
+                  name="leadTime"
                   type="number"
                   min="1"
-                  value={formData.deliveryTime}
+                  value={formData.leadTime}
                   onChange={handleInputChange}
                   required
                 />
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="revisionNumber">Revisions</Label>
+                <Label htmlFor="minOrderQty">MOQ (units)</Label>
                 <Input
-                  id="revisionNumber"
-                  name="revisionNumber"
+                  id="minOrderQty"
+                  name="minOrderQty"
                   type="number"
-                  min="0"
-                  value={formData.revisionNumber}
+                  min="1"
+                  value={formData.minOrderQty}
                   onChange={handleInputChange}
                   required
                 />
@@ -573,21 +561,9 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                 ))
               ) : (
                 <>
-                  <Input 
-                    placeholder="Feature 1" 
-                    onChange={(e) => handleFeatureChange(0, e.target.value)} 
-                    className="mb-2" 
-                  />
-                  <Input 
-                    placeholder="Feature 2" 
-                    onChange={(e) => handleFeatureChange(1, e.target.value)} 
-                    className="mb-2" 
-                  />
-                  <Input 
-                    placeholder="Feature 3" 
-                    onChange={(e) => handleFeatureChange(2, e.target.value)} 
-                    className="mb-2" 
-                  />
+                  <Input placeholder="Feature 1" onChange={(e) => handleFeatureChange(0, e.target.value)} className="mb-2" />
+                  <Input placeholder="Feature 2" onChange={(e) => handleFeatureChange(1, e.target.value)} className="mb-2" />
+                  <Input placeholder="Feature 3" onChange={(e) => handleFeatureChange(2, e.target.value)} className="mb-2" />
                 </>
               )}
             </div>
@@ -609,25 +585,5 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
         </DialogContent>
       </Dialog>
     </>
-  )
-}
-
-// Shield component
-function Shield(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-    </svg>
   )
 }
