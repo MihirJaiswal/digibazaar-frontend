@@ -134,10 +134,10 @@ export default function StoresPage() {
   }
 
   return (
-    <>
+    <div className="bg-white dark:bg-zinc-900">
       <div className="min-h-screen mx-auto max-w-7xl px-6">
         {/* Hero Section with Pattern Background */}
-        <div className="relative overflow-hidden py-8">
+        <div className="relative overflow-hidden py-16">
           <div className="absolute inset-0 opacity-10">
             <div
               className="absolute inset-0"
@@ -163,7 +163,7 @@ export default function StoresPage() {
                   <Input
                     type="text"
                     placeholder="Search stores by name or category..."
-                    className="pl-10 pr-4"
+                    className="pl-10 pr-4 bg-white dark:bg-zinc-950"
                     value={rawSearchQuery}
                     onChange={(e) => setRawSearchQuery(e.target.value)}
                   />
@@ -259,7 +259,7 @@ export default function StoresPage() {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

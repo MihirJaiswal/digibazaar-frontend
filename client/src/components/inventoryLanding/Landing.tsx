@@ -47,7 +47,7 @@ const Landing = () => {
   return (
    <>
    <Header/>
-    <div className="min-h-screen text-white overflow-hidden">
+    <div className="min-h-screen bg-white dark:bg-zinc-900 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24">
         {/* Hero Section */}
         <motion.div
@@ -70,7 +70,7 @@ const Landing = () => {
           
           {/* Glass overlay with description */}
           <div className="absolute bottom-0 left-0 right-0 glass-effect p-4 backdrop-blur-md">
-            <p className="text-sm text-center text-white/90">
+            <p className="text-sm text-center">
               Experience our intelligent warehouse logistics system in action
             </p>
           </div>

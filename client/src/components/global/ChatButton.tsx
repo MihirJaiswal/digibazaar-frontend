@@ -11,10 +11,14 @@ import { motion, AnimatePresence } from "framer-motion"
 export default function ChatButton() {
   const [isOpen, setIsOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [isToggling, setIsToggling] = useState(false)
   const chatBoxRef = useRef<HTMLDivElement>(null)
 
   const toggleChat = () => {
-    setIsOpen(!isOpen)
+    if (isToggling) return
+    setIsToggling(true)
+    setIsOpen((prev) => !prev)
+    setTimeout(() => setIsToggling(false), 300)
   }
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -36,7 +40,12 @@ export default function ChatButton() {
   }, [isOpen])
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    // Wrapping the entire container in a draggable motion.div.
+    <motion.div
+      drag
+      dragMomentum={false}
+      className="fixed bottom-6 right-6 z-50 flex flex-col items-end"
+    >
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -71,6 +80,7 @@ export default function ChatButton() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        className="relative z-50"
       >
         <Button
           onClick={toggleChat}
@@ -79,7 +89,7 @@ export default function ChatButton() {
           onMouseLeave={() => setIsHovered(false)}
           className={cn(
             "h-14 w-14 rounded-full shadow-lg transition-all duration-300",
-            isOpen ? "bg-destructive hover:bg-destructive/90" : "bg-primary hover:bg-primary/90",
+            isOpen ? "bg-purple-600 hover:bg-purple-600/90" : "bg-primary hover:bg-primary/90"
           )}
           aria-label={isOpen ? "Close Chat" : "Open Chat"}
         >
@@ -94,16 +104,6 @@ export default function ChatButton() {
               {isOpen ? <X className="h-6 w-6" /> : <MessageSquare className="h-6 w-6" />}
             </motion.div>
           </AnimatePresence>
-
-          {!isOpen && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
-            >
-              1
-            </motion.span>
-          )}
         </Button>
       </motion.div>
 
@@ -122,7 +122,6 @@ export default function ChatButton() {
           )}
         </AnimatePresence>
       )}
-    </div>
+    </motion.div>
   )
 }
-
