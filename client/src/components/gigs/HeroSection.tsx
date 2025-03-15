@@ -117,10 +117,10 @@ export default function HeroSection() {
           >
             <div className="relative h-[400px] w-full max-w-[500px] overflow-hidden backdrop-blur-sm md:h-[500px]">
               <Image
-                src="/logo.png"
+                src="/logo2.png"
                 alt="Freelancers collaborating"
                 fill
-                className="object-cover"
+                className="object-cover contrast-200"
                 loading="lazy"
                 quality={100}
               />

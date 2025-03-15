@@ -132,7 +132,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
 
             {/* User profile */}
-            <div className="flex-shrink-0 flex border-t border-gray-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-800">
+            <div className="flex-shrink-0 flex border-t border-gray-200 dark:border-zinc-700 p-4 bg-white dark:bg-gradient-to-t from-black via-zinc-950 to-zinc-900">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'} w-full text-sm text-left text-gray-700 dark:text-gray-300`}>

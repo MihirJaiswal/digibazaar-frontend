@@ -48,7 +48,7 @@ export function AboutUsPage() {
       icon: <div className="size-2 rounded-full bg-purple-700 mr-2" />,
       content: (
         <div className="space-y-8">
-          <div className="flex flex-col md:flex-row gap-8 items-center">
+          <div className="flex flex-col md:flex-row gap-8 items-center justify-between md:bg-white md:dark:bg-gradient-to-br from-zinc-900 via-zinc-950 to-black md:p-8 rounded-lg md:border">
             <div className="flex-1 space-y-5">
               <Badge variant="outline" className="px-3 py-1 text-sm bg-primary/10 border-primary/20 text-primary">
                 Established 2025
@@ -68,15 +68,15 @@ export function AboutUsPage() {
                 <Button variant="outline">Learn More</Button>
               </div>
             </div>
-            <div className="relative w-full md:w-1/2 aspect-[16/9] rounded-xl overflow-hidden flex items-center justify-center">
+            <div className="relative w-full h-full md:w-1/2 bg-white dark:bg-black md:bg-transparent dark:md:bg-transparent rounded-xl overflow-hidden flex items-center justify-center">
                 <Image
-                src="/logo.png"
+                src="/logo2.png"
                 alt="DigiBazaar Image"
                 width={400}
                 height={300}
                 loading="lazy"
                 quality={100}
-                className="md:w-80 md:h-full h-48 object-cover"
+                className="md:w-84 md:h-full h-48 object-cover contrast-200"
                 />
             </div>
           </div>
@@ -99,7 +99,7 @@ export function AboutUsPage() {
                     "description": "Designed for smooth and uninterrupted user experience"
                   }
             ].map((stat, i) => (
-              <Card key={i} className="border bg-card/50 hover:bg-card/80 transition-colors">
+              <Card key={i} className="border bg-gay-100 dark:bg-black hover:bg-card/80 transition-colors">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-3xl font-bold text-primary">{stat.title}</CardTitle>
                   <CardDescription className="text-base font-medium">{stat.subtitle}</CardDescription>
@@ -119,7 +119,7 @@ export function AboutUsPage() {
       icon: <div className="size-2 rounded-full bg-purple-700 mr-2" />,
       content: (
         <div className="space-y-8">
-          <div className="relative overflow-hidden rounded-lg border p-8 bg-gradient-to-br from-primary/5 to-background">
+          <div className="relative overflow-hidden rounded-lg border p-8 bg-gradient-to-br dark:from-zinc-900 via-zinc-950 dark:to-black">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
             <div className="relative">
               <Badge variant="outline" className="px-3 py-1 text-sm bg-primary/10 border-primary/20 text-primary">
@@ -569,7 +569,7 @@ export function AboutUsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            <Card className="border bg-gradient-to-br from-primary/5 to-background overflow-hidden">
+            <Card className="border bg-gradient-to-br from-purple-50 to-white dark:from-zinc-900 dark:to-black overflow-hidden">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -621,7 +621,7 @@ export function AboutUsPage() {
               </CardContent>
             </Card>
 
-            <Card className="border bg-gradient-to-br from-primary/5 to-background overflow-hidden">
+            <Card className="border bg-gradient-to-br from-purple-50 to-white dark:from-zinc-900 dark:to-black overflow-hidden">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -751,24 +751,34 @@ export function AboutUsPage() {
                 </div>
 
                 <div className="flex justify-center space-x-4">
-                  {["Twitter", "LinkedIn", "Facebook", "Instagram"].map((social, i) => (
-                    <Button key={i} variant="outline" size="icon" className="rounded-full">
-                      <span className="sr-only">{social}</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="size-4"
-                      >
-                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                      </svg>
-                    </Button>
-                  ))}
-                </div>
+  {[
+    {
+      name: "Github",
+      href: "https://github.com/MihirJaiswal",
+      icon: <Github className="h-6 w-6" />,
+    },
+    {
+      name: "LinkedIn",
+      href: "https://www.linkedin.com/in/mihir-jaiswal-322898287/",
+      icon: <Linkedin className="h-6 w-6" />,
+    },
+    {
+      name: "Instagram",
+      href: "https://www.instagram.com/mihir_jaiswal_/",
+      icon: <Instagram className="h-6 w-6" />,
+    },
+  ].map((social, i) => (
+    <Link
+      key={i}
+      href={social.href}
+      className="text-muted-foreground hover:text-primary transition-transform duration-200 hover:scale-110"
+    >
+      <span className="sr-only">{social.name}</span>
+      {social.icon}
+    </Link>
+  ))}
+</div>
+
               </CardContent>
             </Card>
 
@@ -847,7 +857,7 @@ export function AboutUsPage() {
             </div>
             </aside>
 
-          <main className="relative py-6 lg:gap-10 lg:py-10 xl:grid w-full mx-auto px-6">
+          <main className="relative py-6 lg:gap-10 lg:py-12 xl:grid w-full mx-auto px-6">
             <div className="mx-auto w-full min-w-0 px-1 md:px-6">
                 <div className="mb-8">
                   <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight leading-tight">About DigiBazaar</h1>
