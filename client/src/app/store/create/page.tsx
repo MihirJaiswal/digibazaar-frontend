@@ -132,17 +132,17 @@ export default function SetupWizardPage() {
   return (
     <>
     <Header/>
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-white dark:bg-zinc-900">
       <main className="flex-1 py-6 px-4 sm:px-6 md:px-8 lg:px-10">
-        <div className="mx-auto max-w-5xl border pt-8 rounded-lg">
+        <div className="mx-auto max-w-5xl border pt-8 rounded-lg bg-white dark:bg-black">
           {/* Progress indicator */}
           <div className="mb-6">
-            <div className="flex items-center justify-between max-w-md mx-auto">
+            <div className="flex items-center justify-between max-w-64 md:max-w-md mx-auto">
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
                   className={`relative flex h-8 w-8 items-center justify-center rounded-full ${
-                    step >= i ? "bg-primary text-primary-foreground" : "border bg-muted"
+                    step >= i ? "bg-purple-500 dark:text-white text-black" : "border bg-muted"
                   }`}
                 >
                   {step > i ? <Check className="h-4 w-4" /> : i}
@@ -257,7 +257,7 @@ export default function SetupWizardPage() {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="border-t bg-muted/50 px-6 py-4">
+                <CardFooter className="border-t bg-white dark:bg-black px-6 py-4">
                   <Button onClick={handleNext} className="ml-auto">
                     Next
                     <ChevronRight className="ml-2 h-4 w-4" />
@@ -300,7 +300,7 @@ export default function SetupWizardPage() {
                     ))}
                   </RadioGroup>
                 </CardContent>
-                <CardFooter className="border-t bg-muted/50 px-6 py-4 flex justify-between">
+                <CardFooter className="border-t bg-white dark:bg-black px-6 py-4 flex justify-between">
                   <Button variant="outline" onClick={handleBack}>
                     Back
                   </Button>
@@ -408,7 +408,7 @@ export default function SetupWizardPage() {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="border-t bg-muted/50 px-6 py-4 flex justify-between">
+                <CardFooter className="border-t  bg-white dark:bg-black px-6 py-4 flex justify-between">
                   <Button variant="outline" onClick={handleBack}>
                     Back
                   </Button>
@@ -472,7 +472,7 @@ export default function SetupWizardPage() {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="border-t bg-muted/50 px-6 py-4 flex justify-between">
+                <CardFooter className="border-t bg-white dark:bg-black px-6 py-4 flex justify-between">
                   <Button variant="outline" onClick={handleBack}>
                     Back
                   </Button>
