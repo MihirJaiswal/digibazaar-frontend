@@ -32,7 +32,6 @@ function Cta() {
                   Schedule a Demo
                 </Button>
               </div>
-              <p className="text-sm text-muted-foreground mt-4">No credit card required. 14-day free trial.</p>
             </div>
           </div>
         </section>

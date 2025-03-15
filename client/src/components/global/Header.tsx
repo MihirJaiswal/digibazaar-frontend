@@ -92,6 +92,7 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-6">
           {[
             { name: "Home", path: "/" },
+            { name: "About", path: "/about" },
             { name: "Store", path: "/store" },
             { name: "Experts", path: "/gigs" },
             { name: "Community", path: "/community" },
