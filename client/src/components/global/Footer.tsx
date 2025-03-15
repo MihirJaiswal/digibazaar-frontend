@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 const Footer = () => {
     return (
-        <footer className="flex flex-col relative items-center justify-center border-t border-border pt-16 pb-8 md:pb-0 px-6 lg:px-8 w-full  mx-auto lg:pt-32 bg-[radial-gradient(35%_128px_at_50%_0%,theme(backgroundColor.white/8%),transparent)]">
+        <footer className="flex flex-col relative items-center justify-center border-t border-border pt-16 pb-8 md:pb-0 px-6 lg:px-8 w-full  mx-auto lg:pt-32 bg-[radial-gradient(35%_128px_at_50%_0%,rgba(255,255,255,0.08),white)] dark:bg-[radial-gradient(35%_128px_at_50%_0%,rgba(255,255,255,0.08),black)]">
 
             <div className="absolute top-0 left-1/2 right-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-1.5 bg-foreground rounded-full"></div>
 
@@ -20,7 +20,7 @@ const Footer = () => {
                         <p className="text-muted-foreground mt-4 text-sm text-start">
                             Manage your warehouse and store with ease.
                         </p>
-                        <span className="mt-4 text-neutral-200 text-sm flex items-center">
+                        <span className="mt-4 text-gray-900 dark:text-neutral-200 text-sm flex items-center">
                             Made by <Link href="/" className="font-semibold ml-1">Mihir Jaiswal</Link>
                         </span>
                     </div>

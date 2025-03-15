@@ -834,22 +834,19 @@ export function AboutUsPage() {
       <Header/>
       <div className="container flex-1">
         <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] lg:grid-cols-[240px_1fr]">
-          <aside className="hidden md:block border-r bg-white dark:bg-black">
-            <div className="sticky top-16">
-                <div className="w-full">
-                  <div className="pb-4">
-                    <h4 className="mb-3 px-2 text-xs uppercase tracking-wider font-semibold text-muted-foreground pt-3">
-                      About DigiBazaar
-                    </h4>
-                    <DocsSidebarNav
-                      sections={sections}
-                      activeSection={activeSection}
-                      setActiveSection={setActiveSection}
-                    />
-                  </div>
-                </div>
+        <aside className="hidden md:block border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-black shadow-lg">
+            <div className="sticky top-16 p-6">
+                <h4 className="mb-4 text-xs uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">
+                About DigiBazaar
+                </h4>
+                <DocsSidebarNav
+                sections={sections}
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+                />
             </div>
-          </aside>
+            </aside>
+
           <main className="relative py-6 lg:gap-10 lg:py-10 xl:grid w-full mx-auto px-6">
             <div className="mx-auto w-full min-w-0 px-1 md:px-6">
                 <div className="mb-8">
