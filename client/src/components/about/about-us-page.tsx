@@ -45,7 +45,7 @@ export function AboutUsPage() {
     {
       id: "introduction",
       title: "Introduction",
-      icon: <div className="size-2 rounded-full bg-primary mr-2" />,
+      icon: <div className="size-2 rounded-full bg-purple-700 mr-2" />,
       content: (
         <div className="space-y-8">
           <div className="flex flex-col md:flex-row gap-8 items-center">
@@ -116,7 +116,7 @@ export function AboutUsPage() {
     {
       id: "mission",
       title: "Our Mission",
-      icon: <div className="size-2 rounded-full bg-primary mr-2" />,
+      icon: <div className="size-2 rounded-full bg-purple-700 mr-2" />,
       content: (
         <div className="space-y-8">
           <div className="relative overflow-hidden rounded-lg border p-8 bg-gradient-to-br from-primary/5 to-background">
@@ -210,7 +210,7 @@ export function AboutUsPage() {
     {
         id: "about",
         title: "About Me",
-         icon: <div className="size-2 rounded-full bg-primary mr-2" />,
+         icon: <div className="size-2 rounded-full bg-purple-700 mr-2" />,
         "content": (
           <div className="space-y-8">
             <div className="text-center max-w-3xl mx-auto">
@@ -285,7 +285,7 @@ export function AboutUsPage() {
     {
       id: "services",
       title: "Our Services",
-      icon: <div className="size-2 rounded-full bg-primary mr-2" />,
+      icon: <div className="size-2 rounded-full bg-purple-700 mr-2" />,
       content: (
         <div className="space-y-6">
           <div className="text-center max-w-3xl mx-auto">
@@ -410,7 +410,7 @@ export function AboutUsPage() {
     {
       id: "how-it-works",
       title: "How It Works",
-      icon: <div className="size-2 rounded-full bg-primary mr-2" />,
+      icon: <div className="size-2 rounded-full bg-purple-700 mr-2" />,
       content: (
         <div className="space-y-6">
           <div className="text-center max-w-3xl mx-auto">
@@ -554,7 +554,7 @@ export function AboutUsPage() {
     {
       id: "technology",
       title: "Technology Stack",
-      icon: <div className="size-2 rounded-full bg-primary mr-2" />,
+      icon: <div className="size-2 rounded-full bg-purple-700 mr-2" />,
       content: (
         <div className="space-y-6">
           <div className="text-center max-w-3xl mx-auto">
@@ -692,7 +692,7 @@ export function AboutUsPage() {
     {
       id: "contact",
       title: "Contact Us",
-      icon: <div className="size-2 rounded-full bg-primary mr-2" />,
+      icon: <div className="size-2 rounded-full bg-purple-700 mr-2" />,
       content: (
         <div className="space-y-6">
           <div className="text-center max-w-3xl mx-auto">
