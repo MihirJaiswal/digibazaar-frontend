@@ -79,6 +79,38 @@ const defaultCategories: Category[] = [
 
 const queryClient = new QueryClient();
 
+// Skeleton component for better loading state
+const GigCardSkeleton = () => (
+  <Card className="overflow-hidden h-full flex flex-col transition-shadow hover:shadow-md">
+    <Skeleton className="aspect-[4/3] w-full" />
+    <CardContent className="p-5 flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <Skeleton className="w-10 h-10 rounded-full" />
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-2 w-20" />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-5 w-full" />
+        <Skeleton className="h-5 w-4/5" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-3 w-4/5" />
+        <Skeleton className="h-3 w-3/4" />
+      </div>
+      <div className="flex flex-wrap gap-1 mt-1">
+        <Skeleton className="h-6 w-16 rounded-full" />
+        <Skeleton className="h-6 w-20 rounded-full" />
+      </div>
+      <div className="mt-auto pt-3 border-t flex justify-between items-center">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-7 w-28" />
+      </div>
+    </CardContent>
+  </Card>
+);
+
 function GigsPageContent() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -192,7 +224,7 @@ function GigsPageContent() {
         <div className="w-full md:w-auto">
           <GigsSidebar />
         </div>
-        <main className="py-8 px-4 sm:px-6 lg:px-8">
+        <main className="py-8 px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold">Explore Supplier Listings</h1>
@@ -318,26 +350,9 @@ function GigsPageContent() {
           </div>
 
           {gigsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className="overflow-hidden h-full flex flex-col">
-                  <Skeleton className="aspect-[4/3] w-full" />
-                  <CardContent className="p-5 flex-grow flex flex-col">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Skeleton className="w-8 h-8 rounded-full" />
-                      <div className="space-y-1">
-                        <Skeleton className="h-3 w-24" />
-                        <Skeleton className="h-2 w-16" />
-                      </div>
-                    </div>
-                    <Skeleton className="h-4 w-full mb-1" />
-                    <Skeleton className="h-4 w-3/4 mb-3" />
-                    <div className="mt-auto">
-                      <Skeleton className="h-3 w-24 mb-2" />
-                      <Skeleton className="h-6 w-16" />
-                    </div>
-                  </CardContent>
-                </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <GigCardSkeleton key={i} />
               ))}
             </div>
           ) : filteredGigs.length > 0 ? (
@@ -347,8 +362,7 @@ function GigsPageContent() {
                   <GigCard key={gig.id} gig={gig} showDescription={true} />
                 ))}
               </div>
-              {totalPages > 1 && (
-                <div className="mt-10">
+              {totalPages > 1 && (<div className="mt-10">
                   <PaginationContent className="flex justify-center gap-2">
                     <PaginationItem>
                       <PaginationPrevious

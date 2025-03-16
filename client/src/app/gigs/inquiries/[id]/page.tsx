@@ -33,6 +33,8 @@ import {
   Zap,
   Info,
 } from "lucide-react"
+import Header from "@/components/global/Header"
+import GigsSidebar from "@/components/gigs/GigsSidebar"
 
 // Helper: Format date in a readable way
 const formatDate = (dateString: string): string => {
@@ -787,8 +789,12 @@ export default function NegotiationDetailPage() {
       // Business logic: Calculate total with shipping
 
   return (
+    <>
+   <Header/>
+   <div className="flex bg-white dark:bg-zinc-900">
+    <GigsSidebar/>
     <div className="container mx-auto p-4 space-y-6 max-w-4xl">
-      <Link href="/inquiries">
+      <Link href="/gigs/inquiries" className="md:hidden" >
         <span className="text-blue-500 hover:underline flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -798,12 +804,12 @@ export default function NegotiationDetailPage() {
       </Link>
 
       {/* Header Section */}
-      <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-100 dark:border-zinc-700">
+      <div className="bg-white dark:bg-zinc-950 rounded-xl shadow-lg md:p-6 p-3 mb-6 border border-gray-100 dark:border-zinc-700">
         <div className="flex justify-between items-center mb-5">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Negotiation Details</h1>
           {getStatusBadge(inquiry.status)}
         </div>
-        <div className="flex justify-between items-center flex-wrap gap-3">
+        <div className="flex justify-between items-center flex-wrap gap-3 mb-5">
           <p className="text-gray-600 dark:text-gray-300 text-sm flex items-center">
             <Calendar className="w-4 h-4 mr-2 text-gray-400" />
             Created on {formatDate(inquiry.createdAt)}
@@ -823,8 +829,8 @@ export default function NegotiationDetailPage() {
       </div>
 
       {/* Gig Summary Card */}
-      <Card className="shadow-lg rounded-xl overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-4">
+      <Card className="shadow-lg rounded-t-xl rounded-b-none overflow-hidden">
+        <CardHeader className="p-4">
           <div className="flex items-center">
             <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
               <Image
@@ -863,7 +869,7 @@ export default function NegotiationDetailPage() {
       </Card>
 
       {/* Inquiry Detail Card */}
-      <Card className="shadow-lg rounded-xl bg-white dark:bg-zinc-800 p-6">
+      <Card className="shadow-lg rounded-t-none rounded-b-xl bg-white dark:bg-zinc-950 p-6">
         <div className="flex items-center space-x-4">
           {otherParty?.profilePic ? (
             <Image
@@ -887,7 +893,7 @@ export default function NegotiationDetailPage() {
         <Separator className="my-4" />
 
         {/* Price Summary */}
-        <div className="mb-6 bg-gray-50 dark:bg-zinc-700/50 p-5 rounded-lg border border-gray-100 dark:border-zinc-700">
+        <div className="mb-6 bg-gray-50 dark:bg-zinc-950 p-5 rounded-lg border border-gray-100 dark:border-zinc-700">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
             <DollarSign className="w-5 h-5 mr-2 text-primary" />
             Order Summary
@@ -929,7 +935,7 @@ export default function NegotiationDetailPage() {
         </div>
 
         {/* Negotiation History */}
-        <div className="mb-6 bg-white dark:bg-zinc-800 p-5 rounded-lg border border-gray-100 dark:border-zinc-700">
+        <div className="mb-6 bg-white dark:bg-zinc-950 p-5 rounded-lg border border-gray-100 dark:border-zinc-700">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
             <MessageSquare className="w-5 h-5 mr-2 text-primary" />
             Negotiation Timeline
@@ -1119,6 +1125,8 @@ export default function NegotiationDetailPage() {
       </Dialog>
     </div>
 </div>
+    </div> 
+    </>
   );
   }
 

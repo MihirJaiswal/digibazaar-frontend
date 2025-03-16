@@ -27,6 +27,8 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import Header from "@/components/global/Header"
+import GigsSidebar from "@/components/gigs/GigsSidebar"
 
 export interface Inquiry {
   id: string
@@ -150,6 +152,10 @@ export default function InquiriesPage() {
   }
 
   return (
+    <>
+   <Header/>
+   <div className="flex bg-white dark:bg-zinc-900">
+    <GigsSidebar/>
     <div className="container mx-auto p-4 max-w-6xl">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
@@ -238,6 +244,8 @@ export default function InquiriesPage() {
         </TabsContent>
       </Tabs>
     </div>
+    </div> 
+    </>
   )
 }
 

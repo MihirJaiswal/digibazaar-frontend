@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import Image from "next/image"
+import Header from "@/components/global/Header"
 
 export default function InquiryPage() {
   const router = useRouter()
@@ -199,7 +200,9 @@ export default function InquiryPage() {
   const isPriceHigher = Number.parseFloat(requestedPrice) > gig.bulkPrice
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 py-16 px-4 sm:px-6">
+    <>
+    <Header/>
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 py-6 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center mb-8">
           <Link href="/gigs" className="text-primary hover:text-primary/80 flex items-center">
@@ -209,7 +212,7 @@ export default function InquiryPage() {
         </div>
 
         <Card className="shadow-lg rounded-xl overflow-hidden border-0">
-          <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b px-6 py-6">
+          <CardHeader className="border-b px-6 py-6">
             <div className="flex items-start gap-4">
               <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 bg-white">
                 <Image
@@ -274,7 +277,7 @@ export default function InquiryPage() {
             <form onSubmit={handleSubmitInquiry} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2 flex items-center">
+                  <label className="text-sm font-medium mb-2 flex items-center">
                     <Package className="h-4 w-4 mr-2 text-muted-foreground" />
                     Quantity Required
                   </label>
@@ -291,7 +294,7 @@ export default function InquiryPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 flex items-center">
+                  <label className="text-sm font-medium mb-2 flex items-center">
                     <DollarSign className="h-4 w-4 mr-2 text-muted-foreground" />
                     Requested Price (per unit)
                   </label>
@@ -364,7 +367,7 @@ export default function InquiryPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium mb-2 flex items-center">
+                <label className="text-sm font-medium mb-2 flex items-center">
                   <MessageSquare className="h-4 w-4 mr-2 text-muted-foreground" />
                   Additional Requirements
                 </label>
@@ -400,6 +403,7 @@ export default function InquiryPage() {
         </Card>
       </div>
     </div>
+    </>
   )
 }
 

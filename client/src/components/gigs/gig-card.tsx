@@ -16,7 +16,7 @@ import { Progress } from "@/components/ui/progress"
 interface Seller {
   id: string
   username: string
-  profilePicture: string
+  profilePic: string
   level: string
 }
 
@@ -37,12 +37,9 @@ interface Gig {
   isLiked?: boolean
 }
 
-interface GigCardProps {
-  gig: Gig
-  showDescription?: boolean
-}
 
-export function GigCard({ gig, showDescription = false }: GigCardProps) {
+
+export function GigCard({ gig, showDescription = false }) {
   const { token } = useAuthStore()
   const [isLiked, setIsLiked] = useState<boolean>(gig.isLiked ?? false)
   const [imageLoaded, setImageLoaded] = useState(false)
@@ -110,14 +107,14 @@ export function GigCard({ gig, showDescription = false }: GigCardProps) {
 
   return (
     <Card
-      className="w-full overflow-hidden h-full flex flex-col border border-neutral-200 dark:border-neutral-800 transition-all duration-300 hover:shadow-md rounded-xl bg-white dark:bg-neutral-900"
+      className="w-full overflow-hidden h-full flex flex-col border border-neutral-200 dark:border-neutral-800 transition-all duration-300 hover:shadow-md rounded-xl bg-white dark:bg-black"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       <Link href={`/gigs/gig/${gig.id}`} className="flex-grow flex flex-col">
         <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl">
           {!imageLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 dark:bg-neutral-800">
+            <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 dark:bg-black">
               <Skeleton className="w-full h-full" />
             </div>
           )}
@@ -162,31 +159,6 @@ export function GigCard({ gig, showDescription = false }: GigCardProps) {
           )}
         </div>
         <CardContent className="p-5 flex-grow flex flex-col">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="relative w-10 h-10 rounded-full overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-sm bg-neutral-50 dark:bg-neutral-800">
-              <Image
-                src={gig.seller?.profilePicture || "/placeholder.svg"}
-                alt={gig.seller?.username || "Seller profile"}
-                width={40}
-                height={40}
-                loading="lazy"
-                quality={90}
-                className="w-full h-full object-cover"
-              />
-              {gig.seller?.level.includes("Pro") && (
-                <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-0.5 border border-white dark:border-neutral-900">
-                  <BadgeCheck className="h-3.5 w-3.5 text-white" />
-                </div>
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-neutral-900 dark:text-neutral-200 flex items-center gap-1">
-                {gig.seller?.username}
-              </p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">{gig.seller?.level}</p>
-            </div>
-          </div>
-
           <h3 className="font-semibold text-neutral-900 dark:text-neutral-200 mb-3 line-clamp-2 group-hover:text-primary transition-colors text-base">
             {gig.title}
           </h3>
@@ -242,7 +214,6 @@ export function GigCard({ gig, showDescription = false }: GigCardProps) {
               <Button
                 variant="default"
                 size="sm"
-                className="text-xs font-medium bg-primary hover:bg-primary/90 text-white transition-colors"
               >
                 View Details
               </Button>
