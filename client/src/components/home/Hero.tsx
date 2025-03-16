@@ -8,6 +8,7 @@ import { useMobile } from "./use-mobile"
 import LoadingScreen from "./loading-screen"
 import { useTheme } from "next-themes"
 import DigiBazaarScene from "./digibazaar-scene"
+import Link from "next/link"
 
 export default function Hero() {
   const [loaded, setLoaded] = useState(false)
@@ -66,15 +67,19 @@ export default function Hero() {
           DIGI-BAZAAR
         </h1>
         <p className={`mb-6 text-lg md:text-lg text-center md:text-left ${textColor}`}>
-        Build your online store, manage inventory effortlessly, and connect with customers – No hassle, just growth!
+        Sell online or in bulk, manage your store, streamline wholesale orders, and grow your business effortlessly!
         </p>
         <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+          <Link href='/inventory'>
           <Button className={primaryButtonClass}>
             Get Started
           </Button>
+          </Link>
+          <Link href='/about'>
           <Button variant="outline" className={secondaryButtonClass}>
             Learn More
           </Button>
+          </Link>
         </div>
       </div>
       

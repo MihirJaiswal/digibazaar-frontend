@@ -18,19 +18,23 @@ function Cta() {
                   <ArrowRightIcon className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
                 </TextShimmer>
                         <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                  Ready to Transform Your Warehouse Operations?
+                  Ready to Expand Your Business To New Heights?
                 </h2>
                 <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg mt-1">
-                  Join thousands of businesses that have optimized their warehouse management with our solution.
+                  Join thousands of businesses that have optimized their warehouse management, Store, Sales with our solution.
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row mt-6">
-                <Button size="lg" className="px-8 bg-gradient-to-r from-purple-500 to-cyan-500">
-                  Start Free Trial
+              <Link href="/inventory">
+                <Button size="lg" className="px-8 bg-gradient-to-r from-purple-600 to-cyan-500">
+                  Start Your Store
                 </Button>
+              </Link>
+              <Link href="/gigs">
                 <Button size="lg" variant="outline" className="px-8">
-                  Schedule a Demo
+                  Sell in Bulk
                 </Button>
+              </Link>
               </div>
             </div>
           </div>

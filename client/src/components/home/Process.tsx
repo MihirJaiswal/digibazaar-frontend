@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { BarChart3, Layers, MessageSquare, ShoppingCart, Zap } from "lucide-react"
+import { BarChart3, Layers, MessageSquare, ShoppingCart, Zap, Handshake } from "lucide-react"
 import ServiceCard from "./service-card"
 import { HeroVideoDialog } from "../ui/hero-video-dialog"
 import { Button } from "@/components/ui/button"
@@ -56,9 +56,9 @@ export default function ServicesPage() {
                 gradientTo="to-indigo-500"
               />
               <ServiceCard
-                icon={<MessageSquare className="h-10 w-10" />}
-                title="Hire Experts"
-                description="Hire Experts for managaing your stores, Connect with top eCommerce professionals to optimize and grow your store effortlessly."
+                icon={<Handshake className="h-10 w-10" />}
+                title="Sell in Bulk"
+                description="Reach businesses worldwide by offering wholesale deals with seamless order management."
                 gradientFrom="from-red-500"
                 gradientTo="to-pink-500"
                 className="lg:translate-y-12"
@@ -151,7 +151,7 @@ export default function ServicesPage() {
                   </li>
                 </ul>
                 <Button size="lg" asChild className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:bg-purple-600">
-                  <Link href="/learn-more">Learn More</Link>
+                  <Link href="/about">Learn More</Link>
                 </Button>
               </div>
               <div className="relative aspect-video overflow-hidden rounded-xl">\

@@ -48,7 +48,7 @@ export function AboutUsPage() {
       icon: <div className="size-2 rounded-full bg-purple-700 mr-2" />,
       content: (
         <div className="space-y-8">
-          <div className="flex flex-col md:flex-row gap-8 items-center justify-between md:bg-white md:dark:bg-gradient-to-br from-zinc-900 via-zinc-950 to-black md:p-8 rounded-lg md:border">
+          <div className="flex flex-col md:flex-row gap-8 items-center justify-between md:bg-white md:dark:bg-black md:p-8 rounded-lg md:border">
             <div className="flex-1 space-y-5">
               <Badge variant="outline" className="px-3 py-1 text-sm bg-primary/10 border-primary/20 text-primary">
                 Established 2025
@@ -62,10 +62,11 @@ export function AboutUsPage() {
                 you're looking to buy, sell, or simply explore what the digital marketplace has to offer.
               </p>
               <div className="flex gap-4 pt-2">
+                <Link href="/auth/login">
                 <Button>
                   Get Started <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-                <Button variant="outline">Learn More</Button>
+                </Link>
               </div>
             </div>
             <div className="relative w-full h-full md:w-1/2 bg-white dark:bg-black md:bg-transparent dark:md:bg-transparent rounded-xl overflow-hidden flex items-center justify-center">
@@ -540,10 +541,12 @@ export function AboutUsPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="border-t bg-muted/50 flex justify-center py-4">
+                  <Link href='/auth/login'>
                   <Button className="gap-2">
                     Become a Seller
                     <ArrowRight className="h-4 w-4" />
                   </Button>
+                  </Link>
                 </CardFooter>
               </Card>
             </TabsContent>
