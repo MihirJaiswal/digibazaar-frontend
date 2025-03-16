@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Header from "../global/Header"
 import Footer from "../global/Footer"
+import DocsSidebar from "./sidebar"
 
 export function AboutUsPage() {
   const [open, setOpen] = useState(false)
@@ -844,44 +845,47 @@ export function AboutUsPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-zinc-900">
-      <Header/>
-      <div className="container flex-1">
-        <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] lg:grid-cols-[240px_1fr]">
-        <aside className="hidden md:block border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-black shadow-lg">
-            <div className="sticky top-16 p-6">
-                <h4 className="mb-4 text-xs uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">
-                About DigiBazaar
-                </h4>
-                <DocsSidebarNav
-                sections={sections}
-                activeSection={activeSection}
-                setActiveSection={setActiveSection}
-                />
-            </div>
-            </aside>
-
-          <main className="relative py-6 lg:gap-10 lg:py-12 xl:grid w-full">
-            <div className="mx-auto w-full max-w-7xl min-w-0 px-6 md:px-8 lg:px-12">
-                <div className="mb-8">
-                  <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight leading-tight">About DigiBazaar</h1>
-                  <p className="mt-2 text-lg text-muted-foreground font-normal leading-relaxed">
-                    Learn about our company, mission, and the team behind DigiBazaar
-                  </p>
-                </div>
-                <div className="space-y-16">
-                  {sections.map((section) => (
-                    <div key={section.id} id={section.id} data-section={section.id} className="pb-10 scroll-mt-16">
-                      {section.content}
-                    </div>
-                  ))}
-                </div>
-            </div>
-          </main>
+  <Header />
+  <div className="container flex-1 py-6 lg:py-12">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[250px_1fr] lg:gap-10">
+      <aside className="sticky top-16 self-start overflow-y-auto lg:h-[calc(100vh-4rem)]">
+      <DocsSidebar
+          sections={sections.map((section, index) => ({
+            title: section.title,
+            items: [], // If you want to add subsections, add them here
+          }))}
+          activeSection={sections.findIndex(section => section.id === activeSection)}
+          setActiveSection={(index) => setActiveSection(sections[index].id)}
+        />
+      </aside>
+      <main className="relative w-full min-w-0 px-6">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="mb-8">
+            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight leading-tight">
+              About DigiBazaar
+            </h1>
+            <p className="mt-2 text-lg text-muted-foreground font-normal leading-relaxed">
+              Learn about our company, mission, and the team behind DigiBazaar
+            </p>
+          </div>
+          <div className="space-y-16">
+            {sections.map((section) => (
+              <div 
+                key={section.id} 
+                id={section.id} 
+                data-section={section.id} 
+                className="pb-10 scroll-mt-16"
+              >
+                {section.content}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-
-      <Footer/>
+      </main>
     </div>
+  </div>
+  <Footer />
+</div>
   )
 }
 

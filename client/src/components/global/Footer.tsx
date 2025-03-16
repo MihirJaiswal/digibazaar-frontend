@@ -31,27 +31,27 @@ const Footer = () => {
                         <AnimationContainer delay={0.2}>
                             <div className="">
                                 <h3 className="text-base font-medium text-white">
-                                    Product
+                                    Sell in Bulk
                                 </h3>
                                 <ul className="mt-4 text-sm text-muted-foreground">
                                     <li className="mt-2">
-                                        <Link href="" className="hover:text-foreground transition-all duration-300">
-                                            Features
+                                        <Link href="/gigs" className="hover:text-foreground transition-all duration-300">
+                                            Wholesale
                                         </Link>
                                     </li>
                                     <li className="mt-2">
-                                        <Link href="" className="hover:text-foreground transition-all duration-300">
-                                            Pricing
+                                        <Link href="/gigs/gig" className="hover:text-foreground transition-all duration-300">
+                                            Marketplace
                                         </Link>
                                     </li>
                                     <li className="mt-2">
-                                        <Link href="" className="hover:text-foreground transition-all duration-300">
-                                            Testimonials
+                                        <Link href="/about" className="hover:text-foreground transition-all duration-300">
+                                            About
                                         </Link>
                                     </li>
                                     <li className="mt-2">
-                                        <Link href="" className="hover:text-foreground transition-all duration-300">
-                                            Integration
+                                        <Link href="/" className="hover:text-foreground transition-all duration-300">
+                                            Home
                                         </Link>
                                     </li>
                                 </ul>
@@ -64,22 +64,17 @@ const Footer = () => {
                                 </h3>
                                 <ul className="mt-4 text-sm text-muted-foreground">
                                     <li className="">
-                                        <Link href="" className="hover:text-foreground transition-all duration-300">
-                                            Facebook
+                                        <Link href="https://github.com/MihirJaiswal" className="hover:text-foreground transition-all duration-300">
+                                            Github
                                         </Link>
                                     </li>
                                     <li className="mt-2">
-                                        <Link href="" className="hover:text-foreground transition-all duration-300">
+                                        <Link href="https://www.instagram.com/mihir_jaiswal_/" className="hover:text-foreground transition-all duration-300">
                                             Instagram
                                         </Link>
                                     </li>
                                     <li className="mt-2">
-                                        <Link href="" className="hover:text-foreground transition-all duration-300">
-                                            Twitter
-                                        </Link>
-                                    </li>
-                                    <li className="mt-2">
-                                        <Link href="" className="hover:text-foreground transition-all duration-300">
+                                        <Link href="https://www.linkedin.com/in/mihir-jaiswal-322898287/" className="hover:text-foreground transition-all duration-300">
                                             LinkedIn
                                         </Link>
                                     </li>
@@ -91,17 +86,17 @@ const Footer = () => {
                         <AnimationContainer delay={0.4}>
                             <div className="">
                                 <h3 className="text-base font-medium text-white">
-                                    Resources
+                                    Community
                                 </h3>
                                 <ul className="mt-4 text-sm text-muted-foreground">
                                     <li className="mt-2">
-                                        <Link href="/resources/blog" className="hover:text-foreground transition-all duration-300">
-                                            Blog
+                                        <Link href="community/communities/explore" className="hover:text-foreground transition-all duration-300">
+                                           Explore
                                         </Link>
                                     </li>
                                     <li className="mt-2">
-                                        <Link href="/resources/help" className="hover:text-foreground transition-all duration-300">
-                                            Support
+                                        <Link href="/community/communities/posts" className="hover:text-foreground transition-all duration-300">
+                                        Posts
                                         </Link>
                                     </li>
                                 </ul>
@@ -114,7 +109,7 @@ const Footer = () => {
                                 </h3>
                                 <ul className="mt-4 text-sm text-muted-foreground">
                                     <li className="">
-                                        <Link href="" className="hover:text-foreground transition-all duration-300">
+                                        <Link href="/about" className="hover:text-foreground transition-all duration-300">
                                             About Us
                                         </Link>
                                     </li>

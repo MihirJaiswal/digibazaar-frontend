@@ -2,6 +2,7 @@ import Image from "next/image"
 import { ChevronDown, Plus, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
 
 export default function HeroSection() {
@@ -83,9 +84,11 @@ export default function HeroSection() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
+                  <Link href='/community/communities/explore' >
                   <Button className="w-full sm:w-auto">
                     <Plus className="mr-2 h-4 w-4" /> Start a Discussion
                   </Button>
+                  </Link>
                 </motion.div>
               </div>
 

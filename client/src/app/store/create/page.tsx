@@ -287,7 +287,7 @@ export default function SetupWizardPage() {
                         >
                           <div className="aspect-video w-full overflow-hidden rounded-md bg-muted">
                             <img
-                              src="/placeholder.svg"
+                              src={`/${template}.png`}
                               alt={`${template} template`}
                               className="h-full w-full object-cover"
                             />

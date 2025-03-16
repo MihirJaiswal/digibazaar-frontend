@@ -22,10 +22,10 @@ export function ThemeSelector({ initialTheme, storeId, token, onThemeUpdate }: T
   const [selectedTheme, setSelectedTheme] = useState(initialTheme);
 
   const themeOptions: ThemeOption[] = [
-    { id: "default", name: "Default", thumbnail: "/themes/default-thumbnail.png" },
-    { id: "modern", name: "Modern", thumbnail: "/themes/modern-thumbnail.png" },
-    { id: "classic", name: "Classic", thumbnail: "/themes/classic-thumbnail.png" },
-    { id: "minimal", name: "Minimal", thumbnail: "/themes/minimal-thumbnail.png" },
+    { id: "default", name: "Default", thumbnail: "/default.png" },
+    { id: "modern", name: "Modern", thumbnail: "/modern.png" },
+    { id: "classic", name: "Classic", thumbnail: "/classic.png" },
+    { id: "minimal", name: "Minimal", thumbnail: "/minimal.png" },
   ];
 
   const handleThemeChange = async (theme: string) => {

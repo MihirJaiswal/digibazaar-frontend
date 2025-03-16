@@ -42,10 +42,9 @@ export function StoreLayout({ children }: StoreLayoutProps) {
 
   const navigation = [
     { name: "Dashboard", href: "/store", icon: Home },
-    { name: "Inventory", href: "/inventory", icon: Package },
     { name: "Store Builder", href: "/store/builder", icon: ClipboardList },
     { name: "Marketplace", href: "/store/stores", icon: Store },
-    { name: "Settings", href: "/store/settings", icon: Settings },
+    { name: "Inventory", href: "/inventory", icon: Package },
   ]
 
   // Mobile menu button

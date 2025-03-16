@@ -86,7 +86,7 @@ const Landing = () => {
             Smart Warehouse Management
           </h1>
           <p className='text-md mt-2 text-gray-500 dark:text-gray-300'> Streamline your warehouse operations with cutting-edge technology and intelligent automation.</p>
-          <Button className='text-white bg-gradient-to-r from-purple-500 to-cyan-500 rounded-md mt-4' onClick={() => router.push('/inventory/your-inventory')}>Launch App</Button>
+          <Button className='text-white bg-gradient-to-r from-purple-500 to-cyan-500 rounded-md mt-4' onClick={() => router.push('/store')}>Launch App</Button>
         </motion.div>
         
         {/* Features Section */}
