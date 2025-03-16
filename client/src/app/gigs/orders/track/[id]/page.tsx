@@ -9,7 +9,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, AlertCircle, ArrowLeft, Clock, CheckCircle2, Package, Star, Calendar, MessageSquare, RefreshCw } from 'lucide-react';
+import { Loader2, AlertCircle, ArrowLeft, Clock, CheckCircle2, Package, Star, Calendar, MessageSquare, RefreshCw, Truck } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import Header from "@/components/global/Header";
 
@@ -135,7 +135,7 @@ export default function OrderTrackingPage() {
         };
       case "DELIVERED":
         return {
-          icon: <Package className="h-5 w-5" />,
+          icon: <Truck className="h-5 w-5" />,
           color: "bg-purple-50 text-purple-700 border-purple-200",
           progress: 75,
           progressColor: "bg-purple-500"
@@ -328,7 +328,7 @@ export default function OrderTrackingPage() {
             <div className="w-full flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div>
                 <h4 className="font-medium text-gray-700 dark:text-gray-300">Order Total</h4>
-                <p className="text-2xl font-bold">₹{order.price.toLocaleString()}</p>
+                <p className="text-2xl font-bold">₹{(order.price || 0).toLocaleString()}</p>
               </div>
               <Button 
                 variant="outline" 

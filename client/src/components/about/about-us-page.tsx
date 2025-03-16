@@ -857,8 +857,8 @@ export function AboutUsPage() {
             </div>
             </aside>
 
-          <main className="relative py-6 lg:gap-10 lg:py-12 xl:grid w-full mx-auto px-6">
-            <div className="mx-auto w-full min-w-0 px-1 md:px-6">
+          <main className="relative py-6 lg:gap-10 lg:py-12 xl:grid w-full">
+            <div className="mx-auto w-full max-w-7xl min-w-0 px-6 md:px-8 lg:px-12">
                 <div className="mb-8">
                   <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight leading-tight">About DigiBazaar</h1>
                   <p className="mt-2 text-lg text-muted-foreground font-normal leading-relaxed">

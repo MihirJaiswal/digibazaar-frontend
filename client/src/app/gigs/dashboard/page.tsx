@@ -41,12 +41,12 @@ type Order = {
   };
   status: string;
   createdAt: string;
-  price: number;
+  finalPrice?: number;
+  totalPrice?: number;
   gig: {
     title: string;
   };
 };
-
 // -----------------------------------------------------------------------------
 // Define order statuses to use in the tabs
 const ORDER_STATUSES = ["PENDING", "IN_PROGRESS", "DELIVERED", "REJECTED", "COMPLETED"];
@@ -65,8 +65,6 @@ export default function OrdersDashboard() {
   // State for filtering orders
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
-
-  // Mobile sidebar state
 
   // ---------------------------------------------------------------------------
   // Fetch orders from the seller endpoint
@@ -87,7 +85,11 @@ export default function OrdersDashboard() {
           throw new Error("Failed to fetch orders");
         }
         const data = await res.json();
-        setOrders(data);
+        const transformedData = data.map(order => ({
+          ...order,
+          price: order.totalPrice || order.finalPrice || 0
+        }));
+        setOrders(transformedData);
       } catch (err: any) {
         console.error("Error fetching orders:", err);
         setError("Failed to load orders. Please try again.");
@@ -102,8 +104,8 @@ export default function OrdersDashboard() {
   // ---------------------------------------------------------------------------
   // Calculate total earnings from COMPLETED orders
   const totalEarnings = orders
-    .filter((order) => order.status === "COMPLETED")
-    .reduce((sum, order) => sum + order.price, 0);
+  .filter((order) => order.status === "COMPLETED")
+  .reduce((sum, order) => sum + (order.totalPrice || order.finalPrice || 0), 0);
 
   // Count orders by each status for the summary breakdown
   const countByStatus: { [key: string]: number } = {};
@@ -130,13 +132,21 @@ export default function OrdersDashboard() {
       case "oldest":
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       case "highest":
-        return b.price - a.price;
+        return (b.totalPrice || 0) - (a.totalPrice || 0);
       case "lowest":
-        return a.price - b.price;
+        return (a.totalPrice || 0) - (b.totalPrice || 0);
       default:
         return 0;
     }
   };
+
+  const completedOrders = orders.filter(order => order.status === "COMPLETED");
+console.log("Completed Orders:", completedOrders);
+console.log("Completed Orders Count:", completedOrders.length);
+console.log("Completed Orders:", completedOrders);
+
+
+
 
   // ---------------------------------------------------------------------------
   // Get status badge with appropriate styling
@@ -211,9 +221,9 @@ export default function OrdersDashboard() {
     <div className="min-h-screen bg-white dark:bg-zinc-900">
       {/* Header */}
       <Header />
-        <div className="md:hidden">
-            <GigsSidebar />
-          </div>
+      <div className="md:hidden">
+        <GigsSidebar />
+      </div>
       <div className="flex flex-col md:flex-row">
         {/* Sidebar for Desktop */}
         <div className="hidden md:block">
@@ -221,8 +231,6 @@ export default function OrdersDashboard() {
         </div>
         {/* Main Content */}
         <main className="flex-1 p-4 md:p-6 lg:p-8">
-          {/* Mobile Sidebar Toggle Button */}
-         
           <div className="max-w-7xl mx-auto">
             {/* Dashboard Title */}
             <div className="mb-8">
@@ -353,10 +361,10 @@ export default function OrdersDashboard() {
               {loading ? (
                 <div className="flex items-center justify-center h-64 rounded-lg shadow-sm border">
                   <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm">Loading your orders...</p>
-                  </div>
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-sm">Loading your orders...</p>
                 </div>
+              </div>
               ) : error ? (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -427,7 +435,7 @@ export default function OrdersDashboard() {
                                       <div className="flex items-center gap-4 self-end sm:self-center">
                                         <p className="text-lg font-medium flex items-center">
                                           <DollarSign className="h-4 w-4 text-gray-400" />
-                                          ₹{order.price.toLocaleString()}
+                                          ₹{(order.totalPrice || 0).toLocaleString()}
                                         </p>
                                         <Button
                                           size="sm"
@@ -480,10 +488,10 @@ export default function OrdersDashboard() {
                                 <div className="flex justify-between items-center">
                                   <div>
                                     <p className="font-medium text-gray-800 dark:text-gray-300">#{order.id.slice(0, 6)}</p>
-                                    <p className="text-sm text-gray-600 line-clamp-1">{order.gig.title}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">{order.gig.title}</p>
                                   </div>
                                   <div className="text-right">
-                                    <p className="text-sm font-medium">₹{order.price.toLocaleString()}</p>
+                                    <p className="text-sm font-medium">₹{(order.totalPrice || 0).toLocaleString()}</p>
                                     <p className="text-xs text-gray-500">{formatDate(order.createdAt)}</p>
                                   </div>
                                 </div>
@@ -515,7 +523,7 @@ export default function OrdersDashboard() {
                       <BarChart3 className="h-5 w-5 text-primary" />
                       Order Statistics
                     </CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardDescription className="text-gray-600 dark:text-gray-300">
                       Monthly performance
                     </CardDescription>
                   </CardHeader>

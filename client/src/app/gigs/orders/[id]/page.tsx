@@ -22,6 +22,7 @@ import {
   ShieldAlert,
   Package,
   ExternalLink,
+  Truck
 } from "lucide-react"
 
 type Order = {
@@ -144,6 +145,13 @@ export default function OrderDetailsPage() {
             In Progress
           </Badge>
         )
+        case "DELIVERED":
+          return (
+            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 gap-1">
+              <Truck className="h-3 w-3" />
+              Delivered
+            </Badge>
+          )
       case "COMPLETED":
         return (
           <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1">
@@ -255,7 +263,7 @@ export default function OrderDetailsPage() {
                   <div className="p-4 rounded-lg border border-gray-100 dark:border-gray-700">
                     <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                       <FileText className="h-5 w-5 text-primary" />
-                      Gig Details
+                      Order Details
                     </h3>
                     <p className="text-gray-800  dark:text-gray-300 font-medium text-lg">{order.gig?.title}</p>
                     <p className="text-gray-600 dark:text-gray-300 mt-2">{order.gig?.desc}</p>
@@ -273,12 +281,12 @@ export default function OrderDetailsPage() {
                         <div className="flex items-center text-gray-700 dark:text-gray-300">
                           <DollarSign className="h-4 w-4 mr-3 text-gray-400 dark:text-gray-300" />
                           <span className="text-gray-500 dark:text-gray-300 w-24">Price:</span>
-                          <span className="font-medium">₹{order.price.toLocaleString()}</span>
+                          <span className="font-medium">₹{order.price != null ? order.price.toLocaleString() : 'N/A'}</span>
                         </div>
                         <div className="flex items-start text-gray-700 dark:text-gray-300">
                           <FileText className="h-4 w-4 mr-3 text-gray-400 dark:text-gray-300 mt-0.5" />
                           <span className="text-gray-500 dark:text-gray-300 w-24">Payment ID:</span>
-                          <span className="font-medium break-all">{order.paymentIntent}</span>
+                          <span className="font-medium break-all">{order.paymentIntent || 'N/A'}</span>
                         </div>
                       </div>
                     </div>
@@ -302,7 +310,7 @@ export default function OrderDetailsPage() {
                   <div className="p-5 rounded-lg border border-gray-200  dark:border-gray-700 ">
                     <h3 className="text-lg font-semibold mb-3">Requirements</h3>
                     <div className="p-4 rounded border border-gray-100 dark:border-gray-700">
-                      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{order.requirement}</p>
+                      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{order.requirement || 'No requirements specified'}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -316,4 +324,3 @@ export default function OrderDetailsPage() {
     </div>
   )
 }
-

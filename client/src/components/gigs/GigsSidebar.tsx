@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { useAuthStore } from "@/store/authStore"
-import { Home, FileText, PlusCircle, Settings, Info, ShoppingBag, ChevronRight, PieChart, Menu, X , MessageSquare} from "lucide-react"
+import { Home, PlusCircle, Settings, Info, ShoppingBag, ChevronRight, PieChart, Menu, X , MessageSquare, Store } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,13 +20,13 @@ const GigsSidebar = () => {
 
   const navItems = [
     { href: "/gigs", label: "Home", icon: Home },
-    { href: "/gigs/gig", label: "All Experts", icon: FileText },
+    { href: "/gigs/gig", label: "Marketplace", icon: Store },
     ...(user
       ? [
         { href: "/gigs/dashboard", label: "Dashboard", icon: PieChart },
           { href: "/gigs/orders", label: "Your Orders", icon: ShoppingBag },
           { href: "/gigs/inquiries", label: "Your Inquiries", icon: MessageSquare },
-          { href: "/gigs/create-gig", label: "Create Service", icon: PlusCircle, highlight: true },
+          { href: "/gigs/create-gig", label: "List a Product", icon: PlusCircle, highlight: true },
         ]
       : []),
   ]

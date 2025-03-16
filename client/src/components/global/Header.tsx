@@ -94,7 +94,7 @@ export default function Header() {
             { name: "Home", path: "/" },
             { name: "About", path: "/about" },
             { name: "Store", path: "/store" },
-            { name: "Experts", path: "/gigs" },
+            { name: "Wholesale", path: "/gigs" },
             { name: "Community", path: "/community" },
             { name: "Inventory", path: "/inventory" },
           ].map((route) => (

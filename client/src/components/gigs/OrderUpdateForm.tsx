@@ -161,8 +161,8 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
         return "text-blue-600 bg-blue-50 border-blue-200"
       case "IN_PROGRESS":
         return "text-yellow-600 bg-yellow-50 border-yellow-200"
-      case "COMPLETED":
-        return "text-green-600 bg-green-50 border-green-200"
+      case "DELIVERED":
+        return "text-purple-600 bg-purple-50 border-purple-200"
       default:
         return "text-gray-600 bg-gray-50 border-gray-200"
     }
@@ -210,7 +210,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
                   <SelectContent>
                     <SelectItem value="PENDING">PENDING</SelectItem>
                     <SelectItem value="IN_PROGRESS">IN PROGRESS</SelectItem>
-                    <SelectItem value="COMPLETED">COMPLETED</SelectItem>
+                    <SelectItem value="DELIVERED">DELIVERED</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -231,18 +231,19 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <FileUp className="h-5 w-5 text-primary" />
-              Deliver Final Product
-            </h3>
-            <p className="text-sm text-gray-500">
-              Ready to deliver the completed work? Upload your final delivery files.
-            </p>
-            <Button onClick={handleDeliverProduct} className="w-full sm:w-auto" variant="default">
-              <Package className="mr-2 h-4 w-4" />
-              Deliver Product
-            </Button>
-          </div>
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <FileUp className="h-5 w-5 text-primary" />
+            Provide Digital Proof
+          </h3>
+          <p className="text-sm text-gray-500">
+            Have you delivered the final product? Please upload digital proof of shipment or completion. This could be a screenshot of the tracking information, a delivery confirmation email, or any file that confirms the product has been delivered.
+          </p>
+          <Button onClick={handleDeliverProduct} className="w-full sm:w-auto" variant="default">
+            <Package className="mr-2 h-4 w-4" />
+            Upload Proof
+          </Button>
+        </div>
+
         </div>
 
         <Separator />
@@ -258,7 +259,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
               <Input
                 id="updateTitle"
                 type="text"
-                placeholder="E.g., First draft completed"
+                placeholder="E.g. All t-shirts printed sucessfully"
                 value={updateTitle}
                 onChange={(e) => setUpdateTitle(e.target.value)}
               />
@@ -267,7 +268,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
               <Label htmlFor="updateContent">Update Details</Label>
               <Textarea
                 id="updateContent"
-                placeholder="Describe your progress, challenges, or questions..."
+                placeholder="Describe your progress or any questions..."
                 value={updateContent}
                 onChange={(e) => setUpdateContent(e.target.value)}
                 rows={4}
@@ -341,8 +342,8 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
               ))}
             </div>
           ) : (
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
-              <p className="text-gray-500">No updates have been added yet.</p>
+            <div className="bg-gray-50 dark:bg-zinc-900 p-6 rounded-lg border border-gray-200 text-center">
+              <p className="text-gray-500 dark:text-gray-100">No updates have been added yet.</p>
               <p className="text-sm text-gray-400 mt-1">
                 Add your first update to keep the buyer informed about your progress.
               </p>

@@ -299,9 +299,9 @@ function InquiryList({
                         <Image
                           src={otherParty.profilePic || "/placeholder.svg"}
                           alt={otherParty.username}
-                          width={48}
-                          height={48}
-                          className="rounded-full border-2 border-gray-100 dark:border-gray-700"
+                          width={400}
+                          height={400}
+                          className="rounded-full border-2 border-gray-100 dark:border-gray-700 w-12 h-12 object-cover"
                         />
                       ) : (
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
