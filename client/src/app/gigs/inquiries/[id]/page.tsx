@@ -838,6 +838,8 @@ export default function NegotiationDetailPage() {
                 alt={inquiry.gig.title}
                 width={64}
                 height={64}
+                loading="lazy"
+                quality={100}
                 className="object-cover"
               />
             </div>
@@ -875,9 +877,11 @@ export default function NegotiationDetailPage() {
             <Image
               src={otherParty.profilePic || "/placeholder.svg"}
               alt={otherParty.username}
-              width={40}
-              height={40}
-              className="rounded-full"
+              width={400}
+              height={400}
+              loading="lazy"
+              quality={100}
+              className="rounded-full object-cover h-12 w-12"
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
@@ -886,7 +890,6 @@ export default function NegotiationDetailPage() {
           )}
           <div>
             <h2 className="text-xl font-semibold">{otherParty?.username || "Unknown"}</h2>
-            <p className="text-sm text-gray-500">{otherParty?.role || "Unknown"}</p>
           </div>
         </div>
 
