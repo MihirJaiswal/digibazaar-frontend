@@ -117,12 +117,14 @@ export default function Header() {
 
         {/* Right Section */}
         <div className="flex items-center gap-2 md:gap-4">
-          {/* Cart (Always Visible) */}
-          <Link href="/orders">
+         
+          {user && (
+            <Link href="/orders">
             <Button variant="ghost" size="sm" className="rounded-full p-2">
               <ShoppingCart className="h-5 w-5 text-foreground dark:text-gray-300" />
             </Button>
           </Link>
+          )}
 
           {/* Messages (Only for logged-in users) */}
           {user && (
