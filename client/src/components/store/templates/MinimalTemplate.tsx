@@ -223,129 +223,126 @@ function MinimalTemplateInternal({
       }}
     >
       {/* Header */}
-      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-4 shadow-md bg-white dark:bg-gray-900">
-        <div className="flex items-center gap-4">
-          <Image
-            src={storeLogo || "/placeholder.svg?height=50&width=50"}
-            alt={storeName || "Store Logo"}
-            width={50}
-            height={50}
-            className="rounded-full object-cover"
-          />
-          <span className="text-2xl font-bold text-gray-900 dark:text-white">{storeName}</span>
-        </div>
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
-          {["Home", "Products", "About", "Contact"].map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition"
-            >
-              {item}
-            </a>
-          ))}
-          <Button variant="outline" size="icon" className="ml-2 relative">
-            <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              0
-            </span>
-          </Button>
-        </nav>
-        {/* Mobile Menu Toggle */}
-        <button className="md:hidden text-gray-900 dark:text-white" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <motion.nav
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-16 left-0 w-full bg-white dark:bg-gray-900 shadow-md p-4 flex flex-col gap-4 md:hidden z-30"
-          >
-            {["Home", "Products", "About", "Contact"].map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition"
-                onClick={() => setMenuOpen(false)}
-              >
-                {item}
-              </a>
-            ))}
-            <Button
-              variant="outline"
-              className="flex items-center justify-center gap-2"
-              onClick={() => setMenuOpen(false)}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              <span>Cart (0)</span>
-            </Button>
-          </motion.nav>
-        )}
-      </header>
-
-      {/* Hero Section */}
-      <section className="relative flex flex-col items-center text-center py-20 px-6 md:px-12">
-        {themeCustomization?.bannerImage && (
-          <div className="absolute inset-0 w-full h-full">
-            <Image
-              src={themeCustomization.bannerImage || "/placeholder.svg"}
-              alt={themeCustomization.bannerText || "Banner"}
-              fill
-              className="object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-black/40 dark:bg-black/50"></div>
-          </div>
-        )}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative z-10 max-w-3xl"
+      <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-lg">
+  <div className="container mx-auto px-6 py-3 flex items-center justify-between">
+    <div className="flex items-center gap-4">
+      <Image
+        src={storeLogo || "/placeholder.svg?height=50&width=50"}
+        alt={storeName || "Store Logo"}
+        width={50}
+        height={50}
+        className="rounded-full w-12 h-full object-cover"
+      />
+      <span className="text-lg font-extrabold text-gray-900 dark:text-white">
+        {storeName}
+      </span>
+    </div>
+    {/* Desktop Navigation */}
+    <nav className="hidden md:flex items-center gap-8">
+      {["Home", "Products", "About", "Contact"].map((item) => (
+        <a
+          key={item}
+          href="#"
+          className="text-md font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
         >
-          {!themeCustomization?.bannerImage && (
-            <div className="mb-6">
-              <Image
-                src={storeLogo || "/placeholder.svg?height=150&width=150"}
-                alt={storeName || "Store Logo"}
-                width={150}
-                height={150}
-                className="rounded-full shadow-lg mx-auto"
-              />
-            </div>
-          )}
-          {themeCustomization?.bannerText ? (
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white drop-shadow-lg mb-4">
-              {themeCustomization.bannerText}
-            </h1>
-          ) : (
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-4">
-              Welcome to {storeName}
-            </h1>
-          )}
-          <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-100 dark:text-gray-300 mb-8">
-            {storeDescription}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              style={{ backgroundColor: primaryColor }}
-              className="px-8 py-6 text-lg font-medium text-white rounded-lg shadow-lg hover:opacity-90 transition"
-              size="lg"
-            >
-              Shop Now
-            </Button>
-            <Button
-              variant="outline"
-              className="px-8 py-6 text-lg font-medium rounded-lg shadow-lg transition border-2"
-              size="lg"
-            >
-              Learn More
-            </Button>
-          </div>
-        </motion.div>
-      </section>
+          {item}
+        </a>
+      ))}
+    </nav>
+    {/* Mobile Menu Toggle */}
+    <button
+      aria-label="Toggle Menu"
+      className="md:hidden text-gray-900 dark:text-white"
+      onClick={() => setMenuOpen(!menuOpen)}
+    >
+      {menuOpen ? <X size={28} /> : <Menu size={28} />}
+    </button>
+  </div>
+  {/* Mobile Menu */}
+  {menuOpen && (
+    <motion.nav
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      className="absolute top-16 left-0 w-full bg-white dark:bg-gray-900 shadow-lg p-6 md:hidden z-50"
+    >
+      <div className="flex flex-col gap-4">
+        {["Home", "Products", "About", "Contact"].map((item) => (
+          <a
+            key={item}
+            href="#"
+            className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+            onClick={() => setMenuOpen(false)}
+          >
+            {item}
+          </a>
+        ))}
+      </div>
+    </motion.nav>
+  )}
+</header>
+      {/* Hero Section */}
+      <section className="relative flex flex-col items-center text-center py-24 px-6 md:px-12">
+  {themeCustomization?.bannerImage && (
+    <div className="absolute inset-0">
+      <Image
+        src={themeCustomization.bannerImage || "/placeholder.svg"}
+        alt={themeCustomization.bannerText || "Banner"}
+        fill
+        className="object-cover object-center"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/70"></div>
+    </div>
+  )}
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    className="relative z-10 max-w-3xl px-4"
+  >
+    {!themeCustomization?.bannerImage && (
+      <div className="mb-8">
+        <Image
+          src={storeLogo || "/placeholder.svg?height=150&width=150"}
+          alt={storeName || "Store Logo"}
+          width={150}
+          height={150}
+          className="rounded-full shadow-xl mx-auto"
+        />
+      </div>
+    )}
+    {themeCustomization?.bannerText ? (
+      <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white drop-shadow-xl mb-6">
+        {themeCustomization.bannerText}
+      </h1>
+    ) : (
+      <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-100 dark:text-white mb-6">
+        Welcome to {storeName}
+      </h1>
+    )}
+    <p className="max-w-2xl mx-auto text-xl text-gray-200 dark:text-gray-300 mb-10">
+      {storeDescription}
+    </p>
+    <div className="flex flex-col sm:flex-row gap-6 justify-center">
+      <Button
+        style={{ backgroundColor: primaryColor }}
+        className="px-10 py-4 text-lg font-semibold text-white rounded-full shadow-lg hover:scale-105 transform transition duration-300"
+        size="lg"
+      >
+        Shop Now
+      </Button>
+      <Button
+        variant="outline"
+        className="px-10 py-4 text-lg font-semibold rounded-full shadow-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition border border-white"
+        size="lg"
+      >
+        Learn More
+      </Button>
+    </div>
+  </motion.div>
+</section>
+
+
 
       {/* About Section */}
       <section className="py-16 px-6 md:px-12 ">
