@@ -221,8 +221,8 @@ function GigsPageContent() {
     <div className="min-h-screen bg-white dark:bg-zinc-900">
       <Header />
       <div className="flex flex-col md:flex-row">
+      <GigsSidebar />
         <div className="w-full md:w-auto">
-          <GigsSidebar />
         </div>
         <main className="py-8 px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">

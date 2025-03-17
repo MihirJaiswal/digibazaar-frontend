@@ -77,7 +77,7 @@ const CommunitySidebar = () => {
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           ${isCollapsed ? 'md:w-20' : 'md:w-64'}
           md:translate-x-0 fixed md:relative z-40 md:flex md:flex-shrink-0
-          transition-all duration-300 ease-in-out h-full
+          transition-all duration-300 ease-in-out min-h-screen
         `}
       >
         <div className={`flex flex-col h-full ${isCollapsed ? 'w-20' : 'w-64'}`}>
@@ -203,7 +203,7 @@ const CommunitySidebar = () => {
                       </AvatarFallback>
                     </Avatar>
                     {!isCollapsed && (
-                      <div className="ml-2 flex flex-col">
+                      <div className="ml-2 flex flex-col overflow-hidden">
                         <span className="font-medium truncate">{user.username}</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</span>
                       </div>

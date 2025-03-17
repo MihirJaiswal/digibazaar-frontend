@@ -221,14 +221,8 @@ console.log("Completed Orders:", completedOrders);
     <div className="min-h-screen bg-white dark:bg-zinc-900">
       {/* Header */}
       <Header />
-      <div className="md:hidden">
-        <GigsSidebar />
-      </div>
       <div className="flex flex-col md:flex-row">
-        {/* Sidebar for Desktop */}
-        <div className="hidden md:block">
           <GigsSidebar />
-        </div>
         {/* Main Content */}
         <main className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">

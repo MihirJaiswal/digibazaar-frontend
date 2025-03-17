@@ -43,7 +43,7 @@ interface GigCardProps {
   showDescription?: boolean
 }
 
-export function GigCard({ gig, showDescription = false }: GigCardProps) {
+export function GigCard({ gig, showDescription = false }) {
   const { token } = useAuthStore()
   const [isLiked, setIsLiked] = useState<boolean>(gig.isLiked ?? false)
   const [imageLoaded, setImageLoaded] = useState(false)
