@@ -339,13 +339,13 @@ function InquiryList({
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center">
                         <DollarSign className="w-3 h-3 mr-1" /> Unit Price
                       </p>
-                      <p className="font-medium">${currentPrice}</p>
+                      <p className="font-medium">₹{currentPrice}</p>
                     </div>
                     <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center">
                         <DollarSign className="w-3 h-3 mr-1" /> Total Value
                       </p>
-                      <p className="font-medium">${totalValue.toFixed(2)}</p>
+                      <p className="font-medium">₹{totalValue.toFixed(2)}</p>
                     </div>
                     <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center">

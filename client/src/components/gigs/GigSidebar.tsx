@@ -336,7 +336,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Standard Package</h2>
                 <span className="text-2xl font-bold text-primary">
-                  ${gig.bulkPrice}
+                ₹{gig.bulkPrice}
                 </span>
               </div>
               <p className="text-muted-foreground mb-6">{gig.description}</p>
@@ -408,7 +408,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
                   className="w-full bg-gradient-to-r from-purple-500 to-cyan-500 text-white mb-3" 
                   onClick={handleProceedToOrder}
                 >
-                  Continue (${gig.bulkPrice} per unit)
+                  Continue (₹{gig.bulkPrice} per unit)
                 </Button>
               )}
               <Button 

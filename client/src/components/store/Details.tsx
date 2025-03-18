@@ -25,6 +25,7 @@ import {
   Edit,
   Trash,
   AlertCircle,
+  IndianRupee,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/authStore";
@@ -229,10 +230,10 @@ export default function StoreDashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Sales</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <IndianRupee className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${sales.toFixed(2)}</div>
+              <div className="text-2xl font-bold">₹{sales.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground">
                 Total revenue generated
               </p>
@@ -321,7 +322,7 @@ export default function StoreDashboardPage() {
                     <TableCell>
                       <Badge variant="outline">{order.status}</Badge>
                     </TableCell>
-                    <TableCell>${order.totalPrice.toFixed(2)}</TableCell>
+                    <TableCell>₹{order.totalPrice.toFixed(2)}</TableCell>
                     <TableCell>
                       {new Date(order.createdAt).toLocaleDateString()}
                     </TableCell>

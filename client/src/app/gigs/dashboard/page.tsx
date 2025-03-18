@@ -25,6 +25,7 @@ import {
   ArrowRight,
   Filter,
   RefreshCw,
+  IndianRupee,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -239,7 +240,7 @@ console.log("Completed Orders:", completedOrders);
                 <Card className="overflow-hidden shadow-md border-gray-200 dark:border-gray-600 hover:shadow-lg transition-shadow duration-200">
                   <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 dark:bg-gradient-to-r dark:from-green-600 dark:to-cyan-700 border-b pb-3">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      <DollarSign className="h-5 w-5 text-green-700 dark:text-green-950" />
+                      <IndianRupee className="h-5 w-5 text-green-700 dark:text-green-950" />
                       Total Earnings
                     </CardTitle>
                     <CardDescription className="text-gray-600 dark:text-gray-50">

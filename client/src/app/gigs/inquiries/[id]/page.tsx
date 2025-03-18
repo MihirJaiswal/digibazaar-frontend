@@ -486,7 +486,7 @@ export default function NegotiationDetailPage() {
             <div className="p-4 bg-muted/50 rounded-xl border border-border">
               <p className="text-sm text-muted-foreground mb-1">Bulk Price</p>
               <p className="text-xl font-semibold text-primary">
-                ${inquiry.gig.bulkPrice}
+              ₹{inquiry.gig.bulkPrice}
                 <span className="text-sm font-normal text-muted-foreground">/unit</span>
               </p>
             </div>
@@ -562,7 +562,7 @@ export default function NegotiationDetailPage() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Proposed Price</p>
-                      <p className="font-semibold">${inquiry.proposedPrice} per unit</p>
+                      <p className="font-semibold">₹{inquiry.proposedPrice} per unit</p>
                     </div>
                   </div>
                 </div>
@@ -579,7 +579,7 @@ export default function NegotiationDetailPage() {
                   </div>
                   <div className="p-3 bg-muted/50 rounded-lg border border-border">
                     <p className="text-sm text-muted-foreground">Requested Price</p>
-                    <p className="font-semibold">${inquiry.requestedPrice} per unit</p>
+                    <p className="font-semibold">₹{inquiry.requestedPrice} per unit</p>
                   </div>
                   <div className="p-3 bg-muted/50 rounded-lg border border-border">
                     <p className="text-sm text-muted-foreground">Proposed Quantity</p>
@@ -590,7 +590,7 @@ export default function NegotiationDetailPage() {
                   <div className="p-3 bg-muted/50 rounded-lg border border-border">
                     <p className="text-sm text-muted-foreground">Proposed Price</p>
                     <p className="font-semibold">
-                      {inquiry.proposedPrice !== null ? `$${inquiry.proposedPrice}` : "N/A"}
+                      {inquiry.proposedPrice !== null ? `₹${inquiry.proposedPrice}` : "N/A"}
                     </p>
                   </div>
                 </div>
@@ -608,11 +608,11 @@ export default function NegotiationDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Unit Price</p>
-                    <p className="font-semibold">${recentOfferPrice}</p>
+                    <p className="font-semibold">₹{recentOfferPrice}</p>
                   </div>
                   <div className="col-span-2">
                     <p className="text-sm text-muted-foreground">Order Total</p>
-                    <p className="text-xl font-bold text-green-700 dark:text-green-400">${orderTotal.toFixed(2)}</p>
+                    <p className="text-xl font-bold text-green-700 dark:text-green-400">₹{orderTotal.toFixed(2)}</p>
                   </div>
                 </div>
               </div>
@@ -745,7 +745,7 @@ export default function NegotiationDetailPage() {
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="price" className="text-sm font-medium flex items-center gap-1">
-                    Price per unit <span className="text-xs text-muted-foreground">($)</span>
+                    Price per unit <span className="text-xs text-muted-foreground">(₹)</span>
                   </label>
                   <Input
                     id="price"
@@ -764,7 +764,7 @@ export default function NegotiationDetailPage() {
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted-foreground">Total Order Value:</span>
                   <span className="font-medium">
-                    $
+                  ₹
                     {!isNaN(Number(newQuantity)) && !isNaN(Number(newPrice))
                       ? (Number(newQuantity) * Number(newPrice)).toFixed(2)
                       : "0.00"}
@@ -845,9 +845,9 @@ export default function NegotiationDetailPage() {
                     <p className="text-muted-foreground">Quantity:</p>
                     <p className="font-medium">{recentOfferQuantity} units</p>
                     <p className="text-muted-foreground">Price per unit:</p>
-                    <p className="font-medium">${recentOfferPrice}</p>
+                    <p className="font-medium">₹{recentOfferPrice}</p>
                     <p className="text-muted-foreground">Total:</p>
-                    <p className="font-medium">${orderTotal.toFixed(2)}</p>
+                    <p className="font-medium">₹{orderTotal.toFixed(2)}</p>
                   </div>
                 </div>
               )}

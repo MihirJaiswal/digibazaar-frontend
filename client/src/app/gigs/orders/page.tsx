@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import Header from "@/components/global/Header";
 import GigsSidebar from "@/components/gigs/GigsSidebar";
-import { Loader2, AlertCircle, DollarSign, User } from "lucide-react";
+import { Loader2, AlertCircle, DollarSign, User, IndianRupee } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -144,7 +144,7 @@ function OrdersPageContent() {
                        
                         <div className="flex items-center gap-4">
                           <p className="flex items-center text-sm font-medium">
-                            <DollarSign className="h-4 w-4 mr-1 text-gray-400" />
+                            <IndianRupee className="h-4 w-4 mr-1 text-gray-400" />
                             ₹{order.price}
                           </p>
                           <Button

@@ -22,7 +22,8 @@ import {
   ShieldAlert,
   Package,
   ExternalLink,
-  Truck
+  Truck,
+  IndianRupee
 } from "lucide-react"
 
 type Order = {
@@ -279,7 +280,7 @@ export default function OrderDetailsPage() {
                           <span className="font-medium">{order.status.replace("_", " ")}</span>
                         </div>
                         <div className="flex items-center text-gray-700 dark:text-gray-300">
-                          <DollarSign className="h-4 w-4 mr-3 text-gray-400 dark:text-gray-300" />
+                          <IndianRupee className="h-4 w-4 mr-3 text-gray-400 dark:text-gray-300" />
                           <span className="text-gray-500 dark:text-gray-300 w-24">Price:</span>
                           <span className="font-medium">₹{order.price != null ? order.price.toLocaleString() : 'N/A'}</span>
                         </div>

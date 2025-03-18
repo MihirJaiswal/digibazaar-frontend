@@ -20,6 +20,7 @@ import {
   AlertCircle,
   Calendar,
   MessageSquare,
+  IndianRupee,
 } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
@@ -239,9 +240,9 @@ export default function InquiryPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <Card className="bg-white dark:bg-zinc-800 shadow-sm">
                 <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
-                  <DollarSign className="h-8 w-8 text-primary mb-2" />
+                  <IndianRupee className="h-8 w-8 text-primary mb-2" />
                   <p className="text-sm text-muted-foreground mb-1">List Price</p>
-                  <p className="text-2xl font-bold">${gig.bulkPrice}</p>
+                  <p className="text-2xl font-bold">₹{gig.bulkPrice}</p>
                   <p className="text-xs text-muted-foreground">per unit</p>
                 </CardContent>
               </Card>
@@ -295,11 +296,11 @@ export default function InquiryPage() {
 
                 <div>
                   <label className="text-sm font-medium mb-2 flex items-center">
-                    <DollarSign className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <IndianRupee className="h-4 w-4 mr-2 text-muted-foreground" />
                     Requested Price (per unit)
                   </label>
                   <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <IndianRupee className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="number"
                       min="0.01"
@@ -311,7 +312,7 @@ export default function InquiryPage() {
                       required
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">List price: ${gig.bulkPrice} per unit</p>
+                  <p className="text-xs text-muted-foreground mt-1">List price: ₹{gig.bulkPrice} per unit</p>
                 </div>
               </div>
 
@@ -335,11 +336,11 @@ export default function InquiryPage() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Price per unit</p>
-                        <p className="font-medium">${Number.parseFloat(requestedPrice) || 0}</p>
+                        <p className="font-medium">₹{Number.parseFloat(requestedPrice) || 0}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Total Value</p>
-                        <p className="font-bold">${calculateTotal()}</p>
+                        <p className="font-bold">₹{calculateTotal()}</p>
                       </div>
                       <div>
                         {isPriceHigher ? (
@@ -351,7 +352,7 @@ export default function InquiryPage() {
                           <div className="text-green-600 dark:text-green-400">
                             <p className="text-sm">Potential Savings</p>
                             <p className="font-bold">
-                              ${calculateSavings()} ({savingsPercentage}%)
+                            ₹{calculateSavings()} ({savingsPercentage}%)
                             </p>
                           </div>
                         ) : (

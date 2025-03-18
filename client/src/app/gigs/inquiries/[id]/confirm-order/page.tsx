@@ -279,7 +279,7 @@ function ConfirmOrderContent() {
                     variant="outline"
                     className="bg-primary/10 text-primary border-primary/20 px-3 py-1 text-sm font-semibold"
                   >
-                    ${unitPrice} per unit
+                    ₹{unitPrice} per unit
                   </Badge>
                 </div>
               </CardHeader>
@@ -362,16 +362,16 @@ function ConfirmOrderContent() {
                 <div className="space-y-3 bg-muted/10 p-4 rounded-xl">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Service price</span>
-                    <span className="font-medium">${unitPrice}</span>
+                    <span className="font-medium">₹{unitPrice}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Service fee</span>
-                    <span className="font-medium">$0</span>
+                    <span className="font-medium">₹0</span>
                   </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between">
                     <span className="font-semibold">Total</span>
-                    <span className="font-bold text-lg">${total.toFixed(2)}</span>
+                    <span className="font-bold text-lg">₹{total.toFixed(2)}</span>
                   </div>
                 </div>
                 <div className="bg-muted/10 rounded-xl p-5 space-y-4">

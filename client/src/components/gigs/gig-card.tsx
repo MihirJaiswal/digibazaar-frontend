@@ -185,7 +185,7 @@ export function GigCard({ gig, showDescription = false }) {
           <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/50">
             <div>
               <p className="text-xs text-muted-foreground">Price per unit</p>
-              <p className="font-bold text-lg text-foreground">${gig.bulkPrice.toFixed(2)}</p>
+              <p className="font-bold text-lg text-foreground">₹{gig.bulkPrice.toFixed(2)}</p>
             </div>
             <Button variant="default" size="sm" className="rounded-full px-4">
               View

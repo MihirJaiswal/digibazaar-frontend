@@ -391,7 +391,7 @@ export default function CreateGigPage() {
           <div className="flex items-center justify-between">
             <div className="text-right">
               <span className="text-xs text-muted-foreground">BULK PRICE</span>
-              <p className="font-bold text-lg">${formData.bulkPrice || "0"}</p>
+              <p className="font-bold text-lg">₹{formData.bulkPrice || "0"}</p>
             </div>
             <div className="text-right">
               <span className="text-xs text-muted-foreground">MOQ</span>
@@ -511,7 +511,7 @@ export default function CreateGigPage() {
                               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <div className="space-y-2">
                                   <Label htmlFor="bulkPrice" className="text-base font-medium">
-                                    Bulk Price ($ per unit)
+                                  Price(₹ per unit)
                                   </Label>
                                   <Input
                                     type="number"
@@ -524,7 +524,7 @@ export default function CreateGigPage() {
                                 </div>
                                 <div className="space-y-2">
                                   <Label htmlFor="minOrderQty" className="text-base font-medium">
-                                    Minimum Order Qty
+                                    Minimum Order
                                   </Label>
                                   <Input
                                     type="number"
