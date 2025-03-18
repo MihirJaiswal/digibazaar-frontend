@@ -29,7 +29,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const [menuOpen, setMenuOpen] = useState(false)
 
   // Fallback default values
-  const _navBarColor = navBarColor || "#020c1a"
+  const _navBarColor = navBarColor || "rgba(255,255,255,0.9)"
   const _navBarTextColor = navBarTextColor || "#4b5563" // gray-700
   const _navBarHoverColor = navBarHoverColor || "#3b82f6" // primary blue
   const _borderColor = borderColor || "#e5e7eb" // gray-200
@@ -47,7 +47,8 @@ const Navbar: React.FC<NavbarProps> = ({
         borderColor: _borderColor,
       }}
     >
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between md:grid md:grid-cols-3 md:items-center">
+        {/* Left: Logo & Store Name */}
         <div className="flex items-center gap-3">
           {storeLogo ? (
             <Image
@@ -73,8 +74,8 @@ const Navbar: React.FC<NavbarProps> = ({
           </span>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
+        {/* Center: Desktop Navigation */}
+        <nav className="hidden md:flex justify-center gap-8">
           {navItems.map((item) => (
             <a
               key={item}
@@ -93,8 +94,8 @@ const Navbar: React.FC<NavbarProps> = ({
           ))}
         </nav>
 
-        {/* Cart & Mobile Menu */}
-        <div className="flex items-center gap-4">
+        {/* Right: Cart & Mobile Menu Toggle */}
+        <div className="flex items-center gap-4 justify-end">
           <button
             className="h-9 w-9 flex items-center justify-center rounded-full transition-colors"
             aria-label="Cart"
@@ -125,12 +126,12 @@ const Navbar: React.FC<NavbarProps> = ({
             className="md:hidden"
             style={{ borderTop: `1px solid ${_borderColor}` }}
           >
-            <nav className="container mx-auto py-4 px-4 flex flex-col gap-4">
+            <nav className="container mx-auto py-4 px-4 flex flex-col items-center gap-4">
               {navItems.map((item) => (
                 <a
                   key={item}
                   href="#"
-                  className="py-2 text-base font-medium transition-colors"
+                  className="py-2 text-base font-medium transition-colors text-center"
                   style={{ color: _linkColor }}
                   onMouseEnter={(e) =>
                     (e.currentTarget.style.color = _linkHoverColor)

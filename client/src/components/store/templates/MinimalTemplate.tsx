@@ -144,7 +144,7 @@ function MinimalTemplateInternal({
   const buttonHoverColor = themeCustomization?.buttonHoverColor || "#2563eb"
   const buttonHoverTextColor = themeCustomization?.buttonHoverTextColor || "#ffffff"
   const buttonBorderRadius = themeCustomization?.buttonBorderRadius || "4px"
-  const navBarColor = themeCustomization?.navBarColor || "#1f2937"
+  const navBarColor = themeCustomization?.navBarColor || "#020c1a"
   const navBarTextColor = themeCustomization?.navBarTextColor || "#ffffff"
   const navBarHoverColor = themeCustomization?.navBarHoverColor || "#374151"
   const linkColor = themeCustomization?.linkColor || "#3b82f6"
@@ -357,7 +357,7 @@ function MinimalTemplateInternal({
       <Navbar
         storeLogo={storeLogo}
         storeName={storeName}
-        navBarColor={themeCustomization?.navBarColor || "rgba(0, 0, 0, 0.85)"}
+        navBarColor={themeCustomization?.navBarColor || "#010f1c"}
         navBarTextColor={themeCustomization?.navBarTextColor || "#ffffff"}
         navBarHoverColor={themeCustomization?.navBarHoverColor || "#ff9900"}
         borderColor={themeCustomization?.borderColor || "#333333"}
