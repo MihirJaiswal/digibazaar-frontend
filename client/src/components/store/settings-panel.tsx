@@ -11,24 +11,71 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import Image from "next/image";
 
 interface Customization {
-  fontFamily?: string;
-  fontSize?: string;
-  fontColor?: string;
-  backgroundColor?: string;
-  textColor?: string;
-  buttonColor?: string;
-  bannerImage?: string;
-  bannerText?: string;
-  footerText?: string;
+  // Basic fields
   theme?: string;
   id?: string;
   storeId?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  
+  // Font settings
+  fontFamily?: string;
+  fontSize?: string;
+  fontColor?: string;
+  headingFontFamily?: string;
+  headingFontSize?: string;
+  headingFontColor?: string;
+  
+  // Color scheme
+  backgroundColor?: string;
+  backgroundColor2?: string;
+  textColor?: string;
+  accentColor?: string;
+  borderColor?: string;
+  cardBackgroundColor?: string;
+  
+  // Button styling
+  buttonColor?: string;
+  buttonTextColor?: string;
+  buttonHoverColor?: string;
+  buttonHoverTextColor?: string;
+  buttonBorderRadius?: string;
+  
+  // Navigation styling
+  navBarColor?: string;
+  navBarTextColor?: string;
+  navBarHoverColor?: string;
+  
+  // Link styling
+  linkColor?: string;
+  linkHoverColor?: string;
+  
+  // Message styling
+  errorColor?: string;
+  successColor?: string;
+  warningColor?: string;
+  
+  // Layout settings
+  borderRadius?: string;
+  productGridLayout?: string;
+  containerWidth?: string;
+  
+  // Images
+  aboutImage?: string;
+  bannerImage?: string;
+  footerImage?: string;
+  logoImage?: string;
+  favicon?: string;
+  
+  // Text content
+  bannerText?: string;
+  footerText?: string;
+  
 }
 
 interface SettingsPanelProps {
@@ -50,12 +97,49 @@ export function SettingsPanel({
     bannerText: "",
     bannerImage: "",
     footerText: "",
-    backgroundColor: "#ffffff",
-    buttonColor: "#3b82f6",
-    textColor: "#000000",
+    
+    // Font settings
     fontFamily: "",
     fontSize: "",
     fontColor: "#000000",
+    headingFontFamily: "",
+    headingFontSize: "",
+    headingFontColor: "#000000",
+    
+    // Color scheme
+    backgroundColor: "#ffffff",
+    backgroundColor2: "#f8f8f8",
+    textColor: "#000000",
+    accentColor: "#4f46e5",
+    borderColor: "#e5e7eb",
+    cardBackgroundColor: "#ffffff",
+    
+    // Button styling
+    buttonColor: "#3b82f6",
+    buttonTextColor: "#ffffff",
+    buttonHoverColor: "#2563eb",
+    buttonHoverTextColor: "#ffffff",
+    buttonBorderRadius: "0.25rem",
+    
+    // Navigation styling
+    navBarColor: "#ffffff",
+    navBarTextColor: "#000000",
+    navBarHoverColor: "#f3f4f6",
+    
+    // Link styling
+    linkColor: "#3b82f6",
+    linkHoverColor: "#2563eb",
+    
+    // Message styling
+    errorColor: "#ef4444",
+    successColor: "#22c55e",
+    warningColor: "#f59e0b",
+    
+    // Layout settings
+    borderRadius: "0.25rem",
+    productGridLayout: "grid",
+    containerWidth: "1200px",
+    
   };
 
   // State for customization fields - use initialCustomization values if they exist, otherwise use defaults
@@ -76,10 +160,28 @@ export function SettingsPanel({
     return initialState;
   });
 
-  // State for banner image file upload
+  // State for image file uploads
   const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
+  const [logoImageFile, setLogoImageFile] = useState<File | null>(null);
+  const [footerImageFile, setFooterImageFile] = useState<File | null>(null);
+  const [aboutImageFile, setAboutImageFile] = useState<File | null>(null);
+  const [faviconFile, setFaviconFile] = useState<File | null>(null);
+
+  // State for image previews
   const [bannerImagePreview, setBannerImagePreview] = useState<string>(() => {
     return initialCustomization?.bannerImage || "";
+  });
+  const [logoImagePreview, setLogoImagePreview] = useState<string>(() => {
+    return initialCustomization?.logoImage || "";
+  });
+  const [footerImagePreview, setFooterImagePreview] = useState<string>(() => {
+    return initialCustomization?.footerImage || "";
+  });
+  const [aboutImagePreview, setAboutImagePreview] = useState<string>(() => {
+    return initialCustomization?.aboutImage || "";
+  });
+  const [faviconPreview, setFaviconPreview] = useState<string>(() => {
+    return initialCustomization?.favicon || "";
   });
 
   // Update state if initialCustomization changes
@@ -99,23 +201,39 @@ export function SettingsPanel({
       if (initialCustomization.bannerImage) {
         setBannerImagePreview(initialCustomization.bannerImage);
       }
+      if (initialCustomization.logoImage) {
+        setLogoImagePreview(initialCustomization.logoImage);
+      }
+      if (initialCustomization.footerImage) {
+        setFooterImagePreview(initialCustomization.footerImage);
+      }
+      if (initialCustomization.aboutImage) {
+        setAboutImagePreview(initialCustomization.aboutImage);
+      }
+      if (initialCustomization.favicon) {
+        setFaviconPreview(initialCustomization.favicon);
+      }
     }
   }, [initialCustomization]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setCustomization(prev => ({ ...prev, [id]: value }));
   };
 
-  // Handler for banner image file input change
-  const handleBannerImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSwitchChange = (id: string, checked: boolean) => {
+    setCustomization(prev => ({ ...prev, [id]: checked }));
+  };
+
+  // Handler for image file input changes
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, setFile: React.Dispatch<React.SetStateAction<File | null>>, setPreview: React.Dispatch<React.SetStateAction<string>>, fieldName: keyof Customization) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setBannerImageFile(file);
+      setFile(file);
       const previewUrl = URL.createObjectURL(file);
-      setBannerImagePreview(previewUrl);
-      // Optionally clear the text URL if a file is chosen
-      setCustomization(prev => ({ ...prev, bannerImage: "" }));
+      setPreview(previewUrl);
+      // Clear the text URL if a file is chosen
+      setCustomization(prev => ({ ...prev, [fieldName]: "" }));
     }
   };
 
@@ -144,13 +262,30 @@ export function SettingsPanel({
       // Append the remaining fields
       for (const key in customizationToSend) {
         if (customizationToSend[key as keyof Customization] !== undefined) {
-          formPayload.append(key, String(customizationToSend[key as keyof Customization]));
+          // Handle boolean values specifically
+          if (typeof customizationToSend[key as keyof Customization] === 'boolean') {
+            formPayload.append(key, String(customizationToSend[key as keyof Customization]));
+          } else {
+            formPayload.append(key, String(customizationToSend[key as keyof Customization]));
+          }
         }
       }
       
-      // Append banner image file if one was selected
+      // Append image files if selected
       if (bannerImageFile) {
         formPayload.append("bannerImage", bannerImageFile);
+      }
+      if (logoImageFile) {
+        formPayload.append("logoImage", logoImageFile);
+      }
+      if (footerImageFile) {
+        formPayload.append("footerImage", footerImageFile);
+      }
+      if (aboutImageFile) {
+        formPayload.append("aboutImage", aboutImageFile);
+      }
+      if (faviconFile) {
+        formPayload.append("favicon", faviconFile);
       }
   
       const response = await fetch(url, {
@@ -191,14 +326,12 @@ export function SettingsPanel({
             </div>
             <div className="space-y-2">
               <Label htmlFor="bannerImage">Banner Image</Label>
-              {/* File input for banner image */}
               <Input
                 id="bannerImage"
                 type="file"
                 accept="image/*"
-                onChange={handleBannerImageChange}
+                onChange={(e) => handleImageChange(e, setBannerImageFile, setBannerImagePreview, 'bannerImage')}
               />
-              {/* Display preview if available */}
               {bannerImagePreview && (
                 <div className="mt-2">
                   <Image
@@ -214,6 +347,50 @@ export function SettingsPanel({
               )}
             </div>
             <div className="space-y-2">
+              <Label htmlFor="logoImage">Logo Image</Label>
+              <Input
+                id="logoImage"
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e, setLogoImageFile, setLogoImagePreview, 'logoImage')}
+              />
+              {logoImagePreview && (
+                <div className="mt-2">
+                  <Image
+                    src={logoImagePreview}
+                    alt="Logo Preview"
+                    width={100}
+                    height={100}
+                    loading="lazy"
+                    quality={100}
+                    className="rounded-md object-contain"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="favicon">Favicon</Label>
+              <Input
+                id="favicon"
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e, setFaviconFile, setFaviconPreview, 'favicon')}
+              />
+              {faviconPreview && (
+                <div className="mt-2">
+                  <Image
+                    src={faviconPreview}
+                    alt="Favicon Preview"
+                    width={32}
+                    height={32}
+                    loading="lazy"
+                    quality={100}
+                    className="rounded-md object-contain"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="footerText">Footer Text</Label>
               <Input
                 id="footerText"
@@ -221,6 +398,93 @@ export function SettingsPanel({
                 onChange={handleInputChange}
                 placeholder="Enter footer text"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="footerImage">Footer Image</Label>
+              <Input
+                id="footerImage"
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e, setFooterImageFile, setFooterImagePreview, 'footerImage')}
+              />
+              {footerImagePreview && (
+                <div className="mt-2">
+                  <Image
+                    src={footerImagePreview}
+                    alt="Footer Preview"
+                    width={200}
+                    height={100}
+                    loading="lazy"
+                    quality={100}
+                    className="w-full rounded-md object-cover"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="aboutImage">About Image</Label>
+              <Input
+                id="aboutImage"
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e, setAboutImageFile, setAboutImagePreview, 'aboutImage')}
+              />
+              {aboutImagePreview && (
+                <div className="mt-2">
+                  <Image
+                    src={aboutImagePreview}
+                    alt="About Preview"
+                    width={200}
+                    height={150}
+                    loading="lazy"
+                    quality={100}
+                    className="w-full rounded-md object-cover"
+                  />
+                </div>
+              )}
+            </div>
+            <Separator className="my-4" />
+            <Button onClick={handleSaveChanges}>Save Changes</Button>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+
+      {/* Layout Settings */}
+      <AccordionItem value="layout">
+        <AccordionTrigger>Layout Settings</AccordionTrigger>
+        <AccordionContent>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="containerWidth">Container Width</Label>
+              <Input
+                id="containerWidth"
+                value={customization.containerWidth || ""}
+                onChange={handleInputChange}
+                placeholder="e.g., 1200px"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="borderRadius">Border Radius</Label>
+              <Input
+                id="borderRadius"
+                value={customization.borderRadius || ""}
+                onChange={handleInputChange}
+                placeholder="e.g., 0.25rem"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="productGridLayout">Product Grid Layout</Label>
+              <select
+                id="productGridLayout"
+                className="w-full rounded-md border p-2"
+                value={customization.productGridLayout || ""}
+                onChange={handleInputChange}
+              >
+                <option value="grid">Grid</option>
+                <option value="list">List</option>
+                <option value="masonry">Masonry</option>
+                <option value="compact">Compact</option>
+              </select>
             </div>
             <Separator className="my-4" />
             <Button onClick={handleSaveChanges}>Save Changes</Button>
@@ -252,18 +516,18 @@ export function SettingsPanel({
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="buttonColor">Button Color</Label>
+              <Label htmlFor="backgroundColor2">Secondary Background Color</Label>
               <div className="flex items-center gap-2">
                 <Input
-                  id="buttonColor"
+                  id="backgroundColor2"
                   type="color"
-                  value={customization.buttonColor || defaultValues.buttonColor}
+                  value={customization.backgroundColor2 || defaultValues.backgroundColor2}
                   onChange={handleInputChange}
                   className="h-10 w-10 p-1"
                 />
                 <Input
-                  id="buttonColor"
-                  value={customization.buttonColor || defaultValues.buttonColor}
+                  id="backgroundColor2"
+                  value={customization.backgroundColor2 || defaultValues.backgroundColor2}
                   onChange={handleInputChange}
                   className="flex-1"
                 />
@@ -287,6 +551,253 @@ export function SettingsPanel({
                 />
               </div>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="accentColor">Accent Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="accentColor"
+                  type="color"
+                  value={customization.accentColor || defaultValues.accentColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="accentColor"
+                  value={customization.accentColor || defaultValues.accentColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="borderColor">Border Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="borderColor"
+                  type="color"
+                  value={customization.borderColor || defaultValues.borderColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="borderColor"
+                  value={customization.borderColor || defaultValues.borderColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cardBackgroundColor">Card Background Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="cardBackgroundColor"
+                  type="color"
+                  value={customization.cardBackgroundColor || defaultValues.cardBackgroundColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="cardBackgroundColor"
+                  value={customization.cardBackgroundColor || defaultValues.cardBackgroundColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <Separator className="my-4" />
+            <Button onClick={handleSaveChanges}>Save Changes</Button>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+
+      {/* Button Styling */}
+      <AccordionItem value="buttons">
+        <AccordionTrigger>Button Styling</AccordionTrigger>
+        <AccordionContent>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="buttonColor">Button Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="buttonColor"
+                  type="color"
+                  value={customization.buttonColor || defaultValues.buttonColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="buttonColor"
+                  value={customization.buttonColor || defaultValues.buttonColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="buttonTextColor">Button Text Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="buttonTextColor"
+                  type="color"
+                  value={customization.buttonTextColor || defaultValues.buttonTextColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="buttonTextColor"
+                  value={customization.buttonTextColor || defaultValues.buttonTextColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="buttonHoverColor">Button Hover Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="buttonHoverColor"
+                  type="color"
+                  value={customization.buttonHoverColor || defaultValues.buttonHoverColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="buttonHoverColor"
+                  value={customization.buttonHoverColor || defaultValues.buttonHoverColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="buttonHoverTextColor">Button Hover Text Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="buttonHoverTextColor"
+                  type="color"
+                  value={customization.buttonHoverTextColor || defaultValues.buttonHoverTextColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="buttonHoverTextColor"
+                  value={customization.buttonHoverTextColor || defaultValues.buttonHoverTextColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="buttonBorderRadius">Button Border Radius</Label>
+              <Input
+                id="buttonBorderRadius"
+                value={customization.buttonBorderRadius || ""}
+                onChange={handleInputChange}
+                placeholder="e.g., 0.25rem"
+              />
+            </div>
+            <Separator className="my-4" />
+            <Button onClick={handleSaveChanges}>Save Changes</Button>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+
+      {/* Navigation Styling */}
+      <AccordionItem value="navigation">
+        <AccordionTrigger>Navigation Styling</AccordionTrigger>
+        <AccordionContent>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="navBarColor">Navigation Bar Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="navBarColor"
+                  type="color"
+                  value={customization.navBarColor || defaultValues.navBarColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="navBarColor"
+                  value={customization.navBarColor || defaultValues.navBarColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="navBarTextColor">Navigation Text Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="navBarTextColor"
+                  type="color"
+                  value={customization.navBarTextColor || defaultValues.navBarTextColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="navBarTextColor"
+                  value={customization.navBarTextColor || defaultValues.navBarTextColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="navBarHoverColor">Navigation Hover Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="navBarHoverColor"
+                  type="color"
+                  value={customization.navBarHoverColor || defaultValues.navBarHoverColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="navBarHoverColor"
+                  value={customization.navBarHoverColor || defaultValues.navBarHoverColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="linkColor">Link Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="linkColor"
+                  type="color"
+                  value={customization.linkColor || defaultValues.linkColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="linkColor"
+                  value={customization.linkColor || defaultValues.linkColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="linkHoverColor">Link Hover Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="linkHoverColor"
+                  type="color"
+                  value={customization.linkHoverColor || defaultValues.linkHoverColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="linkHoverColor"
+                  value={customization.linkHoverColor || defaultValues.linkHoverColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
             <Separator className="my-4" />
             <Button onClick={handleSaveChanges}>Save Changes</Button>
           </div>
@@ -299,7 +810,7 @@ export function SettingsPanel({
         <AccordionContent>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fontFamily">Font Family</Label>
+              <Label htmlFor="fontFamily">Body Font Family</Label>
               <select
                 id="fontFamily"
                 className="w-full rounded-md border p-2"
@@ -312,10 +823,15 @@ export function SettingsPanel({
                 <option value="Open Sans">Open Sans</option>
                 <option value="Montserrat">Montserrat</option>
                 <option value="Poppins">Poppins</option>
+                <option value="Lato">Lato</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Nunito">Nunito</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Playfair Display">Playfair Display</option>
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="fontSize">Font Size</Label>
+              <Label htmlFor="fontSize">Body Font Size</Label>
               <Input
                 id="fontSize"
                 value={customization.fontSize || ""}
@@ -324,7 +840,7 @@ export function SettingsPanel({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="fontColor">Font Color</Label>
+              <Label htmlFor="fontColor">Body Font Color</Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="fontColor"
@@ -341,11 +857,63 @@ export function SettingsPanel({
                 />
               </div>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="headingFontFamily">Heading Font Family</Label>
+              <select
+                id="headingFontFamily"
+                className="w-full rounded-md border p-2"
+                value={customization.headingFontFamily || ""}
+                onChange={handleInputChange}
+              >
+                <option value="">Select font</option>
+                <option value="Inter">Inter</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Open Sans">Open Sans</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Lato">Lato</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Nunito">Nunito</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Playfair Display">Playfair Display</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="headingFontSize">Heading Font Size</Label>
+              <Input
+                id="headingFontSize"
+                value={customization.headingFontSize || ""}
+                onChange={handleInputChange}
+                placeholder="e.g., 24px"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="headingFontColor">Heading Font Color</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="headingFontColor"
+                  type="color"
+                  value={customization.headingFontColor || defaultValues.headingFontColor}
+                  onChange={handleInputChange}
+                  className="h-10 w-10 p-1"
+                />
+                <Input
+                  id="headingFontColor"
+                  value={customization.headingFontColor || defaultValues.headingFontColor}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+            </div>
             <Separator className="my-4" />
             <Button onClick={handleSaveChanges}>Save Changes</Button>
           </div>
         </AccordionContent>
       </AccordionItem>
+      {/* Preview & Save */}
+      <div className="mt-4 space-y-4">
+        <Button onClick={handleSaveChanges} className="w-full">Save All Changes</Button>
+      </div>
     </Accordion>
   );
 }

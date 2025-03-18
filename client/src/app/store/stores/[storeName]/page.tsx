@@ -98,7 +98,7 @@ export default function StorePage({ params }: StorePageProps) {
         products={products}
         themeCustomization={customization || {}}
         storeId={store?.id}
-        userId={userId}
+        userId={store?.ownerId}
       />
     </div>
   );
