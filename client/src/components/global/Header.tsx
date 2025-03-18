@@ -163,21 +163,21 @@ export default function Header() {
                   My Account
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="dark:bg-gray-600" />
-                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700" onClick={() => router.push("/profile")}>
+                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-zinc-700" onClick={() => router.push("/profile")}>
                   <User className="mr-2 h-4 w-4" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700" onClick={() => router.push("/inventory")} >
+                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-zinc-700" onClick={() => router.push("/inventory")} >
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
                 </DropdownMenuItem>
-                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-gray-700" onClick={() => router.push("/store")} >
+                <DropdownMenuItem className="dark:text-gray-300 hover:dark:bg-zinc-700" onClick={() => router.push("/store")} >
                   <Store className="mr-2 h-4 w-4" />
                   Store
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="dark:bg-gray-600" />
                 <DropdownMenuItem
-                  className="text-destructive focus:text-destructive dark:text-red-400 hover:dark:bg-gray-700"
+                  className="text-destructive focus:text-destructive dark:text-red-400 hover:dark:bg-zinc-700"
                   onClick={handleLogout}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
