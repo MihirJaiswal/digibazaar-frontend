@@ -33,6 +33,7 @@ import {
   Weight,
   Layers,
   Store,
+  IndianRupee,
 } from "lucide-react";
 import CreateProductVariant from "@/components/inventory/CreateProductVariant";
 import Image from "next/image";
@@ -270,7 +271,7 @@ const CreateProductPage = () => {
                         Basic Info
                       </TabsTrigger>
                       <TabsTrigger value="pricing" className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
+                        <IndianRupee className="h-4 w-4" />
                         Pricing
                       </TabsTrigger>
                       <TabsTrigger value="inventory" className="flex items-center gap-1">
@@ -352,7 +353,7 @@ const CreateProductPage = () => {
                         <div className="flex justify-end">
                           <Button type="button" onClick={() => setActiveTab("pricing")} className="flex items-center gap-2">
                             Next: Pricing
-                            <DollarSign className="h-4 w-4" />
+                            <IndianRupee className="h-4 w-4" />
                           </Button>
                         </div>
                       </TabsContent>
@@ -365,7 +366,7 @@ const CreateProductPage = () => {
                               Price <span className="text-red-500">*</span>
                             </Label>
                             <div className="relative">
-                              <DollarSign className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                              <IndianRupee className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                               <Input
                                 id="price"
                                 name="price"
@@ -384,7 +385,7 @@ const CreateProductPage = () => {
                               Cost Per Item <span className="text-red-500">*</span>
                             </Label>
                             <div className="relative">
-                              <DollarSign className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                              <IndianRupee className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                               <Input
                                 id="costPerItem"
                                 name="costPerItem"
@@ -405,7 +406,7 @@ const CreateProductPage = () => {
                               Profit
                             </Label>
                             <div className="relative">
-                              <DollarSign className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                              <IndianRupee className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                               <Input
                                 id="profit"
                                 name="profit"
@@ -635,7 +636,7 @@ const CreateProductPage = () => {
                         )}
                       </div>
                       <div className="flex items-center justify-between">
-                        <div className="font-bold text-xl">${parseFloat(formData.price || "0").toFixed(2)}</div>
+                        <div className="font-bold text-xl">₹{parseFloat(formData.price || "0").toFixed(2)}</div>
                         <Badge variant={formData.isPublished ? "default" : "secondary"}>
                           {formData.isPublished ? "Published" : "Draft"}
                         </Badge>

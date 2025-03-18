@@ -172,6 +172,8 @@ export default function UserOrders() {
 
   if (orders.length === 0) {
     return (
+      <>
+      <Header/>
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <h1 className="text-3xl font-bold mb-8">My Orders</h1>
         <Card className="text-center p-8">
@@ -183,7 +185,7 @@ export default function UserOrders() {
             </p>
           </CardContent>
           <CardFooter className="flex justify-center">
-            <Link href="/explore">
+            <Link href="/store">
               <Button size="lg" className="px-8">
                 Start Shopping
               </Button>
@@ -191,6 +193,7 @@ export default function UserOrders() {
           </CardFooter>
         </Card>
       </div>
+      </>
     );
   }
 

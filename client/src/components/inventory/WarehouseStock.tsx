@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Package, Search, AlertTriangle, ArrowUpDown, Tag, DollarSign, Percent, Clock, ShoppingCart, Filter, RefreshCw } from 'lucide-react';
+import { Package, Search, AlertTriangle, ArrowUpDown, Tag, DollarSign, Percent, Clock, ShoppingCart, Filter, RefreshCw, IndianRupee } from 'lucide-react';
 import dynamic from "next/dynamic";
 import { useAuthStore } from "@/store/authStore";
 import Image from "next/image";
@@ -233,9 +233,9 @@ export default function WarehouseStock({ warehouseId }: Props) {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Total Value</p>
-                    <p className="text-2xl font-bold text-green-600">${stockStats.totalValue.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-green-600">₹{stockStats.totalValue.toFixed(2)}</p>
                   </div>
-                  <DollarSign className="h-8 w-8 text-green-600" />
+                  <IndianRupee className="h-8 w-8 text-green-600" />
                 </div>
               </CardContent>
             </Card>
@@ -386,15 +386,15 @@ export default function WarehouseStock({ warehouseId }: Props) {
                             )}
                           </TableCell>
                           <TableCell>
-                            <div className="font-medium">${item.product.price.toFixed(2)}</div>
+                            <div className="font-medium">₹{item.product.price.toFixed(2)}</div>
                             <div className="text-xs text-muted-foreground">
-                              Cost: ${item.product.costPerItem?.toFixed(2)}
+                              Cost: ₹{item.product.costPerItem?.toFixed(2)}
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="font-medium">{item.product.margin.toFixed(2)}%</div>
                             <div className="text-xs text-green-600">
-                              ${item.product.profit.toFixed(2)}
+                            ₹{item.product.profit.toFixed(2)}
                             </div>
                           </TableCell>
                           <TableCell>
@@ -484,7 +484,7 @@ export default function WarehouseStock({ warehouseId }: Props) {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Price</p>
-                        <p className="font-semibold">${item.product.price.toFixed(2)}</p>
+                        <p className="font-semibold">₹{item.product.price.toFixed(2)}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Quantity</p>
@@ -496,7 +496,7 @@ export default function WarehouseStock({ warehouseId }: Props) {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Total Value</p>
-                        <p className="font-semibold">${(item.quantity * item.product.price).toFixed(2)}</p>
+                        <p className="font-semibold">₹{(item.quantity * item.product.price).toFixed(2)}</p>
                       </div>
                     </div>
                     

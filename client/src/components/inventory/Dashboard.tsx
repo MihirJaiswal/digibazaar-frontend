@@ -4,7 +4,7 @@ import {  useState, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency, formatNumber } from "@/app/inventory/lib/utils"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, ArrowDown, ArrowUp, BarChart3, DollarSign, MapPin, PackageCheck, PackageX, ShoppingBag, WarehouseIcon } from 'lucide-react'
+import { AlertCircle, ArrowDown, ArrowUp, BarChart3, DollarSign, MapPin, PackageCheck, PackageX, ShoppingBag, WarehouseIcon, IndianRupee } from 'lucide-react'
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
@@ -251,7 +251,7 @@ function DashboardContent() {
         <Card className="overflow-hidden border-l-4 border-l-blue-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2 bg-blue-50 dark:bg-blue-950/20">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-blue-500" />
+            <IndianRupee className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent className="pt-4">
             <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
@@ -363,7 +363,7 @@ function DashboardContent() {
                           />
                           <YAxis />
                           <Tooltip 
-                            formatter={(value) => [`$${value}`, "Revenue"]}
+                            formatter={(value) => [`₹${value}`, "Revenue"]}
                             labelFormatter={(value) => {
                               const [year, month] = value.split('-');
                               return `${new Date(parseInt(year), parseInt(month) - 1).toLocaleString('default', { month: 'long', year: 'numeric' })}`;
@@ -430,7 +430,7 @@ function DashboardContent() {
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="name" />
                           <YAxis />
-                          <Tooltip formatter={(value) => [`$${value}`, "Stock Value"]} />
+                          <Tooltip formatter={(value) => [`₹${value}`, "Stock Value"]} />
                           <Bar dataKey="stockValue" fill="#82ca9d" name="Stock Value" />
                         </BarChart>
                       </ResponsiveContainer>

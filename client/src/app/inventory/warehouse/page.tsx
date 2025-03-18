@@ -38,6 +38,7 @@ import {
   ArrowUpDown,
   RefreshCw,
   Building2,
+  IndianRupee,
 } from "lucide-react";
 import { formatCurrency, formatNumber } from "@/app/inventory/lib/utils";
 import Header from "@/components/global/Header";
@@ -119,7 +120,7 @@ const DashboardStats = ({ warehouses }: { warehouses: WarehouseType[] }) => {
           <CardTitle className="text-sm font-medium">
             Total Stock Value
           </CardTitle>
-          <DollarSign className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <IndianRupee className="h-5 w-5 text-blue-600 dark:text-blue-400" />
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold text-blue-700 dark:text-blue-300">

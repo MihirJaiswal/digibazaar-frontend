@@ -30,10 +30,10 @@ import {
   Trash2,
   ArrowLeft,
   Tag,
-  DollarSign,
   Percent,
   Clock,
   AlertTriangle,
+  IndianRupee
 } from "lucide-react";
 import ManageProductVariants from "@/components/inventory/ManageProductVariants";
 import StockMovementsTable from "@/components/inventory/StockMovementsTable";
@@ -297,7 +297,7 @@ export function ProductDetailPageComponent() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-primary" />
+                  <IndianRupee className="h-5 w-5 text-primary" />
                   Financial Details
                 </CardTitle>
               </CardHeader>
@@ -305,7 +305,7 @@ export function ProductDetailPageComponent() {
                 <div className="space-y-4">
                   <div className="bg-muted/40 p-4 rounded-lg">
                     <div className="text-3xl font-bold text-primary">
-                      ${product.price?.toFixed(2)}
+                    ₹{product.price?.toFixed(2)}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       Selling Price
@@ -318,7 +318,7 @@ export function ProductDetailPageComponent() {
                       </h3>
                       <div className="flex items-center gap-1">
                         <span className="text-lg font-semibold">
-                          ${product.costPerItem?.toFixed(2)}
+                        ₹{product.costPerItem?.toFixed(2)}
                         </span>
                       </div>
                     </div>
@@ -328,7 +328,7 @@ export function ProductDetailPageComponent() {
                       </h3>
                       <div className="flex items-center gap-1">
                         <span className="text-lg font-semibold text-green-600">
-                          ${product.profit?.toFixed(2)}
+                        ₹{product.profit?.toFixed(2)}
                         </span>
                       </div>
                     </div>
@@ -394,7 +394,7 @@ export function ProductDetailPageComponent() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="price" className="text-right">
-                Price ($)
+                Price (₹)
               </Label>
               <Input
                 id="price"
