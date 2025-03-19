@@ -16,13 +16,11 @@ export default function Hero() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
-  // Set mounted to true when component mounts
   useEffect(() => {
     setMounted(true)
   }, [])
 
   useEffect(() => {
-    // Simulate loading assets
     const timer = setTimeout(() => {
       setLoaded(true)
     }, 2000)
@@ -30,63 +28,37 @@ export default function Hero() {
     return () => clearTimeout(timer)
   }, [])
 
-
-  // Determine if we're in dark mode
   const isDarkMode = mounted && theme === "dark"
 
-  // Environment preset based on theme
-  const environmentPreset = isDarkMode ? "night" : "park"
-
-  // Background color based on theme
-  const bgColor = isDarkMode ? "bg-gradient-to-b from-black via-[#320546] md:to-pink-900 to-purple-950" : "bg-gradient-to-b from-white to-purple-200"
-
-  // Heading text colors based on theme
-  const headingClass = isDarkMode 
-    ? "text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400" 
-    : "text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-blue-800"
-
-  // Text color based on theme
-  const textColor = isDarkMode ? "text-gray-200" : "text-gray-800"
-
-  // Primary button styles based on theme
-  const primaryButtonClass = isDarkMode
-    ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-    : "bg-gradient-to-r from-purple-700 to-blue-700 hover:from-purple-600 hover:to-blue-600 text-white"
-
-  // Secondary button styles based on theme
-  const secondaryButtonClass = isDarkMode
-    ? "border-purple-500 text-purple-400 hover:bg-purple-950/30"
-    : "border-purple-600 text-purple-600 hover:bg-purple-100/50"
-
   return (
-    <main className={`relative w-full h-screen overflow-hidden ${bgColor} transition-colors duration-300`}>
+    <main className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-white to-purple-200 dark:from-black dark:via-[#320546] dark:md:to-pink-900 dark:to-purple-950 transition-colors duration-300">
       {!loaded && <LoadingScreen />}
       
       <div className="absolute z-10 max-w-xl p-8 top-12 bg-gradient-to-b from-white via-white to-transparent dark:from-black dark:via-black dark:to-transparent md:bg-gradient-to-b md:from-transparent md:to-transparent  md:dark:bg-gradient-to-b md:dark:from-transparent md:dark:to-transparent">
-        <h1 className={`pb-4 text-4xl font-bold md:text-6xl text-center md:text-left ${headingClass}`}>
+        <h1 className="pb-4 text-4xl font-bold md:text-6xl text-center md:text-left text-transparent bg-clip-text bg-gradient-to-r from-purple-800 to-blue-800 dark:from-purple-400 dark:to-cyan-400">
           DIGI-BAZAAR
         </h1>
-        <p className={`mb-6 text-lg md:text-lg text-center md:text-left ${textColor}`}>
-        Sell online or in bulk, manage your store, streamline wholesale orders, and grow your business effortlessly!
+        <p className="mb-6 text-lg md:text-lg text-center md:text-left text-gray-800 dark:text-gray-200">
+          Sell online or in bulk, manage your store, streamline wholesale orders, and grow your business effortlessly!
         </p>
         <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
           <Link href='/inventory'>
-          <Button className={primaryButtonClass}>
-            Get Started
-          </Button>
+            <Button className={`bg-gradient-to-r ${isDarkMode ? "from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700" : "from-purple-700 to-blue-700 hover:from-purple-600 hover:to-blue-600"} text-white`}>
+              Get Started
+            </Button>
           </Link>
           <Link href='/about'>
-          <Button variant="outline" className={secondaryButtonClass}>
-            Learn More
-          </Button>
+            <Button variant="outline" className={`border ${isDarkMode ? "border-purple-500 text-purple-400 hover:bg-purple-950/30" : "border-purple-600 text-purple-600 hover:bg-purple-100/50"}`}>
+              Learn More
+            </Button>
           </Link>
         </div>
       </div>
       
       <Canvas className="w-full h-screen" shadows camera={{ position: isMobile ? [0, 2, 8] : [2, 0.1, 10], fov: 60 }}>
         <Suspense fallback={null}>
-          <DigiBazaarScene isDarkMode={true}  />
-          <Environment preset={environmentPreset} />
+          <DigiBazaarScene isDarkMode={true} />
+          <Environment preset={isDarkMode ? "night" : "park"} />
           <OrbitControls
             enableZoom={false}
             enablePan={false}

@@ -250,7 +250,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
 
   const handleProceedToOrder = () => {
     if (!token) {
-      router.push("/login")
+      router.push("/auth/login")
     } else {
       router.push(`/gigs/gig/${gig.id}/create-inquiry`)
     }
