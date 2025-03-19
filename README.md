@@ -80,6 +80,8 @@ DigiBazaar is constructed using state-of-the-art technologies to ensure robust p
 - **Backend:** Node.js, Express, and MySQL.
 - **Real-Time Features:** WebSockets enable live notifications and chat functionalities.
 
+---
+
 #  How DigiBazaar Works  
 
 DigiBazaar is built to make **eCommerce, inventory management, and wholesale trading seamless**. Whether you're a **seller, wholesaler, or warehouse manager**, DigiBazaar provides a **smooth, intuitive, and powerful** workflow.  
