@@ -19,8 +19,8 @@ export default function LoadingScreen() {
   if (!isClient) return null // Prevents mismatched SSR output
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
-      <div className="mb-8 text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-black">
+      <div className="mb-8 text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-cyan-600 dark:from-purple-400 dark:to-cyan-400">
         DigiBazaar
       </div>
 
@@ -31,7 +31,7 @@ export default function LoadingScreen() {
         />
       </div>
 
-      <div className="text-gray-400">Loading digital warehouse... {Math.floor(progress)}%</div>
+      <div className="text-gray-700 dark:text-gray-400">Loading digital warehouse... {Math.floor(progress)}%</div>
     </div>
   )
 }
