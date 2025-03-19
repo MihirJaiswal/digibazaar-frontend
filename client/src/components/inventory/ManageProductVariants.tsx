@@ -33,6 +33,11 @@ export default function ManageProductVariants({ productId }: { productId: string
     stock: 0,
     })
 
+    useEffect(() => {
+      console.log("ManageProductVariants mounted with productId:", productId);
+      console.log("Auth token available:", !!token);
+      fetchVariants();
+    }, [productId, token]);
 
   const fetchVariants = async () => {
     setLoading(true)
@@ -138,7 +143,6 @@ export default function ManageProductVariants({ productId }: { productId: string
           <Badge variant="outline" className="text-primary">
             Variants
           </Badge>
-          Product Variants
         </CardTitle>
         <Button onClick={openCreateDialog} className="flex items-center gap-1">
           <Plus className="h-4 w-4" />

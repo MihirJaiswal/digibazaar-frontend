@@ -199,14 +199,14 @@ export function ProductDetailPageComponent() {
    <div className="bg-white dark:bg-zinc-900 min-h-screen">
    <Header/>
    <div className="container mx-auto p-6 space-y-6 ">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">Product Details</h1>
+          <h1 className="md:text-2xl font-bold">Product Details</h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
             <Edit className="h-4 w-4 mr-2" />
             Edit
@@ -221,7 +221,7 @@ export function ProductDetailPageComponent() {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="stock">Stock Management</TabsTrigger>
+          <TabsTrigger value="stock">Stock</TabsTrigger>
           <TabsTrigger value="variants">Variants</TabsTrigger>
         </TabsList>
 
