@@ -4,9 +4,7 @@ Welcome to **DigiBazaar** – my major project and a revolutionary platform. Thi
 
 ---
 ![Screenshot 2025-03-19 225744](https://github.com/user-attachments/assets/f3cf46ae-81b0-4ec7-af07-c604e81c0c57)
-![Screenshot 2025-03-19 225913](https://github.com/user-attachments/assets/e94dd805-9df6-4d8d-8567-95e29091dcf4)
-![Screenshot 2025-03-19 225937](https://github.com/user-attachments/assets/33f6ddb2-a66f-43e7-a755-47946dad283a)
-![Screenshot 2025-03-19 230011](https://github.com/user-attachments/assets/54b2cb18-3cfc-4141-9571-cec46a26b1ce)
+
 
 ---
 
@@ -25,6 +23,8 @@ Engineered for scalability, DigiBazaar integrates seamlessly with **Stripe** for
 
 ## 🏪 Store – Build Your Own eCommerce Empire
 
+![Screenshot 2025-03-19 225913](https://github.com/user-attachments/assets/e94dd805-9df6-4d8d-8567-95e29091dcf4)
+
 With DigiBazaar’s **Store Builder**, you can establish a professional online shop in minutes. No coding skills are required – simply customize the available templates, add your products, and start selling.
 
 ### Key Features:
@@ -37,6 +37,9 @@ With DigiBazaar’s **Store Builder**, you can establish a professional online s
 ---
 
 ## 📦 Warehouse Management System (WMS) – Next-Level Inventory Control
+
+
+![Screenshot 2025-03-19 225937](https://github.com/user-attachments/assets/33f6ddb2-a66f-43e7-a755-47946dad283a)
 
 Efficient inventory management is vital for any business. DigiBazaar’s WMS delivers robust solutions to ensure accurate stock tracking and streamlined operations.
 
@@ -53,6 +56,9 @@ Whether you handle 10 orders or 10,000 orders per day, our WMS is designed to su
 
 ## 🏭 Wholesale – Simplifying Bulk Trading
 
+
+![Screenshot 2025-03-19 230011](https://github.com/user-attachments/assets/54b2cb18-3cfc-4141-9571-cec46a26b1ce)
+
 The DigiBazaar Wholesale Marketplace connects retailers and manufacturers, streamlining bulk transactions for greater efficiency.
 
 ### Advantages:
@@ -67,6 +73,9 @@ This platform provides a global B2B marketplace designed to meet the demands of 
 ---
 
 ## 🌍 Community – Collaborate, Learn, and Grow
+
+![Screenshot 2025-03-19 230443](https://github.com/user-attachments/assets/706547de-22dd-4894-9e39-e740c350416b)
+
 
 DigiBazaar isn’t just about transactions – it’s about building a supportive community for entrepreneurs, wholesalers, and eCommerce professionals.
 
