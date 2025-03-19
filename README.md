@@ -106,6 +106,9 @@ DigiBazaar is built to make **eCommerce, inventory management, and wholesale tra
 ## 🏪 **1. Store – Create & Manage Your Online Shop**  
 DigiBazaar lets you build your **own eCommerce store** in just a few clicks. No coding required!  
 
+![Screenshot 2025-03-19 230837](https://github.com/user-attachments/assets/04805d24-b17e-45f5-bbce-a365a44735ef)
+
+
 ### ✅ **Step-by-Step Workflow:**  
 - **Sign Up & Set Up Your Store** – Register, choose a store name, and select a template.  
 - **Add Products** – Upload images, write descriptions, set prices, and add variants (colors, sizes, etc.) through a user-friendly interface.
@@ -123,6 +126,9 @@ DigiBazaar lets you build your **own eCommerce store** in just a few clicks. No 
 ## 📦 **2. WMS – Advanced Warehouse & Inventory Management**  
 For businesses managing **warehouses, stock levels, and shipments**, DigiBazaar provides an **end-to-end Warehouse Management System (WMS)**.  
 
+![Screenshot 2025-03-19 230944](https://github.com/user-attachments/assets/cba529bf-f0d7-4df1-87ce-af132516df90)
+
+
 ### ✅ **Step-by-Step Workflow:**  
 - **Add Warehouses** – Define storage locations & categorize them (Main, Secondary, etc.).  
 - **Track Stock Levels** – View real-time inventory updates.  
@@ -139,6 +145,9 @@ For businesses managing **warehouses, stock levels, and shipments**, DigiBazaar 
 
 ## 🏭 **3. Wholesale – Buy & Sell in Bulk**  
 DigiBazaar isn’t just for regular eCommerce – it also supports **B2B transactions** with a dedicated **Wholesale Marketplace**.  
+
+![Screenshot 2025-03-19 231022](https://github.com/user-attachments/assets/5d9cfbaf-c548-4102-89df-2a2f40eab9c1)
+
 
 ### ✅ **Step-by-Step Workflow:**  
 - **Sellers List Bulk Products** – Define **MOQ (Minimum Order Quantity)** & pricing tiers.  
