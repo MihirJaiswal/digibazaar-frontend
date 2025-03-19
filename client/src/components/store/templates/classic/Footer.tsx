@@ -68,7 +68,7 @@ const FooterSection: React.FC<FooterSectionProps> = ({
   return (
     <footer 
       className="pt-24 pb-10 relative overflow-hidden"
-      style={{ backgroundColor }}
+      style={{ background: backgroundColor }}
     >
       {/* Background decorative elements */}
       <div 
@@ -305,31 +305,6 @@ const FooterSection: React.FC<FooterSectionProps> = ({
                 </Button>
               </div>
             </form>
-            
-            {/* Contact info */}
-            <div className="mt-8 space-y-3">
-              <div 
-                className="flex items-center gap-3"
-                style={{ color: `${textColor}99` }}
-              >
-                <Mail className="h-4 w-4" style={{ color: primaryColor }} />
-                <span>support@{storeName.toLowerCase().replace(/\s+/g, '')}.com</span>
-              </div>
-              <div 
-                className="flex items-center gap-3"
-                style={{ color: `${textColor}99` }}
-              >
-                <Phone className="h-4 w-4" style={{ color: primaryColor }} />
-                <span>+1 (555) 123-4567</span>
-              </div>
-              <div 
-                className="flex items-start gap-3"
-                style={{ color: `${textColor}99` }}
-              >
-                <MapPin className="h-4 w-4 mt-1" style={{ color: primaryColor }} />
-                <span>123 Commerce St, Suite 100<br />New York, NY 10001</span>
-              </div>
-            </div>
           </motion.div>
         </motion.div>
         

@@ -248,6 +248,7 @@ const FeaturedCollectionSection: React.FC<FeaturedCollectionSectionProps> = ({
             className="rounded-full px-8 py-6 border-2 font-medium transition-all hover:scale-105"
             style={{
               borderColor: primaryColor,
+              background: "transparent",
               color: textColor,
             }}
           >

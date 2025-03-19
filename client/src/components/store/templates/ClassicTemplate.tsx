@@ -370,6 +370,7 @@ function ClassicTemplateInternal({
         bannerText={themeCustomization?.bannerText}
         cardBackgroundColor={themeCustomization?.cardBackgroundColor || "#ffffff"}
         storeLogo={storeLogo}
+        textColor={themeCustomization?.textColor || "#fffff" }
         storeName={storeName}
         storeDescription={storeDescription}
         primaryColor={themeCustomization?.buttonColor || "#3b82f6"}
@@ -984,6 +985,8 @@ function ClassicTemplateInternal({
         storeLogo={storeLogo}
         storeName={storeName}
         storeDescription={storeDescription}
+        backgroundColor={themeCustomization?.navBarColor || "rgba(0, 0, 0, 0.85)"}
+        textColor={themeCustomization?.navBarTextColor || "#ffffff"}
         primaryColor={themeCustomization?.buttonColor || "#3b82f6"}
         footerText={themeCustomization?.footerText}
       />

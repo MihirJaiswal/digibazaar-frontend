@@ -27,28 +27,30 @@ interface ThemeCustomization {
 interface HeroSectionProps {
   bannerImage?: string
   bannerText?: string
+  backgroundColor?: string
   storeLogo: string
   storeName: string
   storeDescription: string
   primaryColor: string
+  textColor: string
   cardBackgroundColor: string
   themeCustomization?: ThemeCustomization
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({
   bannerImage,
+  backgroundColor,
   bannerText,
   storeLogo,
   storeName,
   storeDescription,
   primaryColor,
+  textColor,
   themeCustomization,
   cardBackgroundColor
 }) => {
   // Fallback theme values
   const accentColor = themeCustomization?.accentColor || "#f59e0b"
-  const backgroundColor = themeCustomization?.backgroundColor || "#01172b"
-  const textColor = themeCustomization?.textColor || "#ccd7e0"
   const fontFamily = themeCustomization?.fontFamily || "Arial, sans-serif"
   const headingFontFamily = themeCustomization?.headingFontFamily || "Arial, sans-serif"
   const headingFontSize = themeCustomization?.headingFontSize || "48px"
@@ -125,7 +127,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   className="text-left text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
                   style={{
                     fontFamily: headingFontFamily,
-                    color: headingFontColor,
+                    color: textColor
                   }}
                 >
                   {bannerText || `Welcome to ${storeName}`}
@@ -137,7 +139,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               >
                 <CardDescription 
                   className="text-left text-lg leading-relaxed"
-                  style={{ color: `${textColor}CC` }}
+                  style={{ color: textColor }}
                 >
                   {storeDescription}
                 </CardDescription>
@@ -155,20 +157,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   size="lg"
                 >
                   Shop Now <ArrowRight className="w-5 h-5 ml-1" />
-                </Button>
-              </motion.div>
-              <motion.div variants={itemVariants}>
-                <Button
-                  variant="outline"
-                  style={{
-                    borderColor: accentColor,
-                    color: textColor,
-                    borderRadius: buttonBorderRadius,
-                  }}
-                  className="hover:bg-opacity-10 transition-all duration-300 px-8 py-6 text-base border-2"
-                  size="lg"
-                >
-                  Learn More
                 </Button>
               </motion.div>
             </CardContent>
