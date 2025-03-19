@@ -1,8 +1,8 @@
-# 🚀 DigiBazaar – The Ultimate eCommerce & Warehouse Management Solution  
+# DigiBazaar – The Ultimate eCommerce & Warehouse Management Solution  
 
 Welcome to **DigiBazaar** – a revolutionary platform that merges **eCommerce, Warehouse Management, Wholesale, and Community** into a **single powerful ecosystem**. Whether you're a **small business, wholesaler, or an entrepreneur**, DigiBazaar provides **everything you need** to set up, manage, and scale your online business.  
 
-## 🌟 What is DigiBazaar?  
+## 📌 What is DigiBazaar?  
 DigiBazaar is **not just another eCommerce platform** – it's a **complete business ecosystem**. We bring together:  
 ✅ **A Shopify-like eCommerce Builder** – Create stunning online stores effortlessly.  
 ✅ **A Robust Warehouse Management System (WMS)** – Manage inventory, stocks, and shipments like a pro.  
