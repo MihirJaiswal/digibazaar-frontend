@@ -74,14 +74,7 @@ export default function CommunityPage() {
       <>
         <Header />
         <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-900 min-h-screen">
-          <div className="hidden md:block">
             <Sidebar />
-          </div>
-          <div className="md:hidden p-4">
-            <Button variant="outline" size="icon" onClick={toggleMobileSidebar} className="mb-4">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </div>
           <div className="flex-1 max-w-5xl mx-auto py-4 space-y-4 px-4 md:px-6 w-full">
             <Skeleton className="h-32 md:h-40 w-full rounded-lg" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -102,14 +95,7 @@ export default function CommunityPage() {
       <>
         <Header />
         <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-900 min-h-screen">
-          <div className="hidden md:block">
             <Sidebar />
-          </div>
-          <div className="md:hidden p-4">
-            <Button variant="outline" size="icon" onClick={toggleMobileSidebar} className="mb-4">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </div>
           <div className="flex-1 max-w-5xl mx-auto py-6 md:py-10 text-center px-4">
             <h1 className="text-xl md:text-2xl font-bold mb-4">Community not found</h1>
             <p className="mb-6 text-gray-600 dark:text-gray-400">
@@ -140,41 +126,7 @@ export default function CommunityPage() {
     <>
       <Header />
       <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-900 min-h-screen">
-        {/* Desktop Sidebar */}
-        <div className="hidden md:block">
           <Sidebar />
-        </div>
-
-        {/* Mobile Sidebar Toggle */}
-        <div className="md:hidden px-6 py-3 flex items-center justify-between bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="rounded-lg"
-                onClick={() => router.push('/community/communities/explore')}
-              >
-                Back
-              </Button>
-              
-              <h2 className="text-lg font-semibold truncate flex-1 text-center px-4">
-                {community.name}
-              </h2>
-
-              {user && (
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  asChild 
-                  className="ml-auto rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-                >
-                  <Link href={`/community/communities/${id}/submit`} className="flex items-center">
-                    <Plus className="h-5 w-5" />
-                  </Link>
-                </Button>
-              )}
-            </div>
-
-
 
         {/* Main Content */}
         <div className="flex-1 w-full max-w-7xl mx-auto py-3 md:py-4 space-y-4 md:space-y-6 px-4 md:px-6">

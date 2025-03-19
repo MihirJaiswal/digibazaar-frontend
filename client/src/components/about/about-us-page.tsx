@@ -397,12 +397,6 @@ export function AboutUsPage() {
                     ))}
                   </ul>
                 </CardContent>
-                <CardFooter className="pt-2">
-                  <Button variant="ghost" className="gap-2 text-primary">
-                    Learn more
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </CardFooter>
               </Card>
             ))}
           </div>
@@ -481,10 +475,12 @@ export function AboutUsPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="border-t bg-muted/50 flex justify-center py-4">
+                  <Link href='/store'>
                   <Button className="gap-2">
                     Start Shopping Now
                     <ArrowRight className="h-4 w-4" />
                   </Button>
+                  </Link>
                 </CardFooter>
               </Card>
             </TabsContent>
@@ -682,13 +678,6 @@ export function AboutUsPage() {
                 </ul>
               </CardContent>
             </Card>
-          </div>
-
-          <div className="flex justify-center mt-8">
-            <Button variant="outline" className="gap-2">
-              Read Our Technical Blog
-              <ExternalLink className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       ),

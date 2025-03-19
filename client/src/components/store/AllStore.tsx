@@ -50,7 +50,7 @@ export default function StoresPage() {
   const [rawSearchQuery, setRawSearchQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const { token } = useAuthStore();
+  const { token, user} = useAuthStore();
 
   useEffect(() => {
     async function fetchStores() {
@@ -106,6 +106,8 @@ export default function StoresPage() {
   const handleCategoryFilter = (category: string) => {
     setCategoryFilter(category);
   };
+
+  const createStoreLink = user ? "/store/create" : "/auth/login";
 
   if (loading) {
     return (
@@ -169,7 +171,7 @@ export default function StoresPage() {
                   />
                 </div>
                   <Button asChild variant="default" className="w-full sm:w-auto">
-                    <Link href="/store/create">
+                    <Link href={createStoreLink}>
                       <StoreIcon className="mr-2 h-4 w-4" />
                       Create Your Store
                     </Link>
@@ -217,7 +219,7 @@ export default function StoresPage() {
               {/* Only show the Create Your Store button if the user is logged out */}
               {!token && (
                 <Button asChild className="mt-6">
-                  <Link href="/create-store">Create Your Store</Link>
+                  <Link href={createStoreLink}>Create Your Store</Link>
                 </Button>
               )}
             </div>

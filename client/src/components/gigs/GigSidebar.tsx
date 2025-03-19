@@ -264,7 +264,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
 
   const handleContactSeller = async () => {
     if (!token) {
-      router.push("/login")
+      router.push("/auth/login")
       return
     }
     try {
