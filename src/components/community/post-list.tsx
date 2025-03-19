@@ -175,7 +175,7 @@ export function PostList({ posts }: PostListProps) {
             <div className="flex-1">
               <CardHeader>
                 <CardDescription>
-                  <Link href={`/communities/${post.communityId}`} className="hover:underline">
+                  <Link href={`/community/communities/${post.communityId}`} className="hover:underline">
                     {post.community?.name}
                   </Link>
                   {" • "}
@@ -184,7 +184,7 @@ export function PostList({ posts }: PostListProps) {
                   <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
                 </CardDescription>
                 <CardTitle className="text-lg">
-                  <Link href={`/communities/${post.communityId}/posts/${post.id}`} className="hover:underline">
+                  <Link href={`/community/communities/${post.communityId}/posts/${post.id}`} className="hover:underline">
                     {post.title}
                   </Link>
                 </CardTitle>
