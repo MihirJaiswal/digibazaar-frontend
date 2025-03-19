@@ -1,232 +1,317 @@
-"use client";
+"use client"
 
-import Image from "next/image";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Menu, X, ShoppingCart, Check, ChevronRight, Star } from 'lucide-react';
-import { motion } from "framer-motion";
-import { toast } from "sonner";
-import { useStripe, useElements, CardElement, Elements } from "@stripe/react-stripe-js";
-import { useAuthStore } from "@/store/authStore";
-import { loadStripe } from "@stripe/stripe-js";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type React from "react"
+import { useState } from "react"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { ShoppingCart, Check, Star, Heart } from "lucide-react"
+import { toast } from "sonner"
+import { useStripe, useElements, CardElement, Elements } from "@stripe/react-stripe-js"
+import { useAuthStore } from "@/store/authStore"
+import { loadStripe } from "@stripe/stripe-js"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { cn } from "@/lib/utils"
+import Navbar from "./classic/Navbar"
+import BannerSection from "./classic/Hero"
+import FeaturedCollectionSection from "./classic/Products"
+import AboutSection from "./classic/About"
+import NewsletterSection from "./classic/Newsletter"
+import FooterSection from "./classic/Footer"
 
 interface Product {
-  id: string;
-  title: string;
-  price: number;
-  mainImage: string;
-  variants?: string[];
-  description?: string;
+  id: string
+  title: string
+  price: number
+  mainImage: string
+  variants?: string[]
+  description?: string
 }
 
 export interface ThemeCustomization {
-  fontFamily?: string;
-  fontSize?: string;
-  fontColor?: string;
-  backgroundColor?: string;
-  textColor?: string;
-  buttonColor?: string;
-  bannerImage?: string;
-  bannerText?: string;
-  footerText?: string;
+  theme?: string
+  id?: string
+  storeId?: string
+  createdAt?: Date
+  updatedAt?: Date
+  fontFamily?: string
+  fontSize?: string
+  fontColor?: string
+  headingFontFamily?: string
+  headingFontSize?: string
+  headingFontColor?: string
+  backgroundColor?: string
+  backgroundColor2?: string
+  textColor?: string
+  accentColor?: string
+  borderColor?: string
+  cardBackgroundColor?: string
+  buttonColor?: string
+  buttonTextColor?: string
+  buttonHoverColor?: string
+  buttonHoverTextColor?: string
+  buttonBorderRadius?: string
+  navBarColor?: string
+  navBarTextColor?: string
+  navBarHoverColor?: string
+  linkColor?: string
+  linkHoverColor?: string
+  errorColor?: string
+  successColor?: string
+  warningColor?: string
+  borderRadius?: string
+  productGridLayout?: string
+  containerWidth?: string
+  aboutImage?: string
+  bannerImage?: string
+  footerImage?: string
+  logoImage?: string
+  favicon?: string
+  bannerText?: string
+  footerText?: string
 }
 
 interface ClassicTemplateProps {
-  viewMode: "desktop" | "tablet" | "mobile";
-  currentPage: string;
-  storeName?: string;
-  storeDescription?: string;
-  products?: Product[];
-  storeLogo?: string;
-  themeCustomization?: ThemeCustomization;
-  storeId?: string;
-  userId?: string;
+  viewMode: "desktop" | "tablet" | "mobile"
+  currentPage: string
+  storeName: string
+  storeDescription: string
+  products: Product[]
+  storeLogo: string
+  themeCustomization?: ThemeCustomization
+  storeId: string
+  userId: string
 }
 
 interface ShippingAddress {
-  fullName: string;
-  address: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
+  fullName: string
+  address: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
 }
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "")
 
-// This is the internal component that uses Stripe hooks
 function ClassicTemplateInternal({
-  storeName = "Classic Store",
-  storeDescription = "Enjoy a timeless design that focuses on tradition and quality.",
-  products = [],
-  storeLogo = "/placeholder.svg?height=50&width=50",
+  storeName,
+  storeDescription,
+  products,
+  storeLogo,
   themeCustomization = {},
-  storeId = "",
-  userId = "",
+  storeId,
+  userId,
 }: ClassicTemplateProps) {
-  const { token } = useAuthStore();
-  const stripe = useStripe();
-  const elements = useElements();
+  const { token, user } = useAuthStore()
+  const stripe = useStripe()
+  const elements = useElements()
 
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
-  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'details' | 'shipping' | 'payment'>('details');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [isProductDialogOpen, setIsProductDialogOpen] = useState(false)
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false)
+  const [processing, setProcessing] = useState(false)
+  const [currentStep, setCurrentStep] = useState<"details" | "shipping" | "payment">("details")
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
-    fullName: '',
-    address: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: 'India',
-  });
+    fullName: "",
+    address: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "India",
+  })
+  const [quantity, setQuantity] = useState(1)
+  const [wishlist, setWishlist] = useState<string[]>([])
+  const [error, setError] = useState<string | null>(null)
 
-  // Use sample products if none are provided
-  const displayProducts = products.length > 0 ? products : [
-    {
-      id: "1",
-      name: "Vintage Armchair",
-      price: 15999,
-      image: "/placeholder.svg?height=400&width=400",
-      description: "Handcrafted armchair with premium upholstery and solid wood frame."
-    },
-    {
-      id: "2",
-      name: "Brass Table Lamp",
-      price: 7499,
-      image: "/placeholder.svg?height=400&width=400",
-      description: "Elegant brass lamp with adjustable arm and warm lighting."
-    },
-    {
-      id: "3",
-      name: "Wooden Bookshelf",
-      price: 22999,
-      image: "/placeholder.svg?height=400&width=400",
-      description: "Solid oak bookshelf with adjustable shelves and traditional craftsmanship."
-    },
-    {
-      id: "4",
-      name: "Handwoven Rug",
-      price: 12999,
-      image: "/placeholder.svg?height=400&width=400",
-      description: "Traditional pattern rug made with natural fibers and artisanal techniques."
+  const primaryColor = themeCustomization?.buttonColor || "#3b82f6"
+  const accentColor = themeCustomization?.accentColor || "#f59e0b"
+  const backgroundColor = themeCustomization?.backgroundColor || "#01172b"
+  const textColor = themeCustomization?.textColor || "#ccd7e0"
+  const fontFamily = themeCustomization?.fontFamily || "Arial, sans-serif"
+  const fontSize = themeCustomization?.fontSize || "16px"
+  const fontColor = themeCustomization?.fontColor || textColor
+  const headingFontFamily = themeCustomization?.headingFontFamily || "Arial, sans-serif"
+  const headingFontSize = themeCustomization?.headingFontSize || "24px"
+  const headingFontColor = themeCustomization?.headingFontColor || "#ffffff"
+  const backgroundColor2 = themeCustomization?.backgroundColor2 || "#ffffff"
+  const borderColor = themeCustomization?.borderColor || "#e5e7eb"
+  const cardBackgroundColor = themeCustomization?.cardBackgroundColor || "#1f2937"
+  const buttonTextColor = themeCustomization?.buttonTextColor || "#ffffff"
+  const buttonHoverColor = themeCustomization?.buttonHoverColor || "#2563eb"
+  const buttonHoverTextColor = themeCustomization?.buttonHoverTextColor || "#ffffff"
+  const buttonBorderRadius = themeCustomization?.buttonBorderRadius || "4px"
+  const navBarColor = themeCustomization?.navBarColor || "#1f2937"
+  const navBarTextColor = themeCustomization?.navBarTextColor || "#ffffff"
+  const navBarHoverColor = themeCustomization?.navBarHoverColor || "#374151"
+  const linkColor = themeCustomization?.linkColor || "#3b82f6"
+  const linkHoverColor = themeCustomization?.linkHoverColor || "#2563eb"
+  const errorColor = themeCustomization?.errorColor || "#dc2626"
+  const successColor = themeCustomization?.successColor || "#16a34a"
+  const warningColor = themeCustomization?.warningColor || "#f59e0b"
+  const borderRadius = themeCustomization?.borderRadius || "8px"
+  const productGridLayout = themeCustomization?.productGridLayout || "grid-cols-3"
+  const containerWidth = themeCustomization?.containerWidth || "1200px"
+  const aboutImage = themeCustomization?.aboutImage || "/default-about.jpg"
+  const bannerImage = themeCustomization?.bannerImage || "/default-banner.jpg"
+  const footerImage = themeCustomization?.footerImage || "/default-footer.jpg"
+  const logoImage = themeCustomization?.logoImage || storeLogo
+  const favicon = themeCustomization?.favicon || "/favicon.ico"
+  const bannerText = themeCustomization?.bannerText || "Welcome to our store!"
+  const footerText = themeCustomization?.footerText || "Thank you for visiting!"
+
+  const addToWishlist = (productId: string) => {
+    if (wishlist.includes(productId)) {
+      setWishlist(wishlist.filter((id) => id !== productId))
+      toast.success("Removed from wishlist")
+    } else {
+      setWishlist([...wishlist, productId])
+      toast.success("Added to wishlist")
     }
-  ];
+  }
+
+  const incrementQuantity = () => {
+    setQuantity(quantity + 1)
+  }
+
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1)
+    }
+  }
 
   const openProductDialog = (product: Product) => {
-    setSelectedProduct(product);
-    setIsProductDialogOpen(true);
-    setCurrentStep('details');
-  };
+    setSelectedProduct(product)
+    setIsProductDialogOpen(true)
+    setCurrentStep("details")
+    setQuantity(1)
+    setError(null)
+  }
 
   const closeProductDialog = () => {
-    setIsProductDialogOpen(false);
-    setTimeout(() => setSelectedProduct(null), 300);
-  };
+    setIsProductDialogOpen(false)
+    setTimeout(() => setSelectedProduct(null), 300)
+  }
 
   const openPaymentDialog = () => {
-    setIsProductDialogOpen(false);
+    if (!token) {
+      toast.error("Please login to continue")
+      return
+    }
+
+    setIsProductDialogOpen(false)
     setTimeout(() => {
-      setIsPaymentDialogOpen(true);
-    }, 300);
-  };
+      setIsPaymentDialogOpen(true)
+    }, 300)
+  }
 
   const closePaymentDialog = () => {
-    setIsPaymentDialogOpen(false);
-  };
+    setIsPaymentDialogOpen(false)
+    setError(null)
+  }
 
   const handleShippingSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCurrentStep('payment');
-  };
+    e.preventDefault()
+    if (
+      !shippingAddress.fullName ||
+      !shippingAddress.address ||
+      !shippingAddress.city ||
+      !shippingAddress.state ||
+      !shippingAddress.postalCode ||
+      !shippingAddress.country
+    ) {
+      toast.error("Please fill all shipping fields")
+      return
+    }
+    setCurrentStep("payment")
+  }
 
-  // When the user clicks "Add to Cart", follow these steps:
-  // 1. Create a Payment Intent on the backend.
-  // 2. Confirm the card payment via Stripe.
-  // 3. If payment succeeds, create the order.
   const handleProcessPayment = async () => {
-    if (!selectedProduct) return;
+    if (!selectedProduct) return
     if (!stripe || !elements) {
-      toast.error("Stripe has not loaded. Please refresh and try again.");
-      return;
+      toast.error("Stripe has not loaded. Please refresh and try again.")
+      return
     }
-    const cardElement = elements.getElement(CardElement);
+    const cardElement = elements.getElement(CardElement)
     if (!cardElement) {
-      toast.error("Payment details not available. Please try again.");
-      return;
+      toast.error("Payment details not available. Please try again.")
+      return
     }
 
-    setProcessing(true);
+    setProcessing(true)
+    setError(null)
+
     try {
-      // Step 1: Create Payment Intent (amount in cents)
-      const paymentIntentRes = await fetch(
-        "http://localhost:8800/api/orders/payments/create-intent",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            productId: selectedProduct.id,
-            storeId,
-            // You can send additional info if needed.
-          }),
-        }
-      );
+      const paymentIntentRes = await fetch("http://localhost:8800/api/orders/payments/create-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: selectedProduct.id,
+          storeId,
+          quantity,
+          unitPrice: selectedProduct.price,
+        }),
+      })
 
       if (!paymentIntentRes.ok) {
-        throw new Error("Failed to create payment intent");
+        const errorData = await paymentIntentRes.json().catch(() => ({}))
+        throw new Error(errorData.message || "Failed to create payment intent")
       }
-      const { clientSecret, paymentIntentId } = await paymentIntentRes.json();
-      console.log("Payment Intent:", { clientSecret, paymentIntentId });
 
-      // Step 2: Confirm Payment with Stripe
+      const { clientSecret, paymentIntentId } = await paymentIntentRes.json()
+
       const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: { card: cardElement },
-      });
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: shippingAddress.fullName,
+            address: {
+              line1: shippingAddress.address,
+              city: shippingAddress.city,
+              state: shippingAddress.state,
+              postal_code: shippingAddress.postalCode,
+              country: shippingAddress.country,
+            },
+          },
+        },
+      })
 
-      if (error || paymentIntent?.status !== "succeeded") {
-        throw new Error(error?.message || "Payment not completed");
+      if (error) {
+        throw new Error(error.message || "Payment failed")
       }
-      console.log("Payment succeeded:", paymentIntent);
 
-      // Step 3: Create the order on the backend
+      if (paymentIntent?.status !== "succeeded") {
+        throw new Error("Payment not completed")
+      }
+
       const orderPayload = {
         storeId,
-        // Use the verified user id (passed as a prop) for the order.
         userId,
-        totalPrice: selectedProduct.price,
-        shippingAddress: { 
-          address: shippingAddress.address, 
-          city: shippingAddress.city, 
+        totalPrice: selectedProduct.price * quantity,
+        shippingAddress: {
+          address: shippingAddress.address,
+          city: shippingAddress.city,
           country: shippingAddress.country,
           state: shippingAddress.state,
           postalCode: shippingAddress.postalCode,
-          fullName: shippingAddress.fullName
+          fullName: shippingAddress.fullName,
         },
         paymentIntentId,
         items: [
           {
             productId: selectedProduct.id,
-            quantity: 1,
+            quantity: quantity,
             unitPrice: selectedProduct.price,
-            totalPrice: selectedProduct.price,
+            totalPrice: selectedProduct.price * quantity,
           },
         ],
-      };
+      }
 
       const orderRes = await fetch("http://localhost:8800/api/orders", {
         method: "POST",
@@ -235,853 +320,677 @@ function ClassicTemplateInternal({
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(orderPayload),
-      });
+      })
 
       if (!orderRes.ok) {
-        throw new Error("Failed to create order");
+        const errorData = await orderRes.json().catch(() => ({}))
+        throw new Error(errorData.message || "Failed to create order")
       }
-      toast.success("Order placed successfully!");
-      closePaymentDialog();
-    } catch (error: any) {
-      console.error("Error creating order:", error);
-      toast.error(error.message || "Failed to create order");
-    }
-    setProcessing(false);
-  };
 
-  const primaryColor = themeCustomization?.buttonColor || "#854d0e";
+      toast.success("Order placed successfully!")
+      closePaymentDialog()
+    } catch (error: any) {
+      console.error("Error processing payment:", error)
+      setError(error.message || "Failed to process payment")
+      toast.error(error.message || "Failed to process payment")
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  const steps = [
+    { name: "Product Details", step: "details" },
+    { name: "Shipping", step: "shipping" },
+    { name: "Payment", step: "payment" },
+  ]
 
   return (
-    <div className="min-h-[600px] bg-gray-100 font-serif">
-      {/* Header */}
-      <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center gap-4">
-          <Image
-            src={storeLogo || "/placeholder.svg"}
-            alt={storeName || "Store Logo"
-            }
-            width={40}
-            height={40}
-            className="rounded-full object-cover"
-          />
-          <span className="text-2xl font-bold text-gray-900">
-            {storeName}
-          </span>
-        </div>
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          {["Home", "Products", "About", "Contact"].map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="text-base font-medium text-gray-700 hover:text-amber-800 transition-colors duration-200"
-            >
-              {item}
-            </a>
-          ))}
-          <Button 
-            variant="outline" 
-            size="icon"
-            className="ml-2 relative border-gray-300 text-gray-700 hover:bg-gray-100"
-          >
-            <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -top-2 -right-2 bg-amber-700 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              0
-            </span>
-          </Button>
-        </nav>
-        {/* Mobile Menu Toggle */}
-        <button
-          className="md:hidden text-gray-900"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <motion.nav 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-16 left-0 w-full bg-white border-b border-gray-200 shadow-md p-6 flex flex-col gap-6 md:hidden z-30"
-          >
-            {["Home", "Products", "About", "Contact"].map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="text-lg font-medium text-gray-700 hover:text-amber-800 transition-colors duration-200"
-                onClick={() => setMenuOpen(false)}
-              >
-                {item}
-              </a>
-            ))}
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100"
-              onClick={() => setMenuOpen(false)}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              <span>Cart (0)</span>
-            </Button>
-          </motion.nav>
-        )}
-      </header>
+    <div
+      className="min-h-[600px] font-sans"
+      style={{
+        backgroundColor: themeCustomization?.backgroundColor || "#ffffff",
+        fontFamily: themeCustomization?.fontFamily || "sans-serif",
+        color: themeCustomization?.textColor || "#000000",
+        fontSize: themeCustomization?.fontSize || "16px",
+      }}
+    >
+      <Navbar
+        storeLogo={storeLogo}
+        storeName={storeName}
+        navBarColor={themeCustomization?.navBarColor || "rgba(0, 0, 0, 0.85)"}
+        navBarTextColor={themeCustomization?.navBarTextColor || "#ffffff"}
+        navBarHoverColor={themeCustomization?.navBarHoverColor || "#ff9900"}
+        borderColor={themeCustomization?.borderColor || "#333333"}
+        linkColor={themeCustomization?.linkColor || "#cccccc"}
+        linkHoverColor={themeCustomization?.linkHoverColor || "#ff9900"}
+      />
 
-      {/* Hero Section */}
-      <section className="relative py-16 md:py-24 bg-amber-50">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="lg:w-1/2 text-center lg:text-left"
-            >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                {themeCustomization?.bannerText || "Welcome to the Classic Store"}
-              </h1>
-              <p className="text-xl text-gray-700 mb-8 max-w-xl mx-auto lg:mx-0">
-                {storeDescription}
-              </p>
-              <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                <Button 
-                  size="lg"
-                  className="bg-amber-700 hover:bg-amber-800 text-white px-8 py-6 text-lg"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  Discover Our Collection
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="border-amber-700 text-amber-700 hover:bg-amber-50 px-8 py-6 text-lg"
-                >
-                  Learn More
-                </Button>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="lg:w-1/2"
-            >
-              <div className="relative h-[400px] w-full rounded-lg overflow-hidden shadow-xl border-8 border-white">
-                <Image
-                  src={themeCustomization?.bannerImage || "/placeholder.svg?height=400&width=600"}
-                  alt="Classic Store"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      <BannerSection
+        bannerImage={themeCustomization?.bannerImage}
+        bannerText={themeCustomization?.bannerText}
+        cardBackgroundColor={themeCustomization?.cardBackgroundColor || "#ffffff"}
+        storeLogo={storeLogo}
+        storeName={storeName}
+        storeDescription={storeDescription}
+        primaryColor={themeCustomization?.buttonColor || "#3b82f6"}
+      />
 
-      {/* Featured Products Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Our Timeless Collection
-            </h2>
-            <div className="w-24 h-1 bg-amber-700 mx-auto my-6" style={{ backgroundColor: primaryColor }}></div>
-            <p className="max-w-2xl mx-auto text-gray-700 text-lg">
-              Discover our handcrafted selection of premium products designed with traditional craftsmanship and enduring quality.
-            </p>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {displayProducts.map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 group"
-              >
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name || "Product Image"}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <div className="p-5">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-                      <span className="text-sm ml-1 text-gray-600">4.9</span>
-                    </div>
-                  </div>
-                  <p className="text-lg font-bold text-gray-900 mb-4">
-                    ₹{product.price.toLocaleString('en-IN')}
-                  </p>
-                  <Button
-                    className="w-full bg-amber-700 hover:bg-amber-800 text-white"
-                    style={{ backgroundColor: primaryColor }}
-                    onClick={() => openProductDialog(product)}
-                  >
-                    View Details
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-          
-          <div className="mt-16 text-center">
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="border-amber-700 text-amber-700 hover:bg-amber-50 px-8"
-            >
-              View All Products <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
+      <AboutSection
+        backgroundColor={themeCustomization?.backgroundColor || "#f9fafb"}
+        accentColor={themeCustomization?.accentColor || "#f59e0b"}
+        primaryColor={themeCustomization?.buttonColor || "#3b82f6"}
+        storeName={storeName}
+        storeDescription={storeDescription}
+        imageUrl={themeCustomization?.aboutImage || "/placeholder.svg?height=600&width=800"}
+        badgeText="Our Story"
+        missionText="Our mission is to provide exceptional products that enhance your lifestyle while maintaining the highest standards of quality, sustainability, and customer service."
+        buttonText="Learn More About Us"
+      />
 
-      {/* About Section */}
-      <section className="py-20 bg-amber-50">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col lg:flex-row-reverse items-center gap-12">
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="lg:w-1/2"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                About {storeName}
-              </h2>
-              <div className="w-24 h-1 bg-amber-700 my-6" style={{ backgroundColor: primaryColor }}></div>
-              <p className="text-gray-700 text-lg mb-6 leading-relaxed">
-                {storeDescription}
-              </p>
-              <p className="text-gray-700 text-lg mb-8 leading-relaxed">
-                We are dedicated to preserving traditional craftsmanship while providing exceptional quality. Each piece in our collection is carefully selected to ensure authenticity, durability, and timeless appeal.
-              </p>
-              <Button
-                className="bg-amber-700 hover:bg-amber-800 text-white"
-                style={{ backgroundColor: primaryColor }}
-              >
-                Our Heritage
-              </Button>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="lg:w-1/2"
-            >
-              <div className="relative h-[400px] w-full rounded-lg overflow-hidden shadow-xl border-8 border-white">
-                <Image
-                  src="/placeholder.svg?height=400&width=600"
-                  alt="About our store"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      <FeaturedCollectionSection
+        backgroundColor={themeCustomization?.backgroundColor || "#ffffff"}
+        primaryColor={themeCustomization?.buttonColor || "#3b82f6"}
+        textColor={themeCustomization?.textColor || "#000000"}
+        products={products}
+        addToWishlist={addToWishlist}
+        wishlist={wishlist}
+        openProductDialog={openProductDialog}
+      />
 
-      {/* Why Choose Us Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Us
-            </h2>
-            <div className="w-24 h-1 bg-amber-700 mx-auto my-6" style={{ backgroundColor: primaryColor }}></div>
-            <p className="max-w-2xl mx-auto text-gray-700 text-lg">
-              We&apos;re committed to providing you with the best shopping experience possible.
-            </p>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white border border-gray-200 p-8 rounded-lg shadow-md"
-            >
-              <div 
-                className="w-16 h-16 rounded-full flex items-center justify-center mb-6 text-white"
-                style={{ backgroundColor: primaryColor }}
-              >
-                <span className="text-2xl">🚀</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">Fast Delivery</h3>
-              <p className="text-gray-700">
-                Experience speedy delivery with our efficient logistics network. We ensure your products reach you in the shortest time possible, carefully packaged and ready to enhance your home.
-              </p>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="bg-white border border-gray-200 p-8 rounded-lg shadow-md"
-            >
-              <div 
-                className="w-16 h-16 rounded-full flex items-center justify-center mb-6 text-white"
-                style={{ backgroundColor: primaryColor }}
-              >
-                <span className="text-2xl">💎</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">Artisanal Quality</h3>
-              <p className="text-gray-700">
-                Our products are carefully curated to ensure the highest quality. We stand behind everything we sell with our satisfaction guarantee and commitment to traditional craftsmanship.
-              </p>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              viewport={{ once: true }}
-              className="bg-white border border-gray-200 p-8 rounded-lg shadow-md"
-            >
-              <div 
-                className="w-16 h-16 rounded-full flex items-center justify-center mb-6 text-white"
-                style={{ backgroundColor: primaryColor }}
-              >
-                <span className="text-2xl">📞</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">Personal Service</h3>
-              <p className="text-gray-700">
-                We provide attentive customer support for all your needs. Our dedicated team is always ready to assist you with any questions or concerns about your purchase.
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      
 
-      {/* Product Detail Dialog */}
+      <NewsletterSection
+        primaryColor={themeCustomization?.buttonColor || "#3b82f6"}
+        sectionBackgroundColor={themeCustomization?.backgroundColor || "bg-gray-900"}
+        title="Join Our Community"
+        description="Subscribe to our newsletter and be the first to know about new products, exclusive offers, and more."
+        inputPlaceholder="Your email address"
+        subscribeButtonText="Subscribe"
+        privacyText="By subscribing, you agree to our privacy policy and consent to receive marketing emails."
+      />
+
       {selectedProduct && (
-        <Dialog 
-          open={isProductDialogOpen} 
-          onOpenChange={(open) => { if (!open) closeProductDialog(); }}
+        <Dialog
+          open={isProductDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) closeProductDialog()
+          }}
         >
-          <DialogContent className="max-w-3xl p-0 overflow-hidden bg-white">
-            <div className="flex flex-col md:flex-row">
-              {/* Product Image */}
+          <DialogContent className="max-w-5xl p-0 overflow-hidden rounded-xl border-0 shadow-xl">
+            <div className="flex flex-col md:flex-row max-h-[85vh]">
               <div className="md:w-1/2 relative">
-                <div className="relative h-[300px] md:h-full w-full">
+                <div className="relative h-[400px] md:h-full w-full">
                   <Image
                     src={selectedProduct.mainImage || "/placeholder.svg?height=600&width=600"}
-                    alt={selectedProduct.title || "Product Image"}
+                    alt={selectedProduct.title}
                     fill
                     className="object-cover"
                   />
-                </div>
-              </div>
-              
-              {/* Product Details */}
-              <div className="md:w-1/2 p-6 flex flex-col">
-                <DialogHeader className="mb-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <DialogTitle className="text-2xl font-bold text-gray-900">{selectedProduct.title}</DialogTitle>
-                      <div className="flex items-center mt-2">
-                        <div className="flex">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className="h-4 w-4 text-amber-500 fill-amber-500" />
-                          ))}
-                        </div>
-                        <span className="text-sm ml-2 text-gray-600">(42 reviews)</span>
-                      </div>
-                    </div>
-                    <Badge className="text-lg px-3 py-1 bg-amber-700">₹{selectedProduct.price.toLocaleString('en-IN')}</Badge>
-                  </div>
-                </DialogHeader>
-                
-                <Tabs defaultValue="description" className="flex-1">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="description">Description</TabsTrigger>
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="description" className="mt-4">
-                    <DialogDescription className="text-base text-gray-700">
-                      {selectedProduct.description || 
-                        "This premium product is crafted with traditional techniques and the finest materials. Each piece is unique and made to last for generations, bringing timeless elegance to your home."}
-                    </DialogDescription>
-                  </TabsContent>
-                  <TabsContent value="details" className="mt-4">
-                    {selectedProduct.variants && selectedProduct.variants.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="font-semibold mb-2 text-gray-900">Available Variants:</h4>
-                        <ul className="list-disc list-inside space-y-1">
-                          {selectedProduct.variants.map((variant, index) => (
-                            <li key={index} className="text-gray-700">{variant}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium text-gray-900">SKU:</span> {selectedProduct.id}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium text-gray-900">Category:</span> Heritage Collection
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium text-gray-900">In Stock:</span> Yes
-                      </p>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-                
-                <div className="mt-6 space-y-4">
-                  <div className="flex items-center gap-4">
-                    <Button 
-                      className="flex-1 bg-amber-700 hover:bg-amber-800 text-white"
-                      style={{ backgroundColor: primaryColor }}
-                      onClick={openPaymentDialog}
-                    >
-                      Buy Now
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="flex-1 border-amber-700 text-amber-700 hover:bg-amber-50"
-                    >
-                      Add to Cart
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {/* Payment Dialog */}
-      {selectedProduct && (
-        <Dialog 
-          open={isPaymentDialogOpen} 
-          onOpenChange={(open) => { if (!open) closePaymentDialog(); }}
-        >
-          <DialogContent className="max-w-2xl p-6 bg-white">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-gray-900">Complete Your Purchase</DialogTitle>
-              <DialogDescription className="text-gray-700">
-                You&apos;re purchasing {selectedProduct.title} for ₹{selectedProduct.price.toLocaleString('en-IN')}
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="mt-6">
-              <div className="flex items-center mb-6">
-                <div 
-                  className="w-8 h-8 rounded-full text-white flex items-center justify-center mr-3"
-                  style={{ backgroundColor: currentStep === 'details' ? primaryColor : '#10b981' }}
-                >
-                  {currentStep === 'details' ? '1' : <Check className="h-5 w-5" />}
-                </div>
-                <div className="h-1 flex-1 bg-gray-200">
-                  <div 
-                    className="h-full transition-all duration-300"
-                    style={{ 
-                      width: currentStep === 'details' ? '0%' : currentStep === 'shipping' ? '50%' : '100%',
-                      backgroundColor: primaryColor
-                    }}
-                  ></div>
-                </div>
-                <div 
-                  className={`w-8 h-8 rounded-full flex items-center justify-center mx-3 ${
-                    currentStep === 'details' 
-                      ? 'bg-gray-200 text-gray-600' 
-                      : currentStep === 'shipping' 
-                        ? 'text-white' 
-                        : 'text-white'
-                  }`}
-                  style={{ backgroundColor: currentStep !== 'details' ? primaryColor : undefined }}
-                >
-                  {currentStep === 'shipping' ? '2' : currentStep === 'payment' ? <Check className="h-5 w-5" /> : '2'}
-                </div>
-                <div className="h-1 flex-1 bg-gray-200">
-                  <div 
-                    className="h-full transition-all duration-300"
-                    style={{ 
-                      width: currentStep === 'payment' ? '100%' : '0%',
-                      backgroundColor: primaryColor
-                    }}
-                  ></div>
-                </div>
-                <div 
-                  className={`w-8 h-8 rounded-full flex items-center justify-center ml-3 ${
-                    currentStep === 'payment' 
-                      ? 'text-white' 
-                      : 'bg-gray-200 text-gray-600'
-                  }`}
-                  style={{ backgroundColor: currentStep === 'payment' ? primaryColor : undefined }}
-                >
-                  3
-                </div>
-              </div>
-              
-              {currentStep === 'details' && (
-                <div className="space-y-4">
-                  <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
-                    <div className="flex items-start gap-4">
-                      <div className="relative h-16 w-16 flex-shrink-0">
-                        <Image
-                          src={selectedProduct.mainImage || "/placeholder.svg?height=64&width=64"}
-                          alt={selectedProduct.title || "Product Image"}
-                          fill
-                          className="object-cover rounded-md"
-                        />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-gray-900">{selectedProduct.mainImage}</h4>
-                        <p className="text-sm text-gray-600">Quantity: 1</p>
-                        <p className="font-bold mt-1 text-gray-900">₹{selectedProduct.price.toLocaleString('en-IN')}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    className="w-full bg-amber-700 hover:bg-amber-800 text-white"
-                    style={{ backgroundColor: primaryColor }}
-                    onClick={() => setCurrentStep('shipping')}
+                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/20 to-transparent opacity-60"></div>
+                  <button
+                    className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center text-gray-700 bg-white rounded-full shadow-md hover:scale-110 transition-transform"
+                    onClick={() => addToWishlist(selectedProduct.id)}
+                    aria-label="Add to wishlist"
                   >
-                    Continue to Shipping
-                  </Button>
+                    <Heart
+                      className={cn(
+                        "h-5 w-5",
+                        wishlist.includes(selectedProduct.id) ? "fill-red-500 text-red-500" : "fill-transparent",
+                      )}
+                    />
+                  </button>
+                  <Badge className="absolute top-4 left-4 text-sm px-2 py-1" style={{ backgroundColor: primaryColor }}>
+                    New Arrival
+                  </Badge>
                 </div>
-              )}
-              
-              {currentStep === 'shipping' && (
-                <form onSubmit={handleShippingSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
-                        Full Name
-                      </label>
-                      <input
-                        id="fullName"
-                        type="text"
-                        className="w-full p-2 border rounded-md border-gray-300 focus:ring-amber-500 focus:border-amber-500"
-                        value={shippingAddress.fullName}
-                        onChange={(e) => setShippingAddress({...shippingAddress, fullName: e.target.value})}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="address" className="text-sm font-medium text-gray-700">
-                        Address
-                      </label>
-                      <input
-                        id="address"
-                        type="text"
-                        className="w-full p-2 border rounded-md border-gray-300 focus:ring-amber-500 focus:border-amber-500"
-                        value={shippingAddress.address}
-                        onChange={(e) => setShippingAddress({...shippingAddress, address: e.target.value})}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="city" className="text-sm font-medium text-gray-700">
-                        City
-                      </label>
-                      <input
-                        id="city"
-                        type="text"
-                        className="w-full p-2 border rounded-md border-gray-300 focus:ring-amber-500 focus:border-amber-500"
-                        value={shippingAddress.city}
-                        onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="state" className="text-sm font-medium text-gray-700">
-                        State
-                      </label>
-                      <input
-                        id="state"
-                        type="text"
-                        className="w-full p-2 border rounded-md border-gray-300 focus:ring-amber-500 focus:border-amber-500"
-                        value={shippingAddress.state}
-                        onChange={(e) => setShippingAddress({...shippingAddress, state: e.target.value})}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
-                        Postal Code
-                      </label>
-                      <input
-                        id="postalCode"
-                        type="text"
-                        className="w-full p-2 border rounded-md border-gray-300 focus:ring-amber-500 focus:border-amber-500"
-                        value={shippingAddress.postalCode}
-                        onChange={(e) => setShippingAddress({...shippingAddress, postalCode: e.target.value})}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="country" className="text-sm font-medium text-gray-700">
-                        Country
-                      </label>
-                      <select
-                        id="country"
-                        className="w-full p-2 border rounded-md border-gray-300 focus:ring-amber-500 focus:border-amber-500"
-                        value={shippingAddress.country}
-                        onChange={(e) => setShippingAddress({...shippingAddress, country: e.target.value})}
-                        required
-                      >
-                        <option value="India">India</option>
-                        <option value="USA">USA</option>
-                        <option value="UK">UK</option>
-                        <option value="Canada">Canada</option>
-                        <option value="Australia">Australia</option>
-                      </select>
+              </div>
+
+              <div className="md:w-1/2 flex flex-col">
+                <ScrollArea className="h-full max-h-[85vh] md:max-h-none">
+                  <div className="p-8">
+                    <DialogHeader className="mb-6">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <DialogTitle className="text-3xl font-bold text-gray-900 dark:text-white">
+                            {selectedProduct.title}
+                          </DialogTitle>
+                          <div className="flex items-center mt-3">
+                            <div className="flex">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star key={star} className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                              ))}
+                            </div>
+                            <span className="text-sm ml-2 text-gray-600 dark:text-gray-400">(42 reviews)</span>
+                          </div>
+                        </div>
+                        <Badge className="text-xl px-4 py-1.5 font-semibold" style={{ backgroundColor: primaryColor }}>
+                          ₹{selectedProduct.price.toLocaleString("en-IN")}
+                        </Badge>
+                      </div>
+                    </DialogHeader>
+
+                    <Tabs defaultValue="description" className="flex-1 mt-4">
+                      <TabsList className="grid w-full grid-cols-2 mb-6">
+                        <TabsTrigger value="description" className="text-base py-3">
+                          Description
+                        </TabsTrigger>
+                        <TabsTrigger value="details" className="text-base py-3">
+                          Details
+                        </TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="description" className="mt-2">
+                        <DialogDescription className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                          {selectedProduct.description ||
+                            "This premium product is designed to provide exceptional quality and performance. Made with the finest materials and crafted with attention to detail, it's perfect for those who appreciate excellence."}
+                        </DialogDescription>
+                        <div className="mt-6 grid grid-cols-2 gap-4">
+                          <div className="flex items-center gap-2">
+                            <Check className="h-5 w-5 text-green-500" />
+                            <span className="text-sm">Premium Quality</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="h-5 w-5 text-green-500" />
+                            <span className="text-sm">Durable Materials</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="h-5 w-5 text-green-500" />
+                            <span className="text-sm">Eco-Friendly</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="h-5 w-5 text-green-500" />
+                            <span className="text-sm">1 Year Warranty</span>
+                          </div>
+                        </div>
+                      </TabsContent>
+                      <TabsContent value="details" className="mt-2">
+                        {selectedProduct.variants && selectedProduct.variants.length > 0 && (
+                          <div className="mb-6">
+                            <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Available Variants:</h4>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {selectedProduct.variants.map((variant, index) => (
+                                <Badge
+                                  key={index}
+                                  variant="outline"
+                                  className="px-4 py-2 border-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 text-base"
+                                >
+                                  {variant}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        <div className="space-y-3 text-gray-700 dark:text-gray-300">
+                          <p className="flex justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+                            <span className="font-medium">SKU:</span>
+                            <span>{selectedProduct.id}</span>
+                          </p>
+                          <p className="flex justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+                            <span className="font-medium">Category:</span>
+                            <span>Premium Collection</span>
+                          </p>
+                          <p className="flex justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+                            <span className="font-medium">In Stock:</span>
+                            <span className="text-green-600 font-medium">Yes</span>
+                          </p>
+                          <p className="flex justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+                            <span className="font-medium">Shipping:</span>
+                            <span>Free Shipping</span>
+                          </p>
+                          <p className="flex justify-between py-3">
+                            <span className="font-medium">Estimated Delivery:</span>
+                            <span>3-5 Business Days</span>
+                          </p>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+
+                    <div className="mt-8">
+                      {(!user || (user && user.id !== userId)) && (
+                        <>
+                          <h4 className="font-medium mb-3 text-gray-900 dark:text-white">Quantity</h4>
+                          <div className="flex items-center mb-6">
+                            <button
+                              className="h-12 w-12 rounded-full border-2 border-gray-300 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={decrementQuantity}
+                              disabled={quantity <= 1}
+                            >
+                              <span className="text-xl font-medium">-</span>
+                            </button>
+                            <span className="w-16 text-center font-medium text-lg">{quantity}</span>
+                            <button
+                              className="h-12 w-12 rounded-full border-2 border-gray-300 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={incrementQuantity}
+                            >
+                              <span className="text-xl font-medium">+</span>
+                            </button>
+                            <div className="ml-6 text-gray-600 dark:text-gray-400">
+                              <span className="font-medium">Total: </span>
+                              <span className="font-bold text-lg text-gray-900 dark:text-white">
+                                ₹{(selectedProduct.price * quantity).toLocaleString("en-IN")}
+                              </span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                        {!token ? (
+                          <Button
+                            className="flex-1 rounded-full h-12 text-base"
+                            style={{ backgroundColor: primaryColor }}
+                            asChild
+                          >
+                            <a href="/auth/login">Login to Order</a>
+                          </Button>
+                        ) : user && user.id === userId ? (
+                          <div className="text-center w-full p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-gray-600 dark:text-gray-300">
+                            You're the store owner
+                          </div>
+                        ) : (
+                          <>
+                            <Button
+                              className="flex-1 rounded-full h-12 text-base"
+                              style={{ backgroundColor: primaryColor }}
+                              onClick={openPaymentDialog}
+                            >
+                              <ShoppingCart className="mr-2 h-5 w-5" /> Buy Now
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="flex-1 rounded-full h-12 text-base border-2"
+                              onClick={() => toast.success("Added to cart")}
+                            >
+                              Add to Cart
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="flex justify-between mt-6">
-                    <Button 
-                      type="button" 
-                      variant="outline"
-                      className="border-amber-700 text-amber-700 hover:bg-amber-50"
-                      onClick={() => setCurrentStep('details')}
-                    >
-                      Back
-                    </Button>
-                    <Button 
-                      type="submit"
-                      className="bg-amber-700 hover:bg-amber-800 text-white"
-                      style={{ backgroundColor: primaryColor }}
-                    >
-                      Continue to Payment
-                    </Button>
-                  </div>
-                </form>
-              )}
-              
-              {currentStep === 'payment' && (
-                <div className="space-y-6">
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <h4 className="font-medium mb-2 text-gray-900">Payment Details</h4>
-                    <div className="p-4 border rounded-md bg-white border-gray-300">
-                      <CardElement
-                        options={{
-                          style: {
-                            base: {
-                              fontSize: "16px",
-                              color: "#374151",
-                              "::placeholder": {
-                                color: "#9ca3af",
-                              },
-                            },
-                            invalid: {
-                              color: "#ef4444",
-                            },
-                          },
-                        }}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="flex justify-between mb-2">
-                      <span className="text-gray-700">Subtotal</span>
-                      <span className="text-gray-900">₹{selectedProduct.price.toLocaleString('en-IN')}</span>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-gray-700">Shipping</span>
-                      <span className="text-gray-900">₹0.00</span>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-gray-700">Tax</span>
-                      <span className="text-gray-900">₹{(selectedProduct.price * 0.18).toLocaleString('en-IN')}</span>
-                    </div>
-                    <Separator className="my-2 bg-gray-200" />
-                    <div className="flex justify-between font-bold">
-                      <span className="text-gray-900">Total</span>
-                      <span className="text-gray-900">₹{(selectedProduct.price * 1.18).toLocaleString('en-IN')}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <Button 
-                      variant="outline"
-                      className="border-amber-700 text-amber-700 hover:bg-amber-50"
-                      onClick={() => setCurrentStep('shipping')}
-                    >
-                      Back
-                    </Button>
-                    <Button 
-                      className="bg-amber-700 hover:bg-amber-800 text-white"
-                      style={{ backgroundColor: primaryColor }}
-                      onClick={handleProcessPayment}
-                      disabled={processing}
-                    >
-                      {processing ? "Processing..." : "Complete Purchase"}
-                    </Button>
-                  </div>
-                </div>
-              )}
+                </ScrollArea>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
       )}
 
-      {/* Footer */}
-      <footer className="bg-amber-50 py-12 px-4 md:px-8">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <Image
-                  src={storeLogo || "/placeholder.svg?height=40&width=40"}
-                  alt={storeName || "Store Logo"}
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
-                <span className="text-xl font-bold">{storeName}</span>
+      {selectedProduct && (
+        <Dialog
+          open={isPaymentDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) closePaymentDialog()
+          }}
+        >
+          <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-xl border-0 shadow-xl">
+            <ScrollArea className="max-h-[85vh]">
+              <div className="p-8">
+                <DialogHeader className="mb-8">
+                  <DialogTitle className="text-3xl font-bold text-gray-900 dark:text-white">
+                    Complete Your Purchase
+                  </DialogTitle>
+                  <DialogDescription className="text-base mt-2">
+                    You're purchasing <span className="font-medium">{selectedProduct.title}</span> for{" "}
+                    <span className="font-medium">₹{(selectedProduct.price * quantity).toLocaleString("en-IN")}</span>
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="mb-8">
+                  <nav aria-label="Progress" className="mb-10">
+                    <ol className="flex items-center">
+                      {steps.map((step, stepIdx) => (
+                        <li key={step.name} className={cn("flex-1 relative", stepIdx !== steps.length - 1 && "pr-8")}>
+                          {currentStep === step.step || steps.findIndex((s) => s.step === currentStep) > stepIdx ? (
+                            <div className="flex flex-col items-center">
+                              <div
+                                className="rounded-full h-12 w-12 flex items-center justify-center text-white"
+                                style={{ backgroundColor: primaryColor }}
+                              >
+                                {steps.findIndex((s) => s.step === currentStep) > stepIdx ? (
+                                  <Check className="h-6 w-6" />
+                                ) : (
+                                  stepIdx + 1
+                                )}
+                              </div>
+                              <p className="text-sm font-medium mt-2">{step.name}</p>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center">
+                              <div className="rounded-full h-12 w-12 flex items-center justify-center border-2 border-gray-300 text-gray-500">
+                                {stepIdx + 1}
+                              </div>
+                              <p className="text-sm font-medium text-gray-500 mt-2">{step.name}</p>
+                            </div>
+                          )}
+
+                          {stepIdx !== steps.length - 1 && (
+                            <div
+                              className={cn(
+                                "hidden md:block absolute top-6 right-4 h-0.5 w-full -translate-y-1/2",
+                                steps.findIndex((s) => s.step === currentStep) > stepIdx ? "bg-primary" : "bg-gray-300",
+                              )}
+                              style={
+                                steps.findIndex((s) => s.step === currentStep) > stepIdx
+                                  ? { backgroundColor: primaryColor }
+                                  : {}
+                              }
+                            />
+                          )}
+                        </li>
+                      ))}
+                    </ol>
+                  </nav>
+
+                  {currentStep === "details" && (
+                    <div className="space-y-6">
+                      <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl">
+                        <div className="flex items-start gap-6">
+                          <div className="relative h-28 w-28 flex-shrink-0 rounded-md overflow-hidden">
+                            <Image
+                              src={selectedProduct.mainImage || "/placeholder.svg?height=112&width=112"}
+                              alt={selectedProduct.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-medium text-xl text-gray-900 dark:text-white">
+                              {selectedProduct.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Quantity: {quantity}</p>
+                            <div className="flex justify-between items-end mt-4">
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                                ₹{selectedProduct.price.toLocaleString("en-IN")} × {quantity}
+                              </span>
+                              <span className="font-bold text-xl text-gray-900 dark:text-white">
+                                ₹{(selectedProduct.price * quantity).toLocaleString("en-IN")}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                          <div className="flex justify-between text-gray-700 dark:text-gray-300">
+                            <span>Subtotal</span>
+                            <span>₹{(selectedProduct.price * quantity).toLocaleString("en-IN")}</span>
+                          </div>
+                          <div className="flex justify-between mt-2 text-gray-700 dark:text-gray-300">
+                            <span>Shipping</span>
+                            <span>Free</span>
+                          </div>
+                          <div className="flex justify-between mt-2 text-gray-700 dark:text-gray-300">
+                            <span>Tax (18%)</span>
+                            <span>₹{(selectedProduct.price * quantity * 0.18).toLocaleString("en-IN")}</span>
+                          </div>
+                          <Separator className="my-4" />
+                          <div className="flex justify-between font-bold text-gray-900 dark:text-white text-lg">
+                            <span>Total</span>
+                            <span>₹{(selectedProduct.price * quantity * 1.18).toLocaleString("en-IN")}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button
+                        className="w-full rounded-full h-12 text-base"
+                        style={{ backgroundColor: primaryColor }}
+                        onClick={() => setCurrentStep("shipping")}
+                      >
+                        Continue to Shipping
+                      </Button>
+                    </div>
+                  )}
+
+                  {currentStep === "shipping" && (
+                    <form onSubmit={handleShippingSubmit} className="space-y-6">
+                      <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl">
+                        <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">Shipping Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          <div className="space-y-2">
+                            <label htmlFor="fullName" className="text-sm font-medium text-gray-900 dark:text-white">
+                              Full Name
+                            </label>
+                            <input
+                              id="fullName"
+                              type="text"
+                              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              value={shippingAddress.fullName}
+                              onChange={(e) => setShippingAddress({ ...shippingAddress, fullName: e.target.value })}
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label htmlFor="address" className="text-sm font-medium text-gray-900 dark:text-white">
+                              Address
+                            </label>
+                            <input
+                              id="address"
+                              type="text"
+                              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              value={shippingAddress.address}
+                              onChange={(e) => setShippingAddress({ ...shippingAddress, address: e.target.value })}
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label htmlFor="city" className="text-sm font-medium text-gray-900 dark:text-white">
+                              City
+                            </label>
+                            <input
+                              id="city"
+                              type="text"
+                              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              value={shippingAddress.city}
+                              onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label htmlFor="state" className="text-sm font-medium text-gray-900 dark:text-white">
+                              State
+                            </label>
+                            <input
+                              id="state"
+                              type="text"
+                              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              value={shippingAddress.state}
+                              onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value })}
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label htmlFor="postalCode" className="text-sm font-medium text-gray-900 dark:text-white">
+                              Postal Code
+                            </label>
+                            <input
+                              id="postalCode"
+                              type="text"
+                              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              value={shippingAddress.postalCode}
+                              onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })}
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label htmlFor="country" className="text-sm font-medium text-gray-900 dark:text-white">
+                              Country
+                            </label>
+                            <select
+                              id="country"
+                              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              value={shippingAddress.country}
+                              onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
+                              required
+                            >
+                              <option value="US">United States</option>
+                              <option value="IN">India</option>
+                              <option value="GB">United Kingdom</option>
+                              <option value="CA">Canada</option>
+                              <option value="AU">Australia</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between mt-8">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="rounded-full border-2 h-12 px-6"
+                          onClick={() => setCurrentStep("details")}
+                        >
+                          Back
+                        </Button>
+                        <Button
+                          type="submit"
+                          className="rounded-full h-12 px-6"
+                          style={{ backgroundColor: primaryColor }}
+                        >
+                          Continue to Payment
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+
+                  {currentStep === "payment" && (
+                    <div className="space-y-6">
+                      <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl">
+                        <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">Payment Details</h3>
+                        <div className="p-5 border rounded-lg bg-white dark:bg-gray-700 shadow-sm">
+                          <CardElement
+                            options={{
+                              style: {
+                                base: {
+                                  fontSize: "16px",
+                                  color: "#424770",
+                                  "::placeholder": {
+                                    color: "#aab7c4",
+                                  },
+                                  padding: "10px 0",
+                                },
+                                invalid: {
+                                  color: "#9e2146",
+                                },
+                              },
+                            }}
+                          />
+                        </div>
+
+                        <div className="mt-6 flex items-center">
+                          <div className="flex gap-2 items-center">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="text-green-500"
+                            >
+                              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                            </svg>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Secure payment processing</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl">
+                        <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">Order Summary</h3>
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                          <div className="flex justify-between mb-2 text-gray-700 dark:text-gray-300">
+                            <span>Subtotal</span>
+                            <span>₹{(selectedProduct.price * quantity).toLocaleString("en-IN")}</span>
+                          </div>
+                          <div className="flex justify-between mb-2 text-gray-700 dark:text-gray-300">
+                            <span>Shipping</span>
+                            <span>₹0.00</span>
+                          </div>
+                          <div className="flex justify-between mb-2 text-gray-700 dark:text-gray-300">
+                            <span>Tax (18%)</span>
+                            <span>₹{(selectedProduct.price * quantity * 0.18).toLocaleString("en-IN")}</span>
+                          </div>
+                          <Separator className="my-3" />
+                          <div className="flex justify-between font-bold text-gray-900 dark:text-white text-lg">
+                            <span>Total</span>
+                            <span>₹{(selectedProduct.price * quantity * 1.18).toLocaleString("en-IN")}</span>
+                          </div>
+                        </div>
+
+                        {error && (
+                          <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+                            {error}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex justify-between mt-8">
+                        <Button
+                          variant="outline"
+                          className="rounded-full border-2 h-12 px-6"
+                          onClick={() => setCurrentStep("shipping")}
+                        >
+                          Back
+                        </Button>
+                        <Button
+                          className="rounded-full h-12 px-6"
+                          style={{ backgroundColor: primaryColor }}
+                          onClick={handleProcessPayment}
+                          disabled={processing}
+                        >
+                          {processing ? (
+                            <div className="flex items-center gap-2">
+                              <svg
+                                className="animate-spin h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                              </svg>
+                              Processing...
+                            </div>
+                          ) : (
+                            "Complete Purchase"
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">{storeDescription.substring(0, 100)}...</p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      fillRule="evenodd"
-                      d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </a>
-                <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                  </svg>
-                </a>
-                <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      fillRule="evenodd"
-                      d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                    Products
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                    About Us
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Customer Service</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                    FAQ
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                    Shipping Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                    Returns & Refunds
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                    Privacy Policy
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Newsletter</h4>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Subscribe to our newsletter for updates and offers.
-              </p>
-              <div className="flex">
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  className="flex-1 p-2 border rounded-l-md focus:outline-none"
-                />
-                <Button className="rounded-l-none" style={{ backgroundColor: primaryColor }}>
-                  Subscribe
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          <Separator className="my-8" />
-
-          <div className="text-center text-gray-600 dark:text-gray-400">
-            <p>
-              {themeCustomization?.footerText || `© ${new Date().getFullYear()} ${storeName}. All rights reserved.`}
-            </p>
-          </div>
-        </div>
-      </footer>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      )}
+     <FooterSection
+        storeLogo={storeLogo}
+        storeName={storeName}
+        storeDescription={storeDescription}
+        primaryColor={themeCustomization?.buttonColor || "#3b82f6"}
+        footerText={themeCustomization?.footerText}
+      />
     </div>
   )
 }
 
-// This component wraps the internal component with the Stripe Elements provider
 export function ClassicTemplate(props: ClassicTemplateProps) {
   return (
     <Elements stripe={stripePromise}>
@@ -1090,5 +999,5 @@ export function ClassicTemplate(props: ClassicTemplateProps) {
   )
 }
 
-// Default export for convenience
 export default ClassicTemplate
+
