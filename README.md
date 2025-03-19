@@ -80,6 +80,70 @@ DigiBazaar is constructed using state-of-the-art technologies to ensure robust p
 - **Backend:** Node.js, Express, and MySQL.
 - **Real-Time Features:** WebSockets enable live notifications and chat functionalities.
 
+#  How DigiBazaar Works  
+
+DigiBazaar is built to make **eCommerce, inventory management, and wholesale trading seamless**. Whether you're a **seller, wholesaler, or warehouse manager**, DigiBazaar provides a **smooth, intuitive, and powerful** workflow.  
+
 ---
 
-Harness the power of DigiBazaar to transform your business operations and elevate your online presence. Experience the future of eCommerce and warehouse management today.
+## 🏪 **1. Store – Create & Manage Your Online Shop**  
+DigiBazaar lets you build your **own eCommerce store** in just a few clicks. No coding required!  
+
+### ✅ **Step-by-Step Workflow:**  
+- **Sign Up & Set Up Your Store** – Register, choose a store name, and select a template.  
+- **Add Products** – Upload images, write descriptions, set prices, and add variants (colors, sizes, etc.) through a user-friendly interface.
+- **Customize Your Storefront** – Choose themes, layouts, and branding options.  
+- **Set Up Payments** – Connect your Stripe account (or test mode for now).  
+- **Go Live & Start Selling!** 🚀  
+
+💡 **How Customers Buy?**  
+- Customers browse your store, add items to their cart, and check out with **secure payments** (Stripe).  
+- You receive an order notification & manage it from your **DigiBazaar dashboard**.  
+- Once the order is processed, it moves to **shipment tracking**.  
+
+---
+
+## 📦 **2. WMS – Advanced Warehouse & Inventory Management**  
+For businesses managing **warehouses, stock levels, and shipments**, DigiBazaar provides an **end-to-end Warehouse Management System (WMS)**.  
+
+### ✅ **Step-by-Step Workflow:**  
+- **Add Warehouses** – Define storage locations & categorize them (Main, Secondary, etc.).  
+- **Track Stock Levels** – View real-time inventory updates.  
+- **Automate Restocking Alerts** – Get notified when stock is low.  
+- **Process Orders** – Automatically assign orders to warehouses based on availability.  
+- **Manage Returns & Refunds** – Handle product returns seamlessly.  
+
+💡 **Why WMS Matters?**  
+- Prevents **overselling** by keeping stock in sync.  
+- Automates warehouse operations, **saving time & costs**.  
+- Ensures accurate **inventory tracking**, reducing losses.  
+
+---
+
+## 🏭 **3. Wholesale – Buy & Sell in Bulk**  
+DigiBazaar isn’t just for regular eCommerce – it also supports **B2B transactions** with a dedicated **Wholesale Marketplace**.  
+
+### ✅ **Step-by-Step Workflow:**  
+- **Sellers List Bulk Products** – Define **MOQ (Minimum Order Quantity)** & pricing tiers.  
+- **Buyers Request Quotes** – Negotiate bulk pricing directly with sellers.  
+- **Secure Transactions** – Payments are processed securely via **Stripe**.  
+- **Order Fulfillment & Logistics** – Orders are processed through **DigiBazaar’s WMS**.  
+- **Bulk Discounts & Recurring Orders** – Buyers can save by subscribing to automatic restocking.  
+
+💡 **Who Can Use Wholesale?**  
+- **Manufacturers** selling to retailers.  
+- **Retailers** looking for affordable bulk products.  
+- **Dropshippers** sourcing inventory from suppliers.  
+
+---
+
+## 🌍 **4. Community – Engage, Learn & Grow Together**  
+DigiBazaar isn’t just about selling – it’s about **building a powerful business network**.  
+
+### ✅ **Step-by-Step Workflow:**  
+- **Join the Community** – Every seller gets access to the **DigiBazaar Forums**.  
+- **Share & Learn** – Discuss business strategies, share tips, and ask for help.  
+- **Rate & Review Sellers** – Build trust in the marketplace.  
+- **Live Q&As & Webinars** – Get expert advice on growing your business.  
+- **Stay Updated** – Get real-time marketplace insights & feature updates.  
+
