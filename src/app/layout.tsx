@@ -8,10 +8,10 @@ import ChatButton from "@/components/global/ChatButton";
 
 const roboto = Roboto({
   subsets: ['latin'],
-  weight: ['400', '700'], // Regular and Bold weights
-  style: ['normal', 'italic'], // Normal and Italic styles
+  weight: ['400', '700'], 
+  style: ['normal', 'italic'], 
   display: 'swap',
-  variable: '--font-poppins', // Optional: Define a CSS variable for the font
+  variable: '--font-poppins',
 });
 
 export const metadata: Metadata = {
