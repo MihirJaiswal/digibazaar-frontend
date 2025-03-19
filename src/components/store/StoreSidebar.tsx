@@ -153,12 +153,12 @@ export function StoreLayout({ children }: StoreLayoutProps) {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Profile Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Store className="mr-2 h-4 w-4" />
-                    <span>Store Preferences</span>
+                   <Link href="/profile">
+                   <div className="flex items-center">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </div>
+                   </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => {

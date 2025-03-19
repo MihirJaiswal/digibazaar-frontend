@@ -214,12 +214,12 @@ const CommunitySidebar = () => {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                    <Link href='/profile' >
+                    <div className="flex items-center">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </div>
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => {
@@ -236,7 +236,7 @@ const CommunitySidebar = () => {
             <div className="flex-shrink-0 border-t border-gray-200 dark:border-zinc-700 p-4 bg-white dark:bg-black">
               <div className="text-center space-y-2">
                 <p className="text-sm text-gray-600 dark:text-gray-400">Sign in to join communities</p>
-                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link href="/auth/login" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button className="w-full" size="sm">
                     Sign In
                   </Button>
