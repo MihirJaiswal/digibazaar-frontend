@@ -13,7 +13,7 @@ function Cta() {
               <div className="space-y-2">
               <TextShimmer className="inline-flex items-center justify-center">
                   <Link href="/signin">
-                    <span>✨ Join us now</span>{" "}
+                    <span>Join us now</span>{" "}
                   </Link>
                   <ArrowRightIcon className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
                 </TextShimmer>
