@@ -3,6 +3,12 @@
 Welcome to **DigiBazaar** – my major project and a revolutionary platform. This project represents countless hours of brainstorming, creativity, and hard work. I built DigiBazaar to empower small businesses, wholesalers, and entrepreneurs by delivering a complete suite of tools to launch, manage, and scale online ventures.
 
 ---
+![Screenshot 2025-03-19 225744](https://github.com/user-attachments/assets/f3cf46ae-81b0-4ec7-af07-c604e81c0c57)
+![Screenshot 2025-03-19 225913](https://github.com/user-attachments/assets/e94dd805-9df6-4d8d-8567-95e29091dcf4)
+![Screenshot 2025-03-19 225937](https://github.com/user-attachments/assets/33f6ddb2-a66f-43e7-a755-47946dad283a)
+![Screenshot 2025-03-19 230011](https://github.com/user-attachments/assets/54b2cb18-3cfc-4141-9571-cec46a26b1ce)
+
+---
 
 ## 📌 What is DigiBazaar?
 
