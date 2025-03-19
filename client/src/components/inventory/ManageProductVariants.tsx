@@ -42,7 +42,7 @@ export default function ManageProductVariants({ productId }: { productId: string
   const fetchVariants = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`http://localhost:8800/api/variants/${productId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/variants/${productId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (!res.ok) throw new Error("Failed to fetch variants")
@@ -58,7 +58,7 @@ export default function ManageProductVariants({ productId }: { productId: string
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:8800/api/variants/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/variants/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -74,7 +74,7 @@ export default function ManageProductVariants({ productId }: { productId: string
     if (!editingVariant) return
 
     try {
-      const res = await fetch(`http://localhost:8800/api/variants/${editingVariant.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/variants/${editingVariant.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export default function ManageProductVariants({ productId }: { productId: string
 
   const handleCreate = async () => {
     try {
-      const res = await fetch(`http://localhost:8800/api/variants`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/variants`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

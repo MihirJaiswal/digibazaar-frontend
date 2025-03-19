@@ -57,7 +57,7 @@ export default function ShippingSelection() {
     const fetchShippingMethods = async () => {
       try {
         console.log("📡 Fetching shipping methods...");
-        const res = await fetch("http://localhost:8800/api/shipments/shipping-methods", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shipments/shipping-methods`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -99,7 +99,7 @@ export default function ShippingSelection() {
     setIsProcessing(true);
   
     try {
-      const res = await fetch(`http://localhost:8800/api/shipments/orders/${orderId}/ship`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shipments/orders/${orderId}/ship`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json", 

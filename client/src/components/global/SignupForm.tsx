@@ -158,7 +158,7 @@ export default function SignUp() {
       if (profileImageFile) formPayload.append("profilePic", profileImageFile)
 
       // Initiate OTP request with all user data
-      const response = await axios.post("http://localhost:8800/api/auth/register/initiate", formPayload, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register/initiate` , formPayload, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -188,7 +188,7 @@ export default function SignUp() {
 
     try {
       // Verify OTP - only sending email and OTP as needed
-      const verifyResponse = await axios.post("http://localhost:8800/api/auth/register/verify", {
+      const verifyResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register/verify`, {
         email: formData.email,
         otp: otpData.otp,
       })
@@ -222,7 +222,7 @@ export default function SignUp() {
     setError(null)
 
     try {
-      await axios.post("http://localhost:8800/api/auth/register/resend-otp", { email: formData.email })
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register/resend-otp`, { email: formData.email })
 
       toast.success("OTP resent successfully!")
       setIsCountdownActive(true)

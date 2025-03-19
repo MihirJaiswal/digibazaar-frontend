@@ -102,7 +102,7 @@ export default function SetupWizardPage() {
         formPayload.append("logo", logoFile)
       }
 
-      const response = await fetch("http://localhost:8800/api/stores", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores`, {
         method: "POST",
         headers: {
           // Do not set Content-Type manually so that the browser generates the proper boundary.

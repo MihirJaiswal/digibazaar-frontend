@@ -45,7 +45,7 @@ export default function ProfilePage() {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`http://localhost:8800/api/users/${user.id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         const data = await res.json()
@@ -139,7 +139,7 @@ export default function ProfilePage() {
           }
         })
 
-        response = await fetch(`http://localhost:8800/api/users/${user.id}`, {
+        response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${user.id}`, {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
@@ -149,7 +149,7 @@ export default function ProfilePage() {
         if (dataToSubmit.walletBalance !== undefined) {
           dataToSubmit.walletBalance = Number(dataToSubmit.walletBalance)
         }
-        response = await fetch(`http://localhost:8800/api/users/${user.id}`, {
+        response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${user.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

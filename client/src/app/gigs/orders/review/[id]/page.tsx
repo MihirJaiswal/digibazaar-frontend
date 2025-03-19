@@ -61,7 +61,7 @@ export default function BuyerDeliveryReview() {
     }
 
     const fetchDelivery = async () => {
-      const apiEndpoint = `http://localhost:8800/api/gig-deliveries/order/${gigOrderId}`
+      const apiEndpoint = `${process.env.NEXT_PUBLIC_API_URL}/gig-deliveries/order/${gigOrderId}`
       try {
         const res = await fetch(apiEndpoint, {
           headers: {
@@ -99,7 +99,7 @@ export default function BuyerDeliveryReview() {
     if (!delivery) return
     setAcceptLoading(true)
     try {
-      const res = await fetch(`http://localhost:8800/api/gig-deliveries/${delivery.id}/accept`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-deliveries/${delivery.id}/accept`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

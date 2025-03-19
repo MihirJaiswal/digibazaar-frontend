@@ -33,7 +33,7 @@ export default function StorePage({ params }: StorePageProps) {
     async function fetchData() {
       try {
         // Fetch store details by storeName.
-        const resStore = await fetch(`http://localhost:8800/api/stores/${storeName}`, {
+        const resStore = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores/${storeName}`, {
           headers: { "Content-Type": "application/json" },
         });
         if (!resStore.ok) {
@@ -44,7 +44,7 @@ export default function StorePage({ params }: StorePageProps) {
         setStore(storeData);
 
         // Fetch products for this store (assuming API supports filtering by storeId).
-        const resProducts = await fetch(`http://localhost:8800/api/product-display/store/${storeName}`, {
+        const resProducts = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product-display/store/${storeName}`, {
           headers: { "Content-Type": "application/json" },
         });
         if (!resProducts.ok) {
@@ -55,7 +55,7 @@ export default function StorePage({ params }: StorePageProps) {
 
         // Fetch theme customization for this store.
         const resCustomization = await fetch(
-          `http://localhost:8800/api/stores/theme-customization/${storeName}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/stores/theme-customization/${storeName}`,
           {
             headers: { "Content-Type": "application/json" },
           }

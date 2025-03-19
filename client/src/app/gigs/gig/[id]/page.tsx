@@ -79,7 +79,7 @@ function GigDetailsPageContent() {
   } = useQuery<Gig, Error>({
     queryKey: ["gig", gigId],
     queryFn: async () => {
-      const response = await fetch(`http://localhost:8800/api/gigs/${gigId}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gigs/${gigId}`);
       if (!response.ok) throw new Error("Gig not found");
       return response.json();
     },
@@ -100,7 +100,7 @@ function GigDetailsPageContent() {
     queryKey: ["gigLikeStatus", gigId],
     queryFn: async () => {
       const response = await fetch(
-        `http://localhost:8800/api/gig-likes/${gigId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/gig-likes/${gigId}`
       );
       if (!response.ok) throw new Error("Error checking like status");
       return response.json();
@@ -113,7 +113,7 @@ function GigDetailsPageContent() {
     queryKey: ["gigBookmarkStatus", gigId],
     queryFn: async () => {
       const response = await fetch(
-        `http://localhost:8800/api/gig-bookmarks/${gigId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/gig-bookmarks/${gigId}`
       );
       if (!response.ok) throw new Error("Error checking bookmark status");
       return response.json();
@@ -140,7 +140,7 @@ function GigDetailsPageContent() {
   // Mutation for liking a gig
   const likeMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch("http://localhost:8800/api/gig-likes", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-likes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ gigId }),
@@ -164,7 +164,7 @@ function GigDetailsPageContent() {
   // Mutation for bookmarking a gig
   const bookmarkMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch("http://localhost:8800/api/gig-bookmarks", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-bookmarks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ gigId }),

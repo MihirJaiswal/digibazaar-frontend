@@ -49,7 +49,7 @@ export default function InquiryPage() {
   useEffect(() => {
     if (!gigId) return
     setFetchingGig(true)
-    fetch(`http://localhost:8800/api/gigs/${gigId}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/gigs/${gigId}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to load gig details")
@@ -113,7 +113,7 @@ export default function InquiryPage() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch("http://localhost:8800/api/inquiries", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

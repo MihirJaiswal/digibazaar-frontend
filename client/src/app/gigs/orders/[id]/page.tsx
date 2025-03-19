@@ -71,7 +71,7 @@ export default function OrderDetailsPage() {
 
     const fetchOrderDetails = async () => {
       try {
-        const res = await fetch(`http://localhost:8800/api/gig-orders/${orderId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-orders/${orderId}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -101,7 +101,7 @@ export default function OrderDetailsPage() {
     try {
       setActionLoading(true)
 
-      const res = await fetch(`http://localhost:8800/api/gig-orders/${order.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-orders/${order.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

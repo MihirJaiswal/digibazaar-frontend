@@ -139,7 +139,7 @@ function ProductsPageContent() {
 
   // Fetch products using React Query
   const fetchProducts = async (): Promise<Product[]> => {
-    const res = await fetch("http://localhost:8800/api/products", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
     });

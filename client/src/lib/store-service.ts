@@ -44,7 +44,7 @@ interface Product {
    */
   export async function getProducts(token: string | null): Promise<Product[]> {
     try {
-      const response = await fetch("http://localhost:8800/api/products", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -65,7 +65,7 @@ interface Product {
    */
   export async function getStores(token: string | null): Promise<Store[]> {
     try {
-      const response = await fetch("http://localhost:8800/api/stores", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores`, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -86,7 +86,7 @@ interface Product {
    */
   export async function getAllStores(token: string | null): Promise<Store[]> {
     try {
-      const response = await fetch("http://localhost:8800/api/stores/all", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores/all`, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },

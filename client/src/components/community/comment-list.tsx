@@ -45,8 +45,8 @@ export function CommentList({ postId }: CommentListProps) {
   useEffect(() => {
     async function fetchComments() {
       try {
-        console.log("Fetching comments:", `http://localhost:8800/api/community-comments/${postId}/comments`)
-        const response = await axios.get(`http://localhost:8800/api/community-comments/${postId}/comments`, {
+        console.log("Fetching comments:", `${process.env.NEXT_PUBLIC_API_URL}/community-comments/${postId}/comments`)
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/community-comments/${postId}/comments`, {
           withCredentials: true,
         })
 
@@ -54,7 +54,7 @@ export function CommentList({ postId }: CommentListProps) {
         // Fetch likes for each comment
         const commentsWithLikes = await Promise.all(
           response.data.map(async (comment: Comment) => {
-            const likesResponse = await axios.get(`http://localhost:8800/api/community-comments/${comment.id}/likes`, {
+            const likesResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/community-comments/${comment.id}/likes`, {
               withCredentials: true,
             })
             return {
@@ -128,7 +128,7 @@ export function CommentList({ postId }: CommentListProps) {
       console.log("📝 Submitting reply with token:", token)
 
       const response = await axios.post(
-        "http://localhost:8800/api/community-comments",
+        `${process.env.NEXT_PUBLIC_API_URL}/community-comments`,
         { parentId, content, postId },
         {
           withCredentials: true,
@@ -163,7 +163,7 @@ export function CommentList({ postId }: CommentListProps) {
 
     try {
       await axios.post(
-        `http://localhost:8800/api/community-comments/${commentId}/like`,
+        `${process.env.NEXT_PUBLIC_API_URL}/community-comments/${commentId}/like`,
         { userId: user?.id },
         {
           withCredentials: true,
@@ -189,7 +189,7 @@ export function CommentList({ postId }: CommentListProps) {
 
     try {
       await axios.post(
-        `http://localhost:8800/api/community-comments/${commentId}/unlike`,
+        `${process.env.NEXT_PUBLIC_API_URL}/community-comments/${commentId}/unlike`,
         { userId: user?.id },
         {
           withCredentials: true,

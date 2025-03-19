@@ -19,7 +19,7 @@ export function CommunityInfo({ community }: CommunityInfoProps) {
   const [memberCount, setMemberCount] = useState<number>(community.memberCount || 0);
   const [isMember, setIsMember] = useState<boolean>(false);
 
-  const API_BASE = "http://localhost:8800/api/community-members";
+  const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/community-members`;
 
   useEffect(() => {
     const fetchCommunityMembers = async () => {

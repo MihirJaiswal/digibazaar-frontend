@@ -49,22 +49,28 @@ interface Gig {
   title: string;
   description: string;
   bulkPrice: number;
-  rating: number;
-  reviews: number;
-  seller: {
+  category: string;
+  leadTime: number;
+  minOrderQty: number;
+  supplyCapacity?: number;
+  cover: string;
+  images: string[];
+  features: string[] | string;  // API seems to return features as string sometimes
+  available: boolean;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+  
+  // Optional fields that might not be in API response
+  rating?: number;
+  reviews?: number;
+  seller?: {
     id: string;
     username: string;
     profilePicture: string;
     level: string;
   };
-  images: string[];
-  category: string;
-  tags: string[];
-  leadTime: number;
-  minOrderQty: number;
-  supplyCapacity?: number;
-  cover: string;
-  features: string[];  // Added property
+  tags?: string[];
 }
 
 
@@ -114,7 +120,7 @@ const GigCardSkeleton = () => (
 function GigsPageContent() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 300]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
   const [deliveryTime, setDeliveryTime] = useState<number[]>([30]);
   const [sortBy, setSortBy] = useState<string>("recommended");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -125,7 +131,7 @@ function GigsPageContent() {
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:8800/api/categories");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`);
       if (!res.ok) throw new Error("Failed to fetch categories");
       return res.json();
     },
@@ -146,12 +152,14 @@ function GigsPageContent() {
   const { data: gigsData, isLoading: gigsLoading } = useQuery({
     queryKey: ["gigs"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:8800/api/gigs");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gigs`);
       if (!res.ok) throw new Error("Failed to fetch gigs");
-      return res.json();
+      const data = await res.json(); 
+      console.log("API respose", data)
+      return data
+
     },
   });
-
   const gigs: Gig[] = useMemo(() => {
     const gigsArray: Gig[] =
       Array.isArray(gigsData) ? gigsData : gigsData?.gigs ?? [];
@@ -160,6 +168,8 @@ function GigsPageContent() {
 
   const filteredGigs = useMemo(() => {
     let results = [...gigs];
+    console.log("Initial gigs:", results);
+    
     if (searchTerm) {
       results = results.filter((gig) => {
         const title = gig.title || "";
@@ -169,31 +179,24 @@ function GigsPageContent() {
           description.toLowerCase().includes(searchTerm.toLowerCase())
         );
       });
+      console.log("After search term filter:", results);
     }
+    
     if (selectedCategory !== "All") {
       results = results.filter((gig) => gig.category === selectedCategory);
+      console.log("After category filter:", results);
     }
+    
     results = results.filter(
       (gig) => gig.bulkPrice >= priceRange[0] && gig.bulkPrice <= priceRange[1]
     );
+    console.log("After price range filter:", results, "Range:", priceRange);
+    
     results = results.filter((gig) => gig.leadTime <= deliveryTime[0]);
-
-    switch (sortBy) {
-      case "price-low":
-        results.sort((a, b) => a.bulkPrice - b.bulkPrice);
-        break;
-      case "price-high":
-        results.sort((a, b) => b.bulkPrice - a.bulkPrice);
-        break;
-      case "rating":
-        results.sort((a, b) => b.rating - a.rating);
-        break;
-      case "newest":
-        results = [...results].reverse();
-        break;
-      default:
-        break;
-    }
+    console.log("After delivery time filter:", results, "Max time:", deliveryTime[0]);
+    
+    // Rest of your sorting code...
+    
     return results;
   }, [gigs, searchTerm, selectedCategory, priceRange, deliveryTime, sortBy]);
 

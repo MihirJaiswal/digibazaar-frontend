@@ -79,13 +79,13 @@ export function CommunityList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredCommunities, setFilteredCommunities] = useState<Community[]>([]);
 
-  const API_BASE = "http://localhost:8800/api/community-members";
+  const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/community-members`;
 
   // Fetch communities on mount
   useEffect(() => {
     async function fetchCommunities() {
       try {
-        const { data } = await axios.get<Community[]>("http://localhost:8800/api/communities");
+        const { data } = await axios.get<Community[]>(`${process.env.NEXT_PUBLIC_API_URL}/communities`);
         setCommunities(data);
         setFilteredCommunities(data);
       } catch (error) {

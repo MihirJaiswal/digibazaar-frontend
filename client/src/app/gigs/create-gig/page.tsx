@@ -324,7 +324,7 @@ export default function CreateGigPage() {
         });
       }
 
-      const response = await fetch("http://localhost:8800/api/gigs", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gigs`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -54,7 +54,7 @@ export function GigCard({ gig, showDescription = false }) {
     const fetchLikes = async () => {
       if (!token) return
       try {
-        const res = await fetch("http://localhost:8800/api/gig-toggles-likes/gigs", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-toggles-likes/gigs`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export function GigCard({ gig, showDescription = false }) {
       return
     }
     try {
-      const res = await fetch("http://localhost:8800/api/gig-toggles-likes", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-toggles-likes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

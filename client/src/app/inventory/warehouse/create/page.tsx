@@ -110,7 +110,7 @@ const CreateWarehousePage = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:8800/api/warehouses", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

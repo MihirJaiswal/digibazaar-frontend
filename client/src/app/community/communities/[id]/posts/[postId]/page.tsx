@@ -50,7 +50,7 @@ export default function PostPage() {
     async function fetchCommunity() {
       try {
         const res = await axios.get(
-          `http://localhost:8800/api/communities/${communityId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/communities/${communityId}`,
           { withCredentials: true }
         );
         setCommunityName(res.data.name);
@@ -68,23 +68,23 @@ export default function PostPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        console.log("Fetching post:", `http://localhost:8800/api/community-posts/${postId}`);
+        console.log("Fetching post:", `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}`);
         const postResponse = await axios.get(
-          `http://localhost:8800/api/community-posts/${postId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}`,
           { withCredentials: true }
         );
         setPost(postResponse.data);
 
-        console.log("Fetching comments:", `http://localhost:8800/api/community-comments/${postId}/comments`);
+        console.log("Fetching comments:", `${process.env.NEXT_PUBLIC_API_URL}/community-comments/${postId}/comments`);
         const commentsResponse = await axios.get(
-          `http://localhost:8800/api/community-comments/${postId}/comments`,
+          `${process.env.NEXT_PUBLIC_API_URL}/community-comments/${postId}/comments`,
           { withCredentials: true }
         );
         setComments(commentsResponse.data);
 
-        console.log("Fetching likes:", `http://localhost:8800/api/community-posts/${postId}/likes`);
+        console.log("Fetching likes:", `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}/likes`);
         const likesResponse = await axios.get(
-          `http://localhost:8800/api/community-posts/${postId}/likes`,
+          `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}/likes`,
           {
             withCredentials: true,
             headers: { Authorization: `Bearer ${token}` },
@@ -109,7 +109,7 @@ export default function PostPage() {
   async function handleLike() {
     try {
       await axios.post(
-        `http://localhost:8800/api/community-posts/${postId}/like`,
+        `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}/like`,
         { userId: user?.id },
         { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
       );
@@ -125,7 +125,7 @@ export default function PostPage() {
   async function handleUnlike() {
     try {
       await axios.post(
-        `http://localhost:8800/api/community-posts/${postId}/unlike`,
+        `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}/unlike`,
         { userId: user?.id },
         { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
       );

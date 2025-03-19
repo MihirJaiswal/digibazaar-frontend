@@ -92,7 +92,7 @@ function StockManagementComponent() {
   const { data: warehouses, isLoading: loadingWarehouses } = useQuery(
     "warehouses",
     () =>
-      fetch("http://localhost:8800/api/warehouses", {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then((res) => res.json()),
     { enabled: !!token }
@@ -102,7 +102,7 @@ function StockManagementComponent() {
   const { data: products, isLoading: loadingProducts } = useQuery(
     "products",
     () =>
-      fetch("http://localhost:8800/api/products", {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then((res) => res.json()),
     { enabled: !!token }
@@ -112,7 +112,7 @@ function StockManagementComponent() {
   const { data: warehouseStock } = useQuery(
     ["warehouseStock", warehouseId],
     () =>
-      fetch(`http://localhost:8800/api/warehouses/${warehouseId}/stock`, {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses/${warehouseId}/stock`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then((res) => res.json()),
     { enabled: !!warehouseId && !!token }
@@ -125,7 +125,7 @@ function StockManagementComponent() {
   // Mutation for stock update (either "in" or "out")
   const mutation = useMutation(
     (type: "in" | "out") =>
-      fetch(`http://localhost:8800/api/stock/${type}`, {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/stock/${type}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

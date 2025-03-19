@@ -22,7 +22,7 @@ export function CommunityMembers({ communityId }: CommunityMembersProps) {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch(`http://localhost:8800/api/community-members/${communityId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/community-members/${communityId}`, {
           credentials: "include",
         })
         if (!response.ok) {
@@ -43,7 +43,7 @@ export function CommunityMembers({ communityId }: CommunityMembersProps) {
   // Direct fetch for updating member role
   const handleUpdateRole = async (memberId: string, role: string) => {
     try {
-      const response = await fetch(`http://localhost:8800/api/community-members/${memberId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/community-members/${memberId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export function CommunityMembers({ communityId }: CommunityMembersProps) {
   // Direct fetch for removing a member
   const handleRemoveMember = async (memberId: string) => {
     try {
-      const response = await fetch(`http://localhost:8800/api/community-members/${memberId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/community-members/${memberId}`, {
         method: "DELETE",
         credentials: "include",
       })

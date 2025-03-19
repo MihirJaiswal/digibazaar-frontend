@@ -133,7 +133,7 @@ function ConfirmOrderContent() {
       return;
     }
     // Fetch the inquiry to get associated gig details and final negotiation values.
-    fetch(`http://localhost:8800/api/inquiries/${inquiryId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries/${inquiryId}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -192,7 +192,7 @@ function ConfirmOrderContent() {
     try {
       console.log("Step 1: Requesting Payment Intent...");
       const paymentIntentRes = await fetch(
-        "http://localhost:8800/api/gig-orders/create-payment-intent",
+        `${process.env.NEXT_PUBLIC_API_URL}/gig-orders/create-payment-intent`,
         {
           method: "POST",
           headers: {
@@ -223,7 +223,7 @@ function ConfirmOrderContent() {
       console.log("Payment successful:", paymentIntent);
 
       console.log("Step 3: Creating Order with Backend...");
-      const orderRes = await fetch("http://localhost:8800/api/gig-orders", {
+      const orderRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

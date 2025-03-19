@@ -124,7 +124,7 @@ export default function NegotiationDetailPage() {
     try {
       console.log("[Fetch Inquiry] Requesting inquiry with ID:", id)
       setLoading(true)
-      const res = await fetch(`http://localhost:8800/api/inquiries/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries/${id}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -171,7 +171,7 @@ export default function NegotiationDetailPage() {
   const updateInquiry = async (updatedFields: Partial<Inquiry>) => {
     try {
       console.log("[Update Inquiry] Request received:", { inquiryId: inquiry?.id, updatedFields })
-      const res = await fetch(`http://localhost:8800/api/inquiries/${inquiry!.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries/${inquiry!.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -211,7 +211,7 @@ export default function NegotiationDetailPage() {
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this inquiry?")) return
     try {
-      const res = await fetch(`http://localhost:8800/api/inquiries/${inquiry!.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries/${inquiry!.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
         credentials: "include",

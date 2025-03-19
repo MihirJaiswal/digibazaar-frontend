@@ -182,7 +182,7 @@ export default function CreateCommunityPage() {
       }
       
       const response = await axios.post(
-        "http://localhost:8800/api/communities",
+        `${process.env.NEXT_PUBLIC_API_URL}/communities`,
         formData,
         {
           headers: { 

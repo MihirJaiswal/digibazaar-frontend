@@ -33,7 +33,7 @@ export function CommentForm({ postId, onCommentAdded }: CommentFormProps) {
 
     try {
       const response = await axios.post(
-        "http://localhost:8800/api/community-comments",
+        `${process.env.NEXT_PUBLIC_API_URL}/community-comments`,
         { postId, content, userId: user?.id },
         {
           withCredentials: true,

@@ -41,7 +41,7 @@ const StockMovementsTable = ({ productId }: StockMovementsProps) => {
   useEffect(() => {
     const fetchMovements = async () => {
       try {
-          const res = await fetch(`http://localhost:8800/api/stock/movements/${productId}`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stock/movements/${productId}`, {
           headers: {
             "Authorization": `Bearer ${token}`
           }

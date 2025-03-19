@@ -20,7 +20,7 @@ export default function HomeLand() {
 
     const fetchStore = async () => {
       try {
-        const res = await fetch('http://localhost:8800/api/stores', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

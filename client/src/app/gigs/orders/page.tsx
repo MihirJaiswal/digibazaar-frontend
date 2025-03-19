@@ -43,7 +43,7 @@ function OrdersPageContent() {
   } = useQuery<Order[], Error>({
     queryKey: ["orders", user?.id],
     queryFn: async () => {
-      const endpoint = `http://localhost:8800/api/gig-orders/buyer/${user?.id}`;
+      const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/gig-orders/buyer/${user?.id}`;
       const res = await fetch(endpoint, {
         headers: {
           "Content-Type": "application/json",

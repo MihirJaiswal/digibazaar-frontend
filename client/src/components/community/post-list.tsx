@@ -34,7 +34,7 @@ export function PostList({ posts }: PostListProps) {
         posts.map(async (post) => {
           try {
             const res = await axios.get(
-              `http://localhost:8800/api/community-comments/${post.id}/comments`,
+              `${process.env.NEXT_PUBLIC_API_URL}/community-comments/${post.id}/comments`,
               {
                 withCredentials: true,
               }
@@ -67,7 +67,7 @@ export function PostList({ posts }: PostListProps) {
         posts.map(async (post) => {
           try {
             const res = await axios.get(
-              `http://localhost:8800/api/community-posts/${post.id}/likes`,
+              `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${post.id}/likes`,
               {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${token}` },
@@ -96,7 +96,7 @@ export function PostList({ posts }: PostListProps) {
   async function handleLike(postId: string) {
     try {
       await axios.post(
-        `http://localhost:8800/api/community-posts/${postId}/like`,
+        `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}/like`,
         { userId: user?.id },
         { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
       );
@@ -113,7 +113,7 @@ export function PostList({ posts }: PostListProps) {
   async function handleUnlike(postId: string) {
     try {
       await axios.post(
-        `http://localhost:8800/api/community-posts/${postId}/unlike`,
+        `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}/unlike`,
         { userId: user?.id },
         { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
       );

@@ -37,7 +37,7 @@ const CreateProductVariant = ({ productId }: { productId: string }) => {
       
       // Create variants one by one
       for (const variant of validVariants) {
-        const res = await fetch("http://localhost:8800/api/variants", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/variants`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

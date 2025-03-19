@@ -263,8 +263,9 @@ function OrdersPage() {
   // Fetch orders query using React Query
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['orders'],
+
     queryFn: async () => {
-      const res = await fetch("http://localhost:8800/api/orders", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -287,7 +288,7 @@ function OrdersPage() {
                   return { ...item, product: cachedProduct };
                 }
                 
-                const productRes = await fetch(`http://localhost:8800/api/products/${item.productId}`, {
+                const productRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${item.productId}`, {
                   headers: {
                     Authorization: `Bearer ${token}`,
                   },
@@ -325,7 +326,7 @@ function OrdersPage() {
   // Update order status mutation
   const updateOrderStatusMutation = useMutation({
     mutationFn: async ({ orderId, newStatus }: { orderId: string; newStatus: string }) => {
-      const res = await fetch(`http://localhost:8800/api/orders/${orderId}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

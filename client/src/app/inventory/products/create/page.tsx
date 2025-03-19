@@ -83,7 +83,7 @@ const CreateProductPage = () => {
 
       try {
         setIsLoading(true);
-        const storesRes = await fetch("http://localhost:8800/api/stores", {
+        const storesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores`, {
           headers: { Authorization: `Bearer ${token}` },
           cache: "no-store",
         });
@@ -178,7 +178,7 @@ const CreateProductPage = () => {
         if (mainImageFile) formPayload.append("mainImage", mainImageFile);
         additionalImageFiles.forEach((file) => formPayload.append("images", file));
 
-        const res = await fetch("http://localhost:8800/api/products", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formPayload,

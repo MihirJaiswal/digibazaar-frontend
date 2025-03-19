@@ -16,14 +16,14 @@ export default function UserCommunities() {
   const { user } = useAuthStore();
   const [memberCounts, setMemberCounts] = useState<{ [key: string]: number }>({});
 
-  const API_BASE = "http://localhost:8800/api/community-members";
+  const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/community-members`;
 
   useEffect(() => {
     if (!user) return;
 
     const fetchUserJoinedCommunities = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:8800/api/communities/user/${user.id}/joined`);
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/communities/user/${user.id}/joined`);
         setCommunities(data);
       } catch (error) {
         console.error("Error fetching user communities:", error);

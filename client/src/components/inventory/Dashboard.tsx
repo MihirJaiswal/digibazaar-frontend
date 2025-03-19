@@ -65,12 +65,12 @@ function DashboardContent() {
       const headers = { Authorization: `Bearer ${token}` };
   
       const responses = await Promise.all([
-        fetch("http://localhost:8800/api/warehouses", { headers }),
-        fetch("http://localhost:8800/api/products", { headers }),
-        fetch("http://localhost:8800/api/orders", { headers }),
-        fetch("http://localhost:8800/api/reports/sales", { headers }),
-        fetch("http://localhost:8800/api/reports/stock", { headers }),
-        fetch("http://localhost:8800/api/reports/stock-alert", { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses`, { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/sales`, { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/stock`, { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/stock-alert`, { headers }),
       ]);
   
       const data = await Promise.all(responses.map(res => res.json()));

@@ -64,7 +64,7 @@ export default function InquiriesPage() {
   useEffect(() => {
     async function fetchInquiries() {
       try {
-        const res = await fetch("http://localhost:8800/api/inquiries/user", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/inquiries/user`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

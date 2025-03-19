@@ -67,7 +67,7 @@ export default function OrderTrackingPage() {
     }
     const fetchOrder = async () => {
       try {
-        const res = await fetch(`http://localhost:8800/api/gig-orders/${orderId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-orders/${orderId}`, {
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`,
@@ -97,7 +97,7 @@ export default function OrderTrackingPage() {
     }
     const fetchUpdates = async () => {
       try {
-        const res = await fetch(`http://localhost:8800/api/gig-order-updates/${orderId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-order-updates/${orderId}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
           },

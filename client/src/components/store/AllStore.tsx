@@ -55,7 +55,7 @@ export default function StoresPage() {
   useEffect(() => {
     async function fetchStores() {
       try {
-        const res = await fetch("http://localhost:8800/api/stores/all");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores/all`);
         if (!res.ok) {
           throw new Error("Failed to fetch stores");
         }

@@ -428,7 +428,7 @@ const WarehousesPage = () => {
   } = useQuery<WarehouseType[]>(
     ["warehouses"],
     async () => {
-      const res = await fetch("http://localhost:8800/api/warehouses", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch warehouses");

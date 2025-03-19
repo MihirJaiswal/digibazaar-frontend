@@ -71,7 +71,7 @@ export function ProductDetailPageComponent() {
   } = useQuery(
     ["product", id],
     async () => {
-      const res = await fetch(`http://localhost:8800/api/products/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
       });
@@ -88,7 +88,7 @@ export function ProductDetailPageComponent() {
   } = useQuery(
     ["stock", id],
     async () => {
-      const res = await fetch(`http://localhost:8800/api/products/${id}/stock`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}/stock`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
       });
@@ -136,7 +136,7 @@ export function ProductDetailPageComponent() {
   // Update product handler
   const handleUpdateProduct = useCallback(async () => {
     try {
-      const res = await fetch(`http://localhost:8800/api/products/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -160,7 +160,7 @@ export function ProductDetailPageComponent() {
   // Delete product handler
   const handleDeleteProduct = useCallback(async () => {
     try {
-      const res = await fetch(`http://localhost:8800/api/products/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

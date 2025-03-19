@@ -74,7 +74,7 @@ const PostCard = memo(function PostCard({
         <div className="flex-1">
           <CardHeader>
             <CardDescription>
-              <Link href={`/communities/${post.communityId}`} className="hover:underline">
+              <Link href={`/community/communities/${post.communityId}`} className="hover:underline">
                 {post.community?.name}
               </Link>
               {" • "}
@@ -138,7 +138,7 @@ export default function UserPosts() {
     async function fetchUserPosts() {
       if (!user) return;
       try {
-        const { data } = await axios.get<Post[]>(`http://localhost:8800/api/community-posts/user/${user.id}`, {
+        const { data } = await axios.get<Post[]>(`${process.env.NEXT_PUBLIC_API_URL}/community-posts/user/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
@@ -164,11 +164,11 @@ export default function UserPosts() {
           try {
             // Fetch likes and comments concurrently per post
             const [likesRes, commentsRes] = await Promise.all([
-              axios.get(`http://localhost:8800/api/community-posts/${post.id}/likes`, {
+              axios.get(`${process.env.NEXT_PUBLIC_API_URL}/community-posts/${post.id}/likes`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${token}` },
               }),
-              axios.get(`http://localhost:8800/api/community-comments/${post.id}/comments`, { withCredentials: true }),
+              axios.get(`${process.env.NEXT_PUBLIC_API_URL}/community-comments/${post.id}/comments`, { withCredentials: true }),
             ]);
             likeCountsTemp[post.id] = likesRes.data.length;
             likedStatusTemp[post.id] = likesRes.data.some((like: any) => like.userId === user?.id);
@@ -194,7 +194,7 @@ export default function UserPosts() {
   const handleLike = useCallback(async (postId: string) => {
     try {
       await axios.post(
-        `http://localhost:8800/api/community-posts/${postId}/like`,
+        `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}/like`,
         { userId: user?.id },
         { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
       );
@@ -211,7 +211,7 @@ export default function UserPosts() {
   const handleUnlike = useCallback(async (postId: string) => {
     try {
       await axios.post(
-        `http://localhost:8800/api/community-posts/${postId}/unlike`,
+        `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}/unlike`,
         { userId: user?.id },
         { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
       );

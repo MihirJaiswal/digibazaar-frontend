@@ -72,7 +72,7 @@ export default function WarehouseStock({ warehouseId }: Props) {
     async function fetchWarehouseStock() {
       try {
         console.log('this is our',token)
-        const response = await fetch(`http://localhost:8800/api/stock/warehouse/${warehouseId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stock/warehouse/${warehouseId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) throw new Error("Failed to fetch warehouse stock data");

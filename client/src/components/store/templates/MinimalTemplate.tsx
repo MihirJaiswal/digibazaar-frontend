@@ -245,7 +245,7 @@ function MinimalTemplateInternal({
     setError(null)
 
     try {
-      const paymentIntentRes = await fetch("http://localhost:8800/api/orders/payments/create-intent", {
+      const paymentIntentRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/payments/create-intent`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -313,7 +313,7 @@ function MinimalTemplateInternal({
         ],
       }
 
-      const orderRes = await fetch("http://localhost:8800/api/orders", {
+      const orderRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

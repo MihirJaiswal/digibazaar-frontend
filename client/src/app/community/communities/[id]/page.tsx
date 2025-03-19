@@ -45,12 +45,12 @@ export default function CommunityPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const communityResponse = await axios.get(`http://localhost:8800/api/communities/${id}`, {
+        const communityResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/communities/${id}`, {
           withCredentials: true,
         });
         setCommunity(communityResponse.data);
 
-        const postsResponse = await axios.get(`http://localhost:8800/api/community-posts/community/${id}`, {
+        const postsResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/community-posts/community/${id}`, {
           withCredentials: true,
         });
         setPosts(postsResponse.data);

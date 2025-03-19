@@ -41,7 +41,7 @@ export default function GigImageGallery({
       if (!token) return; // Skip if user is not authenticated
 
       try {
-        const res = await fetch("http://localhost:8800/api/gig-toggles-likes/gigs", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-toggles-likes/gigs`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -73,7 +73,7 @@ export default function GigImageGallery({
     }
 
     try {
-      const res = await fetch("http://localhost:8800/api/gig-toggles-likes", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-toggles-likes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -109,7 +109,7 @@ export default function CreateCommunityPost() {
       if (audioFile) formData.append("audio", audioFile);
 
       const response = await axios.post(
-        "http://localhost:8800/api/community-posts",
+        `${process.env.NEXT_PUBLIC_API_URL}/community-posts`,
         formData,
         {
           headers: {

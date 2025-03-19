@@ -67,7 +67,7 @@ export default function GigSidebar({ gig, isOwner }: GigSidebarProps) {
   const [orderData, setOrderData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isCancelling, setIsCancelling] = useState(false)
-  const baseApiUrl = "http://localhost:8800/api"
+  const baseApiUrl = `${process.env.NEXT_PUBLIC_API_URL}`
   const { token, user } = useAuthStore()
   
   // Updated form state based on new supplier listing fields

@@ -42,7 +42,7 @@ export default function BuilderPage() {
     }
     async function fetchStore() {
       try {
-        const response = await fetch(`http://localhost:8800/api/stores`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export default function BuilderPage() {
   useEffect(() => {
     async function fetchCustomization() {
       try {
-        const response = await fetch(`http://localhost:8800/api/stores/theme-customization/${store?.name}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores/theme-customization/${store?.name}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -98,7 +98,7 @@ export default function BuilderPage() {
     }
     async function fetchProducts() {
       try {
-        const response = await fetch("http://localhost:8800/api/products", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -123,7 +123,7 @@ export default function BuilderPage() {
   const handlePublish = async () => {
     setIsPublishing(true)
     try {
-      const response = await fetch("http://localhost:8800/api/stores", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

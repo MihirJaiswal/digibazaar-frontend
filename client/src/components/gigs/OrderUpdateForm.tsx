@@ -58,7 +58,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
   useEffect(() => {
     const fetchUpdates = async () => {
       try {
-        const res = await fetch(`http://localhost:8800/api/gig-order-updates/${orderId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-order-updates/${orderId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -85,7 +85,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
     setUpdateError("")
 
     try {
-      const res = await fetch(`http://localhost:8800/api/gig-order-updates/status/${orderId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-order-updates/status/${orderId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -128,7 +128,7 @@ export default function OrderUpdateForm({ orderId }: OrderUpdateFormProps) {
         requestBody.expectedDeliveryDate = expectedDeliveryDate
       }
 
-      const res = await fetch(`http://localhost:8800/api/gig-order-updates/${orderId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-order-updates/${orderId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

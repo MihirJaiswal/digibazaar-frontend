@@ -74,7 +74,7 @@ const PostCard: React.FC<PostCardProps> = React.memo(function PostCard({
   useEffect(() => {
     async function fetchCommunity() {
       try {
-        const res = await axios.get(`http://localhost:8800/api/communities/${post.communityId}`);
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/communities/${post.communityId}`);
         // Assuming the API returns an object with a "name" property
         setCommunityName(res.data.name);
       } catch (error) {
@@ -186,7 +186,7 @@ export default function Posts() {
     async function fetchPosts(): Promise<void> {
       try {
         const { data } = await axios.get<Post[]>(
-          "http://localhost:8800/api/community-posts"
+          `${process.env.NEXT_PUBLIC_API_URL}/community-posts`
         );
         console.log("Posts fetched:", data);
         setPosts(data);
@@ -213,7 +213,7 @@ export default function Posts() {
           // Fetch comment counts
           try {
             const res = await axios.get<any>(
-              `http://localhost:8800/api/community-comments/${post.id}/comments`
+              `${process.env.NEXT_PUBLIC_API_URL}/community-comments/${post.id}/comments`
             );
             console.log(`Comments for post ${post.id}:`, res.data);
             commentCountsTemp[post.id] = res.data.length;
@@ -225,7 +225,7 @@ export default function Posts() {
           // Fetch likes and liked status
           try {
             const res = await axios.get<Like[]>(
-              `http://localhost:8800/api/community-posts/${post.id}/likes`,
+              `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${post.id}/likes`,
               {
                 headers: { Authorization: `Bearer ${token}` },
               }
@@ -256,7 +256,7 @@ export default function Posts() {
     async (postId: string): Promise<void> => {
       try {
         await axios.post(
-          `http://localhost:8800/api/community-posts/${postId}/like`,
+          `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}/like`,
           { userId: user?.id },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -276,7 +276,7 @@ export default function Posts() {
     async (postId: string): Promise<void> => {
       try {
         await axios.post(
-          `http://localhost:8800/api/community-posts/${postId}/unlike`,
+          `${process.env.NEXT_PUBLIC_API_URL}/community-posts/${postId}/unlike`,
           { userId: user?.id },
           { headers: { Authorization: `Bearer ${token}` } }
         );

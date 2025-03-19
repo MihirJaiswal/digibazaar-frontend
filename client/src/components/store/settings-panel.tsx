@@ -241,7 +241,7 @@ export function SettingsPanel({
     try {
       // Determine whether to use POST or PUT based on existence of initialCustomization
       const method = initialCustomization ? "PUT" : "POST";
-      const url = "http://localhost:8800/api/stores/theme-customization";
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/stores/theme-customization`;
       
       // Build FormData payload
       const formPayload = new FormData();

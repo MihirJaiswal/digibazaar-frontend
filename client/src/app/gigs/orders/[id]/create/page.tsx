@@ -35,7 +35,7 @@ export default function SellerDeliveryUpload() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:8800/api/gig-deliveries/upload", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-deliveries/upload`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

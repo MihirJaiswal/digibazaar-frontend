@@ -48,7 +48,7 @@ interface OtherUser {
 export default function MergedChatsPage() {
   const { token, user } = useAuthStore()
   const router = useRouter()
-  const baseApiUrl = "http://localhost:8800/api"
+  const baseApiUrl = `${process.env.NEXT_PUBLIC_API_URL}` 
   const [isMobile, setIsMobile] = useState(false)
 
   // ---------------------------
@@ -248,7 +248,7 @@ export default function MergedChatsPage() {
   useEffect(() => {
     if (!selectedConversationId) return
     if (!socketRef.current) {
-      socketRef.current = io("http://localhost:8800", { transports: ["websocket"] })
+      socketRef.current = io(`${process.env.NEXT_PUBLIC_URL}`, { transports: ["websocket"] })
     }
     socketRef.current.emit("joinRoom", selectedConversationId)
     socketRef.current.on("messageReceived", (message) => {

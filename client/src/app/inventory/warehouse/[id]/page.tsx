@@ -117,10 +117,10 @@ const WarehouseDetailsPage = () => {
       try {
         // Make API calls in parallel
         const [warehouseRes, stockRes] = await Promise.all([
-          fetch(`http://localhost:8800/api/warehouses/${id}`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses/${id}`, {
             headers: { "Authorization": `Bearer ${token}` },
           }),
-          fetch(`http://localhost:8800/api/warehouses/${id}/stock`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses/${id}/stock`, {
             headers: { "Authorization": `Bearer ${token}` },
           })
         ]);
@@ -157,7 +157,7 @@ const WarehouseDetailsPage = () => {
   useEffect(() => {
     const fetchWarehouseStock = async () => {
       try {
-        const res = await fetch(`http://localhost:8800/api/warehouses/${id}/stock`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses/${id}/stock`, {
           headers: {
             "Authorization": `Bearer ${token}`
           }
@@ -174,7 +174,7 @@ const WarehouseDetailsPage = () => {
   // Delete warehouse
   const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:8800/api/warehouses/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`
@@ -199,7 +199,7 @@ const WarehouseDetailsPage = () => {
   const handleUpdateSubmit = async (e: FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch(`http://localhost:8800/api/warehouses/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -225,7 +225,7 @@ const WarehouseDetailsPage = () => {
   // Submit assign product location
   const handleAssignLocation = async () => {
     try {
-      const res = await fetch("http://localhost:8800/api/warehouses/assign-location", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses/assign-location`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -242,7 +242,7 @@ const WarehouseDetailsPage = () => {
       toast.success("Product location assigned successfully")
 
       // Refresh warehouse stock
-      const stockRes = await fetch(`http://localhost:8800/api/warehouses/${id}/stock`, {
+      const stockRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses/${id}/stock`, {
         headers: {
           "Authorization": `Bearer ${token}`
         }

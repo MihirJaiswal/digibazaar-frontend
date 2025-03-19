@@ -38,7 +38,7 @@ export default function GigReviewForm({ gigId, onSubmit, onCancel }: GigReviewFo
 
   const fetchReviews = async () => {
     try {
-      const response = await fetch(`http://localhost:8800/api/gig-reviews/${gigId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-reviews/${gigId}`, {
         headers: {
           "Content-Type": "application/json",
         }
@@ -83,7 +83,7 @@ export default function GigReviewForm({ gigId, onSubmit, onCancel }: GigReviewFo
 
   const fetchStarCount = async () => {
     try {
-      const response = await fetch(`http://localhost:8800/api/gig-stars/count/${gigId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-stars/count/${gigId}`, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
@@ -109,7 +109,7 @@ export default function GigReviewForm({ gigId, onSubmit, onCancel }: GigReviewFo
 
     try {
       // 1. Submit the gig review using the POST endpoint
-      const reviewResponse = await fetch("http://localhost:8800/api/gig-reviews", {
+      const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -130,7 +130,7 @@ export default function GigReviewForm({ gigId, onSubmit, onCancel }: GigReviewFo
       const reviewData = await reviewResponse.json()
 
       // 2. Add the star rating via the gig-stars/add endpoint
-      const starResponse = await fetch("http://localhost:8800/api/gig-stars/add", {
+      const starResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-stars/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -191,7 +191,7 @@ export default function GigReviewForm({ gigId, onSubmit, onCancel }: GigReviewFo
   
     try {
       // 1. Update the review
-      const reviewResponse = await fetch(`http://localhost:8800/api/gig-reviews/${existingUserReview.id}`, {
+      const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-reviews/${existingUserReview.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -249,7 +249,7 @@ export default function GigReviewForm({ gigId, onSubmit, onCancel }: GigReviewFo
   
     try {
       // 1. Delete the review
-      const reviewResponse = await fetch(`http://localhost:8800/api/gig-reviews/${reviewId}`, {
+      const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-reviews/${reviewId}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -262,7 +262,7 @@ export default function GigReviewForm({ gigId, onSubmit, onCancel }: GigReviewFo
       }
       
       // 2. Remove the star
-      const starResponse = await fetch("http://localhost:8800/api/gig-stars/remove", {
+      const starResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/gig-stars/remove`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

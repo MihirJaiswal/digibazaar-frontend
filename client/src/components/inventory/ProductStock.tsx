@@ -51,7 +51,7 @@ export default function ProductStock({ productId }: Props) {
     async function fetchStock() {
         try {
           console.log('ye hai ', token)
-        const response = await fetch(`http://localhost:8800/api/stock/product/${productId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stock/product/${productId}`, {
           headers: {
             "Authorization": `Bearer ${token}`
           }

@@ -191,7 +191,7 @@ export default function AssignInventoryPage() {
     const fetchOrderDetails = async () => {
       setLoading(true)
       try {
-        const res = await fetch(`http://localhost:8800/api/orders/${orderId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -200,7 +200,7 @@ export default function AssignInventoryPage() {
 
         // Fetch product details for each item
         const productPromises = orderData.items.map(async (item) => {
-          const productRes = await fetch(`http://localhost:8800/api/products/${item.productId}`, {
+          const productRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${item.productId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -226,7 +226,7 @@ export default function AssignInventoryPage() {
   useEffect(() => {
     const fetchWarehouses = async () => {
       try {
-        const res = await fetch("http://localhost:8800/api/warehouses", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -273,7 +273,7 @@ export default function AssignInventoryPage() {
 
       for (const warehouse of warehouses) {
         try {
-          const res = await fetch(`http://localhost:8800/api/warehouses/${warehouse.id}/stock`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses/${warehouse.id}/stock`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -303,7 +303,7 @@ export default function AssignInventoryPage() {
     setLoading(true)
 
     try {
-      const res = await fetch(`http://localhost:8800/api/warehouses/${warehouseId}/stock`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/warehouses/${warehouseId}/stock`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -348,7 +348,7 @@ export default function AssignInventoryPage() {
     setIsProcessing(true)
 
     try {
-      const res = await fetch(`http://localhost:8800/api/orders/${orderId}/assign-stock`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/assign-stock`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -32,7 +32,7 @@ export function ThemeSelector({ initialTheme, storeId, token, onThemeUpdate }: T
     setSelectedTheme(theme);
     try {
       // Update the theme customization record for the store.
-      const response = await fetch("http://localhost:8800/api/stores", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stores`, {
         method: "PUT", // Assume an update; use POST if creating a new record
         headers: {
           "Content-Type": "application/json",

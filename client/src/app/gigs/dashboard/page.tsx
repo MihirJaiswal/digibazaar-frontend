@@ -75,7 +75,7 @@ export default function OrdersDashboard() {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const endpoint = `http://localhost:8800/api/gig-orders/seller/${user.id}`;
+        const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/gig-orders/seller/${user.id}`;
         const res = await fetch(endpoint, {
           headers: {
             "Content-Type": "application/json",

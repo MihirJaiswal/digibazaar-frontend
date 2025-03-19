@@ -75,7 +75,7 @@ export default function UserOrders() {
 
     const fetchOrders = async () => {
       try {
-        const response = await fetch("http://localhost:8800/api/orders/user/orders", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/user/orders`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
